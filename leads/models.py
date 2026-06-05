@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import CustomUser
+from core.models import Company, Branch
 
 
 class LeadSource(models.Model):
@@ -28,8 +29,26 @@ class Lead(models.Model):
         ('lost', 'Lost'),
     ]
 
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100, blank=True)
+
+    last_name = models.CharField(
+        max_length=100,
+        blank=True
+    )
 
     phone = models.CharField(
         max_length=20,

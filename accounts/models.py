@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from core.models import Company, Branch
 
 
 class Role(models.Model):
@@ -17,8 +18,32 @@ class Department(models.Model):
 
 
 class CustomUser(AbstractUser):
-    phone = models.CharField(max_length=20, blank=True)
-    employee_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
+    phone = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    employee_id = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True
+    )
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     role = models.ForeignKey(
         Role,
@@ -44,7 +69,10 @@ class StaffProfile(models.Model):
         on_delete=models.CASCADE
     )
 
-    joining_date = models.DateField(null=True, blank=True)
+    joining_date = models.DateField(
+        null=True,
+        blank=True
+    )
 
     date_of_birth = models.DateField(
         null=True,
