@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'leads',
     'core',
     'admissions',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
