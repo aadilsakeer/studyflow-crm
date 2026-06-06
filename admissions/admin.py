@@ -7,6 +7,7 @@ from .models import (
     VisaCase,
     University,
     Course,
+    OfferLetter,
 )
 
 
@@ -129,4 +130,22 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = (
         'level',
         'university'
+    )
+
+@admin.register(OfferLetter)
+class OfferLetterAdmin(admin.ModelAdmin):
+    list_display = (
+        'offer_number',
+        'application',
+        'status',
+        'issue_date',
+        'acceptance_deadline'
+    )
+
+    search_fields = (
+        'offer_number',
+    )
+
+    list_filter = (
+        'status',
     )

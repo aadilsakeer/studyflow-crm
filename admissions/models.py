@@ -270,3 +270,49 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+class OfferLetter(models.Model):
+
+    STATUS_CHOICES = [
+        ('conditional', 'Conditional'),
+        ('unconditional', 'Unconditional'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE
+    )
+
+    offer_number = models.CharField(
+        max_length=100,
+        unique=True
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='conditional'
+    )
+
+    issue_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    acceptance_deadline = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    notes = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.offer_number
