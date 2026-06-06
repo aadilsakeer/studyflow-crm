@@ -213,3 +213,60 @@ class VisaCase(models.Model):
 
     def __str__(self):
         return f"Visa - {self.application}"
+    
+class University(models.Model):
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    country = models.CharField(
+        max_length=100
+    )
+
+    city = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    website = models.URLField(
+        blank=True
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Course(models.Model):
+
+    university = models.ForeignKey(
+        University,
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    level = models.CharField(
+        max_length=100
+    )
+
+    duration = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    tuition_fee = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.name

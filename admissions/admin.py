@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import Student, Application
-from .models import Student, Application, Document
-from .models import Student, Application, Document, VisaCase
+
+from .models import (
+    Student,
+    Application,
+    Document,
+    VisaCase,
+    University,
+    Course,
+)
 
 
 @admin.register(Student)
@@ -48,6 +54,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         'intake'
     )
 
+
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     list_display = (
@@ -65,6 +72,7 @@ class DocumentAdmin(admin.ModelAdmin):
         'status',
     )
 
+
 @admin.register(VisaCase)
 class VisaCaseAdmin(admin.ModelAdmin):
     list_display = (
@@ -80,4 +88,45 @@ class VisaCaseAdmin(admin.ModelAdmin):
 
     list_filter = (
         'status',
+    )
+
+
+@admin.register(University)
+class UniversityAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'country',
+        'city',
+        'is_active'
+    )
+
+    search_fields = (
+        'name',
+        'country',
+        'city'
+    )
+
+    list_filter = (
+        'country',
+        'is_active'
+    )
+
+
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'university',
+        'level',
+        'tuition_fee'
+    )
+
+    search_fields = (
+        'name',
+        'university__name'
+    )
+
+    list_filter = (
+        'level',
+        'university'
     )
