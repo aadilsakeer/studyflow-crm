@@ -190,6 +190,10 @@ class LeadTimeline(models.Model):
         max_length=255
     )
 
+    description = models.TextField(
+        blank=True
+    )
+
     performed_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -202,7 +206,6 @@ class LeadTimeline(models.Model):
 
     def __str__(self):
         return self.action
-
 
 class LeadAuditLog(models.Model):
     lead = models.ForeignKey(
