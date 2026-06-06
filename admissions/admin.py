@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Student, Application
 from .models import Student, Application, Document
+from .models import Student, Application, Document, VisaCase
 
 
 @admin.register(Student)
@@ -58,6 +59,23 @@ class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = (
         'document_name',
+    )
+
+    list_filter = (
+        'status',
+    )
+
+@admin.register(VisaCase)
+class VisaCaseAdmin(admin.ModelAdmin):
+    list_display = (
+        'application',
+        'status',
+        'submission_date',
+        'decision_date'
+    )
+
+    search_fields = (
+        'application__university_name',
     )
 
     list_filter = (

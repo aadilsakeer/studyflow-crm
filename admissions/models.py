@@ -166,3 +166,50 @@ class Document(models.Model):
 
     def __str__(self):
         return self.document_name
+class VisaCase(models.Model):
+
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('preparing', 'Preparing'),
+        ('submitted', 'Submitted'),
+        ('biometrics_completed', 'Biometrics Completed'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    application = models.OneToOneField(
+        Application,
+        on_delete=models.CASCADE
+    )
+
+    submission_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    biometrics_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    decision_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='not_started'
+    )
+
+    remarks = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"Visa - {self.application}"
