@@ -7,9 +7,9 @@ from .models import (
     CallLog,
     FollowUp,
     LeadTimeline,
-    LeadAuditLog
+    LeadAuditLog,
+    LeadImportLog,
 )
-
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
@@ -43,3 +43,4 @@ admin.site.register(CallLog)
 admin.site.register(FollowUp)
 admin.site.register(LeadTimeline)
 admin.site.register(LeadAuditLog)
+admin.site.register(LeadImportLog)  

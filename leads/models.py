@@ -239,3 +239,38 @@ class LeadAuditLog(models.Model):
 
     def __str__(self):
         return self.field_changed
+    
+class LeadImportLog(models.Model):
+
+    file_name = models.CharField(
+        max_length=255
+    )
+
+    imported_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    total_records = models.IntegerField(
+        default=0
+    )
+
+    imported_records = models.IntegerField(
+        default=0
+    )
+
+    duplicate_records = models.IntegerField(
+        default=0
+    )
+
+    failed_records = models.IntegerField(
+        default=0
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.file_name
