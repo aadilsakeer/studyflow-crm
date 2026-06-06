@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Student, Application
+from .models import Student, Application, Document
 
 
 @admin.register(Student)
@@ -44,4 +45,21 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_filter = (
         'application_status',
         'intake'
+    )
+
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = (
+        'document_name',
+        'application',
+        'status',
+        'uploaded_at'
+    )
+
+    search_fields = (
+        'document_name',
+    )
+
+    list_filter = (
+        'status',
     )

@@ -131,3 +131,38 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student.student_id} - {self.university_name}"
+    
+class Document(models.Model):
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('received', 'Received'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    ]
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE
+    )
+
+    document_name = models.CharField(
+        max_length=255
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    remarks = models.TextField(
+        blank=True
+    )
+
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.document_name
