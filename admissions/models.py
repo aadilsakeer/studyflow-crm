@@ -86,3 +86,48 @@ class Student(models.Model):
 
     def __str__(self):
         return self.student_id
+
+class Application(models.Model):
+
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('offer_received', 'Offer Received'),
+        ('rejected', 'Rejected'),
+        ('visa_processing', 'Visa Processing'),
+        ('completed', 'Completed'),
+    ]
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE
+    )
+
+    university_name = models.CharField(
+        max_length=255
+    )
+
+    course_name = models.CharField(
+        max_length=255
+    )
+
+    intake = models.CharField(
+        max_length=100
+    )
+
+    application_status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='draft'
+    )
+
+    notes = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.student.student_id} - {self.university_name}"
