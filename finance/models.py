@@ -154,3 +154,86 @@ class Receipt(models.Model):
 
     def __str__(self):
         return self.receipt_number
+    
+class Refund(models.Model):
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('paid', 'Paid'),
+    ]
+
+    payment = models.ForeignKey(
+        Payment,
+        on_delete=models.CASCADE
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    reason = models.TextField()
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    refund_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"Refund - {self.payment}"
+
+
+class Expense(models.Model):
+
+    CATEGORY_CHOICES = [
+        ('rent', 'Rent'),
+        ('salary', 'Salary'),
+        ('marketing', 'Marketing'),
+        ('travel', 'Travel'),
+        ('utility', 'Utility'),
+        ('other', 'Other'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE
+    )
+
+    title = models.CharField(
+        max_length=255
+    )
+
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    expense_date = models.DateField()
+
+    remarks = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.title
