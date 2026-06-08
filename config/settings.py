@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'admissions',
     'finance',
     'hrm',
+    'knowledgebase',
 ]
 
 MIDDLEWARE = [
