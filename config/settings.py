@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'core',
     'leads',
     'admissions',
+    'finance',
 ]
 
 MIDDLEWARE = [
