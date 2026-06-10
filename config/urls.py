@@ -33,4 +33,16 @@ urlpatterns = [
         'api/',
         include('admissions.api_urls')
     ),
+    path(
+         'api/reports/',
+        include('reports.api_urls')
+    ),
+    path(
+         'api/dashboard/',
+         include('core.api_urls')
+        ),
+    path(
+    'api/partners/',
+    include('partners.api_urls')
+),
 ]

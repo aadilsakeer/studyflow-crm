@@ -3,7 +3,10 @@ from django.conf import settings
 
 
 class Company(models.Model):
-    name = models.CharField(max_length=255)
+
+    name = models.CharField(
+        max_length=255
+    )
 
     email = models.EmailField(
         blank=True,
@@ -38,6 +41,7 @@ class Company(models.Model):
 
 
 class Branch(models.Model):
+
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE
@@ -68,6 +72,7 @@ class Branch(models.Model):
     def __str__(self):
         return f"{self.company.name} - {self.name}"
 
+
 class Task(models.Model):
 
     STATUS_CHOICES = [
@@ -83,6 +88,13 @@ class Task(models.Model):
         ('high', 'High'),
         ('urgent', 'Urgent'),
     ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     title = models.CharField(
         max_length=255

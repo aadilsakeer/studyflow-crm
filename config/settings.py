@@ -42,6 +42,17 @@ INSTALLED_APPS = [
     'finance',
     'hrm',
     'knowledgebase',
+    'recruitment',
+    'workvisa',
+    'checklist',
+    'deadlines',
+    'notifications',
+    'reports',
+    'licensing',
+    'auditlogs',
+    'activity',
+    'partners',
+    'agents',
 ]
 
 MIDDLEWARE = [
