@@ -10,6 +10,10 @@ def module_required(module_code):
 
         def wrapped(view, request, *args, **kwargs):
 
+            print("USER:", request.user)
+            print("AUTH:", request.user.is_authenticated)
+            print("COMPANY:", getattr(request.user, "company", None))
+
             company = getattr(
                 request.user,
                 'company',
@@ -17,7 +21,6 @@ def module_required(module_code):
             )
 
             if not company:
-
                 return Response(
                     {
                         "detail": "Company not found."
@@ -29,7 +32,6 @@ def module_required(module_code):
                 company,
                 module_code
             ):
-
                 return Response(
                     {
                         "detail": (

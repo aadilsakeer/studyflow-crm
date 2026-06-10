@@ -45,4 +45,12 @@ urlpatterns = [
     'api/partners/',
     include('partners.api_urls')
 ),
+path(
+    'api/agents/',
+    include('agents.api_urls')
+),
+path(
+    'api-auth/',
+    include('rest_framework.urls')
+),
 ]
