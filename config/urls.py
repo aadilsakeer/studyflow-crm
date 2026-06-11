@@ -53,4 +53,8 @@ path(
     'api-auth/',
     include('rest_framework.urls')
 ),
+path(
+    'api/recruitment/',
+    include('recruitment.api_urls')
+),
 ]
