@@ -27,20 +27,15 @@ class EmployerListCreateAPIView(
 
     serializer_class = EmployerSerializer
 
-def get_queryset(self):
+    def get_queryset(self):
+        return Employer.objects.filter(
+            company=self.request.user.company
+        )
 
-    return Employer.objects.filter(
-        company=self.request.user.company
-    )
-
-def perform_create(
-    self,
-    serializer
-):
-
-    serializer.save(
-        company=self.request.user.company
-    )
+    def perform_create(self, serializer):
+        serializer.save(
+            company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -57,11 +52,10 @@ class EmployerDetailAPIView(
 
     serializer_class = EmployerSerializer
 
-def get_queryset(self):
-
-    return Employer.objects.filter(
-        company=self.request.user.company
-    )
+    def get_queryset(self):
+        return Employer.objects.filter(
+            company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -88,11 +82,11 @@ class JobOpeningListCreateAPIView(
 
     serializer_class = JobOpeningSerializer
 
-def get_queryset(self):
+    def get_queryset(self):
+        return JobOpening.objects.filter(
+            employer__company=self.request.user.company
+        )
 
-    return JobOpening.objects.filter(
-        employer__company=self.request.user.company
-    )
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -108,11 +102,10 @@ class JobOpeningDetailAPIView(
 
     serializer_class = JobOpeningSerializer
 
-def get_queryset(self):
-
-    return JobOpening.objects.filter(
-        employer__company=self.request.user.company
-    )
+    def get_queryset(self):
+        return JobOpening.objects.filter(
+            employer__company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -140,16 +133,11 @@ class CandidateListCreateAPIView(
     serializer_class = CandidateSerializer
 
     def get_queryset(self):
-
         return Candidate.objects.filter(
             company=self.request.user.company
         )
 
-    def perform_create(
-        self,
-        serializer
-    ):
-
+    def perform_create(self, serializer):
         serializer.save(
             company=self.request.user.company
         )
@@ -170,7 +158,6 @@ class CandidateDetailAPIView(
     serializer_class = CandidateSerializer
 
     def get_queryset(self):
-
         return Candidate.objects.filter(
             company=self.request.user.company
         )
@@ -190,6 +177,8 @@ class CandidateDetailAPIView(
     @module_required('recruitment')
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
 # Interview
 
 class InterviewListCreateAPIView(
@@ -198,11 +187,10 @@ class InterviewListCreateAPIView(
 
     serializer_class = InterviewSerializer
 
-def get_queryset(self):
-
-    return Interview.objects.filter(
-        candidate__company=self.request.user.company
-    )
+    def get_queryset(self):
+        return Interview.objects.filter(
+            candidate__company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -217,13 +205,12 @@ class InterviewDetailAPIView(
     generics.RetrieveUpdateDestroyAPIView
 ):
 
-   serializer_class = InterviewSerializer
+    serializer_class = InterviewSerializer
 
-def get_queryset(self):
-
-    return Interview.objects.filter(
-        candidate__company=self.request.user.company
-    )
+    def get_queryset(self):
+        return Interview.objects.filter(
+            candidate__company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -250,11 +237,10 @@ class DeploymentListCreateAPIView(
 
     serializer_class = DeploymentSerializer
 
-def get_queryset(self):
-
-    return Deployment.objects.filter(
-        candidate__company=self.request.user.company
-    )
+    def get_queryset(self):
+        return Deployment.objects.filter(
+            candidate__company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -271,11 +257,10 @@ class DeploymentDetailAPIView(
 
     serializer_class = DeploymentSerializer
 
-def get_queryset(self):
-
-    return Deployment.objects.filter(
-        candidate__company=self.request.user.company
-    )
+    def get_queryset(self):
+        return Deployment.objects.filter(
+            candidate__company=self.request.user.company
+        )
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
