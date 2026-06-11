@@ -57,4 +57,8 @@ path(
     'api/recruitment/',
     include('recruitment.api_urls')
 ),
+path(
+    'api/workvisa/',
+    include('workvisa.api_urls')
+),
 ]
