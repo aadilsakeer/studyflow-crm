@@ -69,4 +69,8 @@ path(
     'api/finance/',
     include('finance.api_urls')
 ),
+path(
+    'api/hrm/',
+    include('hrm.api_urls')
+),
 ]

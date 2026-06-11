@@ -149,3 +149,73 @@ class Resignation(models.Model):
 
     def __str__(self):
         return f"{self.employee} Resignation"
+    
+class Department(models.Model):
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(
+        max_length=100
+    )
+
+    description = models.TextField(
+        blank=True
+    )
+
+    def __str__(self):
+        return self.name
+    
+class Payroll(models.Model):
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE
+    )
+
+    employee = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE
+    )
+
+    month = models.CharField(
+        max_length=20
+    )
+
+    year = models.PositiveIntegerField()
+
+    basic_salary = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    deductions = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    net_salary = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.employee} - {self.month} {self.year}"
