@@ -65,4 +65,8 @@ path(
     'api/auditlogs/',
     include('auditlogs.api_urls')
 ),
+path(
+    'api/finance/',
+    include('finance.api_urls')
+),
 ]
