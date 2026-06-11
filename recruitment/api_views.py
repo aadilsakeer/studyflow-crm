@@ -66,6 +66,38 @@ class EmployerDetailAPIView(
             company=self.request.user.company
         )
 
+    def perform_update(self, serializer):
+
+        employer = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='update',
+            object_id=employer.id,
+            description=(
+                f'Updated employer '
+                f'{employer.name}'
+            )
+        )
+
+    def perform_destroy(self, instance):
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='delete',
+            object_id=instance.id,
+            description=(
+                f'Deleted employer '
+                f'{instance.name}'
+            )
+        )
+
+        instance.delete()
+
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -82,9 +114,7 @@ class EmployerDetailAPIView(
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
-
 # Job Opening
-
 class JobOpeningListCreateAPIView(
     generics.ListCreateAPIView
 ):
@@ -94,6 +124,22 @@ class JobOpeningListCreateAPIView(
     def get_queryset(self):
         return JobOpening.objects.filter(
             employer__company=self.request.user.company
+        )
+
+    def perform_create(self, serializer):
+
+        job = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='create',
+            object_id=job.id,
+            description=(
+                f'Created job opening '
+                f'{job.title}'
+            )
         )
 
     @module_required('recruitment')
@@ -116,6 +162,38 @@ class JobOpeningDetailAPIView(
             employer__company=self.request.user.company
         )
 
+    def perform_update(self, serializer):
+
+        job = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='update',
+            object_id=job.id,
+            description=(
+                f'Updated job opening '
+                f'{job.title}'
+            )
+        )
+
+    def perform_destroy(self, instance):
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='delete',
+            object_id=instance.id,
+            description=(
+                f'Deleted job opening '
+                f'{instance.title}'
+            )
+        )
+
+        instance.delete()
+
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -131,8 +209,6 @@ class JobOpeningDetailAPIView(
     @module_required('recruitment')
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
-
-
 # Candidate
 
 class CandidateListCreateAPIView(
@@ -233,7 +309,6 @@ class CandidateDetailAPIView(
         return self.destroy(request, *args, **kwargs)
 
 # Interview
-
 class InterviewListCreateAPIView(
     generics.ListCreateAPIView
 ):
@@ -245,6 +320,22 @@ class InterviewListCreateAPIView(
             candidate__company=self.request.user.company
         )
 
+    def perform_create(self, serializer):
+
+        interview = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='create',
+            object_id=interview.id,
+            description=(
+                f'Created interview for '
+                f'{interview.candidate.full_name}'
+            )
+        )
+
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -252,8 +343,7 @@ class InterviewListCreateAPIView(
     @module_required('recruitment')
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
-
-
+    
 class InterviewDetailAPIView(
     generics.RetrieveUpdateDestroyAPIView
 ):
@@ -264,6 +354,38 @@ class InterviewDetailAPIView(
         return Interview.objects.filter(
             candidate__company=self.request.user.company
         )
+
+    def perform_update(self, serializer):
+
+        interview = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='update',
+            object_id=interview.id,
+            description=(
+                f'Updated interview for '
+                f'{interview.candidate.full_name}'
+            )
+        )
+
+    def perform_destroy(self, instance):
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='delete',
+            object_id=instance.id,
+            description=(
+                f'Deleted interview for '
+                f'{instance.candidate.full_name}'
+            )
+        )
+
+        instance.delete()
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
@@ -281,7 +403,6 @@ class InterviewDetailAPIView(
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
-
 # Deployment
 
 class DeploymentListCreateAPIView(
@@ -293,6 +414,22 @@ class DeploymentListCreateAPIView(
     def get_queryset(self):
         return Deployment.objects.filter(
             candidate__company=self.request.user.company
+        )
+
+    def perform_create(self, serializer):
+
+        deployment = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='create',
+            object_id=deployment.id,
+            description=(
+                f'Deployed candidate '
+                f'{deployment.candidate.full_name}'
+            )
         )
 
     @module_required('recruitment')
@@ -314,6 +451,38 @@ class DeploymentDetailAPIView(
         return Deployment.objects.filter(
             candidate__company=self.request.user.company
         )
+
+    def perform_update(self, serializer):
+
+        deployment = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='update',
+            object_id=deployment.id,
+            description=(
+                f'Updated deployment for '
+                f'{deployment.candidate.full_name}'
+            )
+        )
+
+    def perform_destroy(self, instance):
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='delete',
+            object_id=instance.id,
+            description=(
+                f'Deleted deployment for '
+                f'{instance.candidate.full_name}'
+            )
+        )
+
+        instance.delete()
 
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
