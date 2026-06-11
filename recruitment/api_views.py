@@ -1,6 +1,7 @@
 from rest_framework import generics
 
 from licensing.decorators import module_required
+from auditlogs.services import AuditLogService
 
 from .models import (
     Employer,
@@ -35,6 +36,14 @@ class EmployerListCreateAPIView(
     def perform_create(self, serializer):
         serializer.save(
             company=self.request.user.company
+        )
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='recruitment',
+            action='create',
+            object_id=serializer.instance.id,
+            description=f'Employer created: {serializer.instance.name}'
         )
 
     @module_required('recruitment')
@@ -138,8 +147,21 @@ class CandidateListCreateAPIView(
         )
 
     def perform_create(self, serializer):
-        serializer.save(
+
+        candidate = serializer.save(
             company=self.request.user.company
+        )
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='create',
+            object_id=candidate.id,
+            description=(
+                f'Created candidate '
+                f'{candidate.full_name}'
+            )
         )
 
     @module_required('recruitment')
@@ -162,6 +184,38 @@ class CandidateDetailAPIView(
             company=self.request.user.company
         )
 
+    def perform_update(self, serializer):
+
+        candidate = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='update',
+            object_id=candidate.id,
+            description=(
+                f'Updated candidate '
+                f'{candidate.full_name}'
+            )
+        )
+
+    def perform_destroy(self, instance):
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Recruitment',
+            action='delete',
+            object_id=instance.id,
+            description=(
+                f'Deleted candidate '
+                f'{instance.full_name}'
+            )
+        )
+
+        instance.delete()
+
     @module_required('recruitment')
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -177,7 +231,6 @@ class CandidateDetailAPIView(
     @module_required('recruitment')
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
-
 
 # Interview
 

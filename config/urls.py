@@ -61,4 +61,8 @@ path(
     'api/workvisa/',
     include('workvisa.api_urls')
 ),
+path(
+    'api/auditlogs/',
+    include('auditlogs.api_urls')
+),
 ]
