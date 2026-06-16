@@ -56,9 +56,11 @@ INSTALLED_APPS = [
     'dashboard',
     'clientportal',
     'whatsapp',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -170,3 +172,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 LOGIN_REDIRECT_URL = "/api/agents/"
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
