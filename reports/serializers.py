@@ -1,7 +1,32 @@
 from rest_framework import serializers
 
+from .models import (
+    Report,
+    ReportSchedule
+)
 
-class ReportSummarySerializer(serializers.Serializer):
+
+class ReportSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+        model = Report
+        fields = '__all__'
+
+
+class ReportScheduleSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+        model = ReportSchedule
+        fields = '__all__'
+
+
+class ReportSummarySerializer(
+    serializers.Serializer
+):
 
     total_leads = serializers.IntegerField()
 

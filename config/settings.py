@@ -16,10 +16,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_7j8p$h@(*f-0(4msa#!l9%+9#t_qwrfy+lg4%o5lx(%@nz7&#'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -53,6 +53,9 @@ INSTALLED_APPS = [
     'activity',
     'partners',
     'agents',
+    'dashboard',
+    'clientportal',
+    'whatsapp',
 ]
 
 MIDDLEWARE = [
@@ -148,6 +151,16 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '1000/day',
+        'anon': '100/day',
+    }
 }
 
 # JWT Configuration

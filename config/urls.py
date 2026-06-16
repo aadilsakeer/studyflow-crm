@@ -73,4 +73,16 @@ path(
     'api/hrm/',
     include('hrm.api_urls')
 ),
+path(
+    'api/dashboard/',
+    include('dashboard.api_urls')
+),
+path(
+    'api/clientportal/',
+    include('clientportal.api_urls')
+),
+path(
+    'api/whatsapp/',
+    include('whatsapp.api_urls')
+),
 ]
