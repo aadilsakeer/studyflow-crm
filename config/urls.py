@@ -85,4 +85,10 @@ path(
     'api/whatsapp/',
     include('whatsapp.api_urls')
 ),
+path(
+    "api/followups/",
+    include(
+        "followups.api_urls"
+    ),
+),
 ]
