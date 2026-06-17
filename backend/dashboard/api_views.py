@@ -24,7 +24,8 @@ class DashboardAPIView(APIView):
         company = get_user_company(request.user)
 
         data = DashboardService.get_dashboard_data(
-            company
+            company,
+            request.query_params.get('range', '30d'),
         )
 
         return Response(data)
