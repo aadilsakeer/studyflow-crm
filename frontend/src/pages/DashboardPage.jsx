@@ -1,6 +1,7 @@
 import DashboardCards from "../components/DashboardCards";
 import FollowUpWidgets from "../components/FollowUpWidgets";
-import DashboardChart from "../components/DashboardChart";
+import DashboardTrendCharts from "../components/DashboardTrendCharts";
+import DashboardRangeSelector from "../components/DashboardRangeSelector";
 import RecentActivities from "../components/RecentActivities";
 import LoadingState from "../components/LoadingState";
 
@@ -9,8 +10,12 @@ import { Box, Typography } from "@mui/material";
 import useDashboard from "../hooks/useDashboard";
 
 function DashboardPage() {
-    const { dashboard, loading } =
-        useDashboard();
+    const {
+        dashboard,
+        loading,
+        range,
+        setRange,
+    } = useDashboard();
 
     if (loading) {
         return (
@@ -37,6 +42,15 @@ function DashboardPage() {
                 </Typography>
             </Box>
 
+            <DashboardRangeSelector
+                value={range}
+                onChange={setRange}
+                label={
+                    dashboard?.range_label
+                    || "Time Range"
+                }
+            />
+
             <DashboardCards
                 dashboard={dashboard}
             />
@@ -57,9 +71,10 @@ function DashboardPage() {
                 }}
             >
                 <Box sx={{ flex: 2 }}>
-                    <DashboardChart
-                        trend={
-                            dashboard?.lead_trend
+                    <DashboardTrendCharts
+                        trends={dashboard?.trends}
+                        rangeLabel={
+                            dashboard?.range_label
                         }
                     />
                 </Box>

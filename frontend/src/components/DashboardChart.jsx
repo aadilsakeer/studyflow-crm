@@ -14,7 +14,15 @@ import {
     CartesianGrid,
 } from "recharts";
 
-function DashboardChart({ trend = [] }) {
+function DashboardChart({
+    title,
+    subtitle,
+    trend = [],
+    dataKey = "value",
+    seriesLabel = "Count",
+    color = "#2563EB",
+    valueFormatter,
+}) {
     const hasTrend = trend.length > 0;
 
     return (
@@ -26,7 +34,7 @@ function DashboardChart({ trend = [] }) {
                 border: "1px solid #E5E7EB",
                 backgroundColor: "#FFFFFF",
                 height: "100%",
-                minHeight: 420,
+                minHeight: 320,
             }}
         >
             <Typography
@@ -36,21 +44,23 @@ function DashboardChart({ trend = [] }) {
                     fontWeight: 600,
                 }}
             >
-                Lead Trend
+                {title}
             </Typography>
 
-            <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 3 }}
-            >
-                New leads over the last 6 months
-            </Typography>
+            {subtitle ? (
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 3 }}
+                >
+                    {subtitle}
+                </Typography>
+            ) : null}
 
             {!hasTrend ? (
                 <Box
                     sx={{
-                        height: 300,
+                        height: 240,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -59,15 +69,13 @@ function DashboardChart({ trend = [] }) {
                     <Typography
                         color="text.secondary"
                     >
-                        No lead data yet. Create
-                        your first lead to see
-                        trends.
+                        No data for this period.
                     </Typography>
                 </Box>
             ) : (
                 <ResponsiveContainer
                     width="100%"
-                    height={300}
+                    height={240}
                 >
                     <LineChart data={trend}>
                         <CartesianGrid
@@ -76,7 +84,7 @@ function DashboardChart({ trend = [] }) {
                         />
 
                         <XAxis
-                            dataKey="month"
+                            dataKey="label"
                             tick={{ fill: "#64748B" }}
                         />
 
@@ -87,19 +95,21 @@ function DashboardChart({ trend = [] }) {
 
                         <Tooltip
                             formatter={(value) => [
-                                value,
-                                "Leads",
+                                valueFormatter
+                                    ? valueFormatter(value)
+                                    : value,
+                                seriesLabel,
                             ]}
                         />
 
                         <Line
                             type="monotone"
-                            dataKey="leads"
-                            stroke="#2563EB"
+                            dataKey={dataKey}
+                            stroke={color}
                             strokeWidth={3}
                             dot={{
                                 r: 4,
-                                fill: "#2563EB",
+                                fill: color,
                             }}
                             activeDot={{ r: 6 }}
                         />

@@ -2,29 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import api from "../services/api";
 import { showError } from "../utils/toast";
 import { formatApiError } from "../services/leads";
-
-function buildEmptyTrend() {
-    const trend = [];
-    const today = new Date();
-
-    for (let i = 5; i >= 0; i -= 1) {
-        const date = new Date(
-            today.getFullYear(),
-            today.getMonth() - i,
-            1,
-        );
-
-        trend.push({
-            month: date.toLocaleString(
-                "en-US",
-                { month: "short" },
-            ),
-            leads: 0,
-        });
-    }
-
-    return trend;
-}
+import {
+    DASHBOARD_RANGE_KEY,
+    DEFAULT_DASHBOARD_RANGE,
+} from "../utils/dashboardRanges";
 
 const EMPTY_DASHBOARD = {
     total_leads: 0,
@@ -34,38 +15,56 @@ const EMPTY_DASHBOARD = {
     todays_follow_ups: 0,
     pending_follow_ups: 0,
     completed_today: 0,
-    lead_trend: buildEmptyTrend(),
+    kpis: {},
+    trends: {},
+    lead_trend: [],
     recent_activities: [],
+    range: DEFAULT_DASHBOARD_RANGE,
+    range_label: "Last 30 Days",
 };
 
+function readStoredRange() {
+    const stored = localStorage.getItem(
+        DASHBOARD_RANGE_KEY,
+    );
+
+    return stored || DEFAULT_DASHBOARD_RANGE;
+}
+
 function useDashboard() {
+    const [range, setRange] = useState(
+        readStoredRange,
+    );
     const [dashboard, setDashboard] = useState(
-        EMPTY_DASHBOARD
+        EMPTY_DASHBOARD,
     );
     const [loading, setLoading] = useState(true);
     const errorShown = useRef(false);
 
     useEffect(() => {
-        loadDashboard();
+        loadDashboard(range);
 
         return () => {
             errorShown.current = false;
         };
-    }, []);
+    }, [range]);
 
-    async function loadDashboard() {
+    async function loadDashboard(selectedRange) {
+        setLoading(true);
+
         try {
             const response = await api.get(
-                "/dashboard/"
+                "/dashboard/",
+                {
+                    params: {
+                        range: selectedRange,
+                    },
+                },
             );
 
             setDashboard({
                 ...EMPTY_DASHBOARD,
                 ...response.data,
-                lead_trend:
-                    response.data.lead_trend?.length
-                        ? response.data.lead_trend
-                        : buildEmptyTrend(),
                 recent_activities:
                     response.data.recent_activities
                     ?? [],
@@ -73,7 +72,7 @@ function useDashboard() {
         } catch (error) {
             console.error(
                 "Error loading dashboard:",
-                error
+                error,
             );
 
             setDashboard(EMPTY_DASHBOARD);
@@ -82,7 +81,7 @@ function useDashboard() {
                 errorShown.current = true;
                 showError(
                     formatApiError(error)
-                    || "Failed to load dashboard"
+                    || "Failed to load dashboard",
                 );
             }
         } finally {
@@ -90,9 +89,19 @@ function useDashboard() {
         }
     }
 
+    function updateRange(nextRange) {
+        localStorage.setItem(
+            DASHBOARD_RANGE_KEY,
+            nextRange,
+        );
+        setRange(nextRange);
+    }
+
     return {
         dashboard,
         loading,
+        range,
+        setRange: updateRange,
     };
 }
 
