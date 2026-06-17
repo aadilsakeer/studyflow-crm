@@ -57,6 +57,16 @@ class HasAnyPermission(BasePermission):
         return user_has_any_permission(user, self.codes)
 
 
+def permission_required(code):
+    """Return a permission class for DRF permission_classes."""
+
+    class _Permission(HasPermission):
+        def __init__(self):
+            super().__init__(code)
+
+    return _Permission
+
+
 class ActionPermissionMixin:
     permission_map = {}
 

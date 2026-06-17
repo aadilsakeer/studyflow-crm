@@ -18,7 +18,7 @@ from accounts.access import filter_leads_for_user
 from accounts.constants import PERM_LEADS_CONVERT
 from accounts.permissions import (
     IsCompanyMember,
-    HasPermission,
+    permission_required,
     ActionPermissionMixin,
     crm_permission_map,
 )
@@ -218,7 +218,7 @@ class LeadConvertAPIView(
     permission_classes = [
         IsAuthenticated,
         IsCompanyMember,
-        HasPermission(PERM_LEADS_CONVERT),
+        permission_required(PERM_LEADS_CONVERT),
     ]
 
     def post(self, request, pk):

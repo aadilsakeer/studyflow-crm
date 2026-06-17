@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.constants import PERM_DASHBOARD_VIEW
 from accounts.permissions import (
     IsCompanyMember,
-    HasPermission,
+    permission_required,
 )
 
 from core.mixins import get_user_company
@@ -17,7 +17,7 @@ class DashboardAPIView(APIView):
     permission_classes = [
         IsAuthenticated,
         IsCompanyMember,
-        HasPermission(PERM_DASHBOARD_VIEW),
+        permission_required(PERM_DASHBOARD_VIEW),
     ]
 
     def get(self, request):
