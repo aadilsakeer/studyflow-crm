@@ -3,6 +3,7 @@ import { getFollowUps, updateFollowUp } from "../services/followups";
 
 function useFollowUps(filters = {}) {
     const [followUps, setFollowUps] = useState([]);
+    const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
     const loadFollowUps = useCallback(async () => {
@@ -23,8 +24,19 @@ function useFollowUps(filters = {}) {
                 params.lead = filters.lead;
             }
 
+            if (filters.page) {
+                params.page = filters.page;
+            }
+
             const data = await getFollowUps(params);
-            setFollowUps(data);
+
+            if (data.results) {
+                setFollowUps(data.results);
+                setCount(data.count);
+            } else {
+                setFollowUps(data);
+                setCount(data.length);
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -34,6 +46,7 @@ function useFollowUps(filters = {}) {
         filters.completed,
         filters.date,
         filters.lead,
+        filters.page,
     ]);
 
     useEffect(() => {
@@ -49,6 +62,7 @@ function useFollowUps(filters = {}) {
 
     return {
         followUps,
+        count,
         loading,
         reload: loadFollowUps,
         toggleComplete,

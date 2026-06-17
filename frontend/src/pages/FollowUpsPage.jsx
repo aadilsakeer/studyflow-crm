@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 
 import {
     Paper,
@@ -14,6 +15,7 @@ import {
     Checkbox,
     ToggleButton,
     ToggleButtonGroup,
+    TablePagination,
 } from "@mui/material";
 
 import useFollowUps from "../hooks/useFollowUps";
@@ -42,17 +44,24 @@ function FollowUpsPage() {
         },
     }[filter] || { completed: "false" };
 
+    const [page, setPage] = useState(0);
+
     const {
         followUps,
+        count,
         loading,
         toggleComplete,
-    } = useFollowUps(filters);
+    } = useFollowUps({
+        ...filters,
+        page: page + 1,
+    });
 
     function handleFilterChange(
         _event,
         value
     ) {
         if (value) {
+            setPage(0);
             setSearchParams({ filter: value });
         }
     }
@@ -204,6 +213,17 @@ function FollowUpsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <TablePagination
+                component="div"
+                count={count}
+                page={page}
+                onPageChange={(_e, newPage) =>
+                    setPage(newPage)
+                }
+                rowsPerPage={20}
+                rowsPerPageOptions={[20]}
+            />
         </Paper>
     );
 }

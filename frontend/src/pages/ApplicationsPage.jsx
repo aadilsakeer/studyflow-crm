@@ -19,6 +19,7 @@ import {
     Box,
     TextField,
     MenuItem,
+    TablePagination,
 } from "@mui/material";
 
 const STATUS_OPTIONS = [
@@ -57,14 +58,17 @@ function ApplicationsPage() {
         useState(null);
     const [drawerOpen, setDrawerOpen] =
         useState(false);
+    const [page, setPage] = useState(0);
 
     const {
         applications,
+        count,
         loading,
         reload,
     } = useApplications({
         search,
         status,
+        page: page + 1,
     });
 
     if (loading && applications.length === 0) {
@@ -143,11 +147,12 @@ function ApplicationsPage() {
                         size="small"
                         placeholder="Search student, university, course..."
                         value={search}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setSearch(
                                 e.target.value
-                            )
-                        }
+                            );
+                            setPage(0);
+                        }}
                         sx={{ minWidth: 280 }}
                     />
 
@@ -156,11 +161,12 @@ function ApplicationsPage() {
                         size="small"
                         label="Status"
                         value={status}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setStatus(
                                 e.target.value
-                            )
-                        }
+                            );
+                            setPage(0);
+                        }}
                         sx={{ minWidth: 180 }}
                     >
                         {STATUS_OPTIONS.map(
@@ -283,6 +289,17 @@ function ApplicationsPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                <TablePagination
+                    component="div"
+                    count={count}
+                    page={page}
+                    onPageChange={(_e, newPage) =>
+                        setPage(newPage)
+                    }
+                    rowsPerPage={20}
+                    rowsPerPageOptions={[20]}
+                />
             </Paper>
         </>
     );

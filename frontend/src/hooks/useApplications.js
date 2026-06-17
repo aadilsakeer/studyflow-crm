@@ -4,6 +4,7 @@ import { getApplications } from "../services/applications";
 function useApplications(filters = {}) {
     const [applications, setApplications] =
         useState([]);
+    const [count, setCount] = useState(0);
     const [loading, setLoading] =
         useState(true);
 
@@ -29,17 +30,33 @@ function useApplications(filters = {}) {
                         filters.search;
                 }
 
+                if (filters.page) {
+                    params.page =
+                        filters.page;
+                }
+
                 const data =
                     await getApplications(
                         params
                     );
 
-                setApplications(
-                    Array.isArray(data)
-                        ? data
-                        : data.results
-                        || []
-                );
+                if (data.results) {
+                    setApplications(
+                        data.results
+                    );
+                    setCount(data.count);
+                } else {
+                    setApplications(
+                        Array.isArray(data)
+                            ? data
+                            : []
+                    );
+                    setCount(
+                        Array.isArray(data)
+                            ? data.length
+                            : 0
+                    );
+                }
             } catch (error) {
                 console.error(error);
             } finally {
@@ -50,6 +67,7 @@ function useApplications(filters = {}) {
             filters.student,
             filters.status,
             filters.search,
+            filters.page,
         ]
     );
 
@@ -59,6 +77,7 @@ function useApplications(filters = {}) {
 
     return {
         applications,
+        count,
         loading,
         reload: loadApplications,
     };

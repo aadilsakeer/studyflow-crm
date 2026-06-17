@@ -8,9 +8,6 @@ from rest_framework.generics import (
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.pagination import (
-    PageNumberPagination,
-)
 from rest_framework.permissions import IsAuthenticated
 
 from admissions.serializers import (
@@ -48,12 +45,6 @@ from .conversion_service import (
 )
 
 
-class LeadPagination(PageNumberPagination):
-    page_size = 20
-    page_size_query_param = "page_size"
-    max_page_size = 100
-
-
 class LeadQuerysetMixin:
     def get_company(self):
         return getattr(
@@ -86,11 +77,15 @@ class LeadListAPIView(
 ):
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
-    pagination_class = LeadPagination
     permission_map = crm_permission_map("leads")
 
     def get_queryset(self):
-        queryset = self.get_lead_queryset()
+        queryset = self.get_lead_queryset().select_related(
+            "company",
+            "branch",
+            "source",
+            "assigned_to",
+        ).prefetch_related("tags")
 
         search = self.request.query_params.get(
             "search",
@@ -180,6 +175,9 @@ class LeadTimelineListAPIView(
         return LeadTimeline.objects.filter(
             lead_id=lead_pk,
             lead__company=company,
+        ).select_related(
+            "performed_by",
+            "lead",
         ).order_by("-created_at")
 
 
@@ -207,6 +205,9 @@ class LeadAuditLogListAPIView(
         return LeadAuditLog.objects.filter(
             lead_id=lead_pk,
             lead__company=company,
+        ).select_related(
+            "changed_by",
+            "lead",
         ).order_by("-changed_at")
 
 

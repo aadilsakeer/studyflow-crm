@@ -16,11 +16,13 @@ import {
     Chip,
     Box,
     TextField,
+    TablePagination,
 } from "@mui/material";
 
 function StudentsPage() {
     const [search, setSearch] =
         useState("");
+    const [page, setPage] = useState(0);
 
     const [selectedStudent,
         setSelectedStudent] =
@@ -29,24 +31,11 @@ function StudentsPage() {
     const [drawerOpen, setDrawerOpen] =
         useState(false);
 
-    const { students, loading, reload } =
-        useStudents({ search });
-
-    const filtered = search
-        ? students.filter((s) => {
-              const term = search.toLowerCase();
-              return (
-                  s.lead_name
-                      ?.toLowerCase()
-                      .includes(term)
-                  || s.student_id
-                      ?.toLowerCase()
-                      .includes(term)
-                  || s.lead_phone
-                      ?.includes(term)
-              );
-          })
-        : students;
+    const { students, count, loading, reload } =
+        useStudents({
+            search,
+            page: page + 1,
+        });
 
     if (loading) {
         return (
@@ -97,11 +86,12 @@ function StudentsPage() {
                         size="small"
                         placeholder="Search students..."
                         value={search}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setSearch(
                                 e.target.value
-                            )
-                        }
+                            );
+                            setPage(0);
+                        }}
                         sx={{ width: 280 }}
                     />
                 </Box>
@@ -129,7 +119,7 @@ function StudentsPage() {
                         </TableHead>
 
                         <TableBody>
-                            {filtered.length
+                            {students.length
                             === 0 ? (
                                 <TableRow>
                                     <TableCell
@@ -143,7 +133,7 @@ function StudentsPage() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filtered.map(
+                                students.map(
                                     (
                                         student
                                     ) => (
@@ -205,6 +195,17 @@ function StudentsPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                <TablePagination
+                    component="div"
+                    count={count}
+                    page={page}
+                    onPageChange={(_e, newPage) =>
+                        setPage(newPage)
+                    }
+                    rowsPerPage={20}
+                    rowsPerPageOptions={[20]}
+                />
             </Paper>
         </>
     );
