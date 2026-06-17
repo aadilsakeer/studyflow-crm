@@ -1,5 +1,10 @@
 from rest_framework import serializers
 
+from core.validators import (
+    get_request_company,
+    validate_lead_in_company,
+)
+
 from leads.models import CallLog
 
 
@@ -15,6 +20,15 @@ class CallLogSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "call_time",
             "called_by",
+        )
+
+    def validate_lead(self, lead):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_lead_in_company(
+            lead,
+            company,
         )
 
     def get_called_by_name(self, obj):

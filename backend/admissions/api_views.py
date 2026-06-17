@@ -35,6 +35,13 @@ from .serializers import (
 )
 
 
+class AdmissionsSerializerContextMixin:
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
+
 # Student
 
 class StudentListCreateAPIView(
@@ -377,6 +384,7 @@ class UniversityDetailAPIView(
 # Document
 
 class DocumentListCreateAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
@@ -410,6 +418,7 @@ class DocumentListCreateAPIView(
 
 
 class DocumentDetailAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
@@ -463,6 +472,7 @@ class DocumentDetailAPIView(
 # Visa Case
 
 class VisaCaseListCreateAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
@@ -497,6 +507,7 @@ class VisaCaseListCreateAPIView(
 
 
 class VisaCaseDetailAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
@@ -629,6 +640,7 @@ class CourseDetailAPIView(
 # Offer Letter
 
 class OfferLetterListCreateAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
@@ -663,6 +675,7 @@ class OfferLetterListCreateAPIView(
     
 
 class OfferLetterDetailAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
@@ -714,6 +727,7 @@ class OfferLetterDetailAPIView(
 
     
 class SupportTicketListCreateAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
@@ -747,6 +761,7 @@ class SupportTicketListCreateAPIView(
 
 
 class SupportTicketDetailAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
@@ -800,6 +815,7 @@ class SupportTicketDetailAPIView(
 # Ticket Comment
 
 class TicketCommentListCreateAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
@@ -834,6 +850,7 @@ class TicketCommentListCreateAPIView(
     
 
 class TicketCommentDetailAPIView(
+    AdmissionsSerializerContextMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):

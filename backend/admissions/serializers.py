@@ -1,5 +1,13 @@
 from rest_framework import serializers
 
+from core.validators import (
+    get_request_company,
+    validate_application_in_company,
+    validate_lead_in_company,
+    validate_student_in_company,
+    validate_ticket_in_company,
+)
+
 from .models import (
     Student,
     Application,
@@ -71,26 +79,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
         return obj.student.student_id
 
     def validate_student(self, student):
-        request = self.context.get("request")
-
-        if not request:
-            return student
-
-        company = getattr(
-            request.user,
-            "company",
-            None,
+        company = get_request_company(
+            self.context,
         )
-
-        if (
-            company
-            and student.company_id != company.id
-        ):
-            raise serializers.ValidationError(
-                "Student not found in your company."
-            )
-
-        return student
+        return validate_student_in_company(
+            student,
+            company,
+        )
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -99,12 +94,30 @@ class DocumentSerializer(serializers.ModelSerializer):
         model = Document
         fields = "__all__"
 
+    def validate_application(self, application):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_application_in_company(
+            application,
+            company,
+        )
+
 
 class VisaCaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VisaCase
         fields = "__all__"
+
+    def validate_application(self, application):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_application_in_company(
+            application,
+            company,
+        )
 
 
 class UniversitySerializer(serializers.ModelSerializer):
@@ -127,6 +140,15 @@ class OfferLetterSerializer(serializers.ModelSerializer):
         model = OfferLetter
         fields = "__all__"
 
+    def validate_application(self, application):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_application_in_company(
+            application,
+            company,
+        )
+
 
 class SupportTicketSerializer(serializers.ModelSerializer):
 
@@ -134,9 +156,27 @@ class SupportTicketSerializer(serializers.ModelSerializer):
         model = SupportTicket
         fields = "__all__"
 
+    def validate_student(self, student):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_student_in_company(
+            student,
+            company,
+        )
+
 
 class TicketCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketComment
         fields = "__all__"
+
+    def validate_ticket(self, ticket):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_ticket_in_company(
+            ticket,
+            company,
+        )

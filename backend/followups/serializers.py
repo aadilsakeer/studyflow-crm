@@ -2,6 +2,11 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
+from core.validators import (
+    get_request_company,
+    validate_lead_in_company,
+)
+
 from leads.models import FollowUp
 
 
@@ -24,6 +29,15 @@ class FollowUpSerializer(
         return (
             f"{obj.lead.first_name} "
             f"{obj.lead.last_name}".strip()
+        )
+
+    def validate_lead(self, lead):
+        company = get_request_company(
+            self.context,
+        )
+        return validate_lead_in_company(
+            lead,
+            company,
         )
 
     def update(self, instance, validated_data):

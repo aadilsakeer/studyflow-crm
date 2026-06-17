@@ -23,6 +23,11 @@ class CallLogListAPIView(
     serializer_class = CallLogSerializer
     permission_map = crm_permission_map("calllogs")
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
