@@ -1,7 +1,9 @@
 import axios from "axios";
 
+import { API_BASE_URL } from "../config/api";
+
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000/api",
+    baseURL: API_BASE_URL,
 });
 
 let isRefreshing = false;
@@ -77,7 +79,7 @@ api.interceptors.response.use(
 
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/api/token/refresh/",
+                `${API_BASE_URL}/token/refresh/`,
                 { refresh }
             );
 
@@ -87,6 +89,13 @@ api.interceptors.response.use(
                 "access",
                 newAccess
             );
+
+            if (response.data.refresh) {
+                localStorage.setItem(
+                    "refresh",
+                    response.data.refresh
+                );
+            }
 
             processQueue(null, newAccess);
 
