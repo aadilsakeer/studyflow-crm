@@ -1,6 +1,6 @@
 # Globvio CRM — Product Roadmap
 
-## Phase 1 — Platform Hardening (in progress)
+## Phase 1 — Platform Hardening (complete)
 
 - RBAC with six roles
 - Tenant isolation fixes
@@ -8,6 +8,9 @@
 - Global API pagination
 - Query optimization (N+1)
 - Database indexes on hot paths
+- permission_required() DRF fix
+
+See `docs/phase1-completion-report.md` for verification results.
 
 ## Phase 2 — Soft Delete (planned, not in Phase 1)
 
