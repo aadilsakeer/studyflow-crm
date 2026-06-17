@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 
+from accounts.constants import PERM_UNIVERSITIES_VIEW
 from accounts.services.permission_service import (
     user_has_permission,
     user_has_any_permission,
@@ -67,6 +68,21 @@ def permission_required(code):
     return _Permission
 
 
+class IsPlatformAdmin(BasePermission):
+    message = (
+        "Only platform administrators can modify "
+        "the shared catalog."
+    )
+
+    def has_permission(self, request, view):
+        user = request.user
+
+        if not user or not user.is_authenticated:
+            return False
+
+        return user.is_superuser
+
+
 class ActionPermissionMixin:
     permission_map = {}
 
@@ -84,7 +100,30 @@ class ActionPermissionMixin:
         return [
             IsAuthenticated(),
             IsCompanyMember(),
-            HasPermission(code),
+            permission_required(code)(),
+        ]
+
+
+class CatalogPermissionMixin(ActionPermissionMixin):
+    catalog_view_permission = PERM_UNIVERSITIES_VIEW
+
+    def get_permissions(self):
+        from rest_framework.permissions import (
+            IsAuthenticated,
+        )
+
+        if self.request.method.upper() == "GET":
+            return [
+                IsAuthenticated(),
+                IsCompanyMember(),
+                permission_required(
+                    self.catalog_view_permission,
+                )(),
+            ]
+
+        return [
+            IsAuthenticated(),
+            IsPlatformAdmin(),
         ]
 
 

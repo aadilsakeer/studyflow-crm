@@ -1,12 +1,25 @@
 from django.db.models import Q
+from django.utils import timezone
 
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 from auditlogs.services import AuditLogService
 
 from accounts.access import filter_students_for_user
+from accounts.constants import (
+    PERM_STUDENTS_RESTORE,
+    PERM_APPLICATIONS_RESTORE,
+)
 from accounts.permissions import (
     ActionPermissionMixin,
+    CatalogPermissionMixin,
+    IsCompanyMember,
+    permission_required,
     crm_permission_map,
 )
 
@@ -170,10 +183,22 @@ class StudentDetailAPIView(
         )
 
     def perform_destroy(self, instance):
+        user = self.request.user
+        now = timezone.now()
+
+        Application.objects.filter(
+            student=instance,
+        ).update(
+            is_deleted=True,
+            deleted_at=now,
+            deleted_by=user,
+        )
+
+        instance.soft_delete(user)
 
         AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
+            company=user.company,
+            user=user,
             module='Admissions',
             action='delete',
             object_id=instance.id,
@@ -182,8 +207,6 @@ class StudentDetailAPIView(
                 f'{instance.student_id}'
             )
         )
-
-        instance.delete()
 
 
 
@@ -316,10 +339,12 @@ class ApplicationDetailAPIView(
         )
 
     def perform_destroy(self, instance):
+        user = self.request.user
+        instance.soft_delete(user)
 
         AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
+            company=user.company,
+            user=user,
             module='Admissions',
             action='delete',
             object_id=instance.id,
@@ -329,8 +354,6 @@ class ApplicationDetailAPIView(
             )
         )
 
-        instance.delete()
-
 
 
 
@@ -338,11 +361,9 @@ class ApplicationDetailAPIView(
 # University
 
 class UniversityListCreateAPIView(
-    ActionPermissionMixin,
+    CatalogPermissionMixin,
     generics.ListCreateAPIView
 ):
-
-    permission_map = crm_permission_map("universities")
 
     serializer_class = UniversitySerializer
 
@@ -390,11 +411,9 @@ class UniversityListCreateAPIView(
 
 
 class UniversityDetailAPIView(
-    ActionPermissionMixin,
+    CatalogPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
-
-    permission_map = crm_permission_map("universities")
 
     serializer_class = UniversitySerializer
 
@@ -617,11 +636,9 @@ class VisaCaseDetailAPIView(
 # Course
 
 class CourseListCreateAPIView(
-    ActionPermissionMixin,
+    CatalogPermissionMixin,
     generics.ListCreateAPIView
 ):
-
-    permission_map = crm_permission_map("universities")
 
     serializer_class = CourseSerializer
 
@@ -647,11 +664,9 @@ class CourseListCreateAPIView(
     
 
 class CourseDetailAPIView(
-    ActionPermissionMixin,
+    CatalogPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
-
-    permission_map = crm_permission_map("universities")
 
     serializer_class = CourseSerializer
 
@@ -952,3 +967,160 @@ class TicketCommentDetailAPIView(
         )
 
         instance.delete()
+
+
+class StudentTrashListAPIView(
+    ActionPermissionMixin,
+    generics.ListAPIView,
+):
+    permission_map = {"GET": "students.restore"}
+    serializer_class = StudentSerializer
+
+    def get_queryset(self):
+        company = getattr(
+            self.request.user,
+            "company",
+            None,
+        )
+
+        if not company:
+            return Student.all_objects.none()
+
+        queryset = Student.all_objects.dead().filter(
+            company=company,
+        ).select_related("lead")
+
+        return filter_students_for_user(
+            queryset,
+            self.request.user,
+        ).order_by("-deleted_at")
+
+
+class StudentRestoreAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyMember,
+        permission_required(PERM_STUDENTS_RESTORE),
+    ]
+
+    def post(self, request, pk):
+        company = getattr(request.user, "company", None)
+
+        if not company:
+            return Response(
+                {"detail": "Company not found."},
+                status=400,
+            )
+
+        student = get_object_or_404(
+            Student.all_objects.dead().filter(
+                company=company,
+            ),
+            pk=pk,
+        )
+
+        from leads.models import Lead
+
+        if not Lead.objects.filter(
+            pk=student.lead_id,
+        ).exists():
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Cannot restore student: "
+                        "linked lead is deleted."
+                    ),
+                },
+            )
+
+        if Student.objects.filter(
+            student_id=student.student_id,
+        ).exists():
+            raise ValidationError(
+                {
+                    "detail": (
+                        "An active student with this "
+                        "ID already exists."
+                    ),
+                },
+            )
+
+        student.restore()
+        Application.all_objects.filter(
+            student=student,
+            is_deleted=True,
+        ).update(
+            is_deleted=False,
+            deleted_at=None,
+            deleted_by=None,
+        )
+
+        return Response(
+            StudentSerializer(student).data,
+        )
+
+
+class ApplicationTrashListAPIView(
+    ActionPermissionMixin,
+    generics.ListAPIView,
+):
+    permission_map = {"GET": "applications.restore"}
+    serializer_class = ApplicationSerializer
+
+    def get_queryset(self):
+        company = getattr(
+            self.request.user,
+            "company",
+            None,
+        )
+
+        if not company:
+            return Application.all_objects.none()
+
+        return Application.all_objects.dead().filter(
+            student__company=company,
+        ).select_related(
+            "student",
+        ).order_by("-deleted_at")
+
+
+class ApplicationRestoreAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyMember,
+        permission_required(PERM_APPLICATIONS_RESTORE),
+    ]
+
+    def post(self, request, pk):
+        company = getattr(request.user, "company", None)
+
+        if not company:
+            return Response(
+                {"detail": "Company not found."},
+                status=400,
+            )
+
+        application = get_object_or_404(
+            Application.all_objects.dead().filter(
+                student__company=company,
+            ),
+            pk=pk,
+        )
+
+        if not Student.objects.filter(
+            pk=application.student_id,
+        ).exists():
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Cannot restore application: "
+                        "student is deleted."
+                    ),
+                },
+            )
+
+        application.restore()
+
+        return Response(
+            ApplicationSerializer(application).data,
+        )
