@@ -1,5 +1,9 @@
 from rest_framework import serializers
 
+from accounts.services.permission_service import (
+    get_user_permission_codes,
+)
+
 from .models import CustomUser
 
 
@@ -9,6 +13,7 @@ class CurrentUserSerializer(
     display_name = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
     role_name = serializers.SerializerMethodField()
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -21,6 +26,8 @@ class CurrentUserSerializer(
             "display_name",
             "company_name",
             "role_name",
+            "permissions",
+            "is_superuser",
         )
 
     def get_display_name(self, obj):
@@ -41,3 +48,8 @@ class CurrentUserSerializer(
             return obj.role.name
 
         return None
+
+    def get_permissions(self, obj):
+        return sorted(
+            get_user_permission_codes(obj)
+        )

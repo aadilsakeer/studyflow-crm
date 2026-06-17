@@ -31,8 +31,10 @@ import {
 } from "../utils/toast";
 
 import LoadingState from "../components/LoadingState";
+import usePermissions from "../hooks/usePermissions";
 
 function UniversitiesPage() {
+    const { can } = usePermissions();
     const [universities, setUniversities] =
         useState([]);
     const [loading, setLoading] =
@@ -224,14 +226,16 @@ function UniversitiesPage() {
                         Universities
                     </Typography>
 
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            setOpen(true)
-                        }
-                    >
-                        Add University
-                    </Button>
+                    {can("universities.add") && (
+                        <Button
+                            variant="contained"
+                            onClick={() =>
+                                setOpen(true)
+                            }
+                        >
+                            Add University
+                        </Button>
+                    )}
                 </Box>
 
                 <TextField

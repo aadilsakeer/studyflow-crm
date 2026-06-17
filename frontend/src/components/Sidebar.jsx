@@ -3,7 +3,6 @@ import PeopleIcon from "@mui/icons-material/People";
 import SchoolIcon from "@mui/icons-material/School";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import EventIcon from "@mui/icons-material/Event";
 import LogoutIcon from "@mui/icons-material/Logout";
 
@@ -17,6 +16,9 @@ import {
 } from "@mui/material";
 
 import { useLocation, useNavigate } from "react-router-dom";
+
+import usePermissions from "../hooks/usePermissions";
+import { NAV_PERMISSIONS } from "../utils/permissions";
 
 const navItems = [
     {
@@ -49,16 +51,21 @@ const navItems = [
         path: "/universities",
         icon: <AccountBalanceIcon />,
     },
-    {
-        label: "Visa Cases",
-        path: "/visa-cases",
-        icon: <FlightTakeoffIcon />,
-    },
 ];
 
 function Sidebar({ onLogout }) {
     const navigate = useNavigate();
     const location = useLocation();
+    const { can } = usePermissions();
+
+    const visibleItems = navItems.filter(
+        (item) => {
+            const perm =
+                NAV_PERMISSIONS[item.path];
+
+            return !perm || can(perm);
+        },
+    );
 
     return (
         <Box
@@ -84,16 +91,23 @@ function Sidebar({ onLogout }) {
             </Typography>
 
             <List sx={{ flex: 1 }}>
-                {navItems.map((item) => (
+                {visibleItems.map((item) => (
                     <ListItemButton
                         key={item.path}
-                        selected={location.pathname === item.path}
-                        onClick={() => navigate(item.path)}
+                        selected={
+                            location.pathname
+                            === item.path
+                        }
+                        onClick={() =>
+                            navigate(item.path)
+                        }
                     >
                         <ListItemIcon>
                             {item.icon}
                         </ListItemIcon>
-                        <ListItemText primary={item.label} />
+                        <ListItemText
+                            primary={item.label}
+                        />
                     </ListItemButton>
                 ))}
             </List>

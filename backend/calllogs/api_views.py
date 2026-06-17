@@ -3,6 +3,11 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from core.mixins import LeadCompanyFilteredMixin
 
 from leads.models import CallLog
@@ -10,11 +15,13 @@ from .serializers import CallLogSerializer
 
 
 class CallLogListAPIView(
+    ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     ListCreateAPIView,
 ):
     queryset = CallLog.objects.all()
     serializer_class = CallLogSerializer
+    permission_map = crm_permission_map("calllogs")
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -71,8 +78,10 @@ class CallLogListAPIView(
 
 
 class CallLogDetailAPIView(
+    ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     RetrieveUpdateDestroyAPIView,
 ):
     queryset = CallLog.objects.all()
     serializer_class = CallLogSerializer
+    permission_map = crm_permission_map("calllogs")

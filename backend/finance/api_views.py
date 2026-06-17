@@ -1,7 +1,11 @@
 from rest_framework import generics
 
-from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
+
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
 
 from .models import (
     Payment,
@@ -21,8 +25,11 @@ from .serializers import (
 
 
 class PaymentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("payments")
 
     serializer_class = PaymentSerializer
 
@@ -50,18 +57,15 @@ class PaymentListCreateAPIView(
             )
         )
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('finance')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class PaymentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("payments")
 
     serializer_class = PaymentSerializer
 
@@ -103,21 +107,9 @@ class PaymentDetailAPIView(
 
         instance.delete()
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('finance')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 class ExpenseListCreateAPIView(
     generics.ListCreateAPIView
@@ -149,13 +141,7 @@ class ExpenseListCreateAPIView(
             )
         )
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('finance')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class ExpenseDetailAPIView(
@@ -202,26 +188,17 @@ class ExpenseDetailAPIView(
 
         instance.delete()
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('finance')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 #invoice 
 class InvoiceListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("invoices")
 
     serializer_class = InvoiceSerializer
 
@@ -247,18 +224,15 @@ class InvoiceListCreateAPIView(
             )
         )
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('finance')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class InvoiceDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("invoices")
 
     serializer_class = InvoiceSerializer
 
@@ -300,21 +274,9 @@ class InvoiceDetailAPIView(
 
         instance.delete()
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('finance')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 class ReceiptListCreateAPIView(
     generics.ListCreateAPIView
@@ -344,13 +306,7 @@ class ReceiptListCreateAPIView(
             )
         )
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('finance')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class ReceiptDetailAPIView(
@@ -397,21 +353,9 @@ class ReceiptDetailAPIView(
 
         instance.delete()
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('finance')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('finance')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 #refunds
 class RefundListCreateAPIView(
@@ -442,13 +386,7 @@ class RefundListCreateAPIView(
             )
         )
 
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('finance')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class RefundDetailAPIView(
@@ -494,19 +432,3 @@ class RefundDetailAPIView(
         )
 
         instance.delete()
-
-    @module_required('finance')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    @module_required('finance')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    @module_required('finance')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('finance')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)

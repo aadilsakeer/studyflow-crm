@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LeadDrawer from "../components/LeadDrawer";
 import useLeads from "../hooks/useLeads";
+import usePermissions from "../hooks/usePermissions";
 import LeadDialog from "../components/LeadDialog";
 import LoadingState from "../components/LoadingState";
 import {
@@ -39,6 +40,8 @@ function LeadsPage() {
         useState(null);
     const [drawerOpen, setDrawerOpen] =
         useState(false);
+
+    const { can } = usePermissions();
 
     const { leads, count, loading, reload } =
         useLeads({
@@ -113,14 +116,16 @@ function LeadsPage() {
                         Leads Management
                     </Typography>
 
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            setOpen(true)
-                        }
-                    >
-                        Add Lead
-                    </Button>
+                    {can("leads.add") && (
+                        <Button
+                            variant="contained"
+                            onClick={() =>
+                                setOpen(true)
+                            }
+                        >
+                            Add Lead
+                        </Button>
+                    )}
                 </Box>
 
                 <Box

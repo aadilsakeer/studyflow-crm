@@ -2,8 +2,13 @@ from django.db.models import Q
 
 from rest_framework import generics
 
-from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
+
+from accounts.access import filter_students_for_user
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
 
 from .models import (
     Student,
@@ -33,15 +38,22 @@ from .serializers import (
 # Student
 
 class StudentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("students")
 
     serializer_class = StudentSerializer
 
     def get_queryset(self):
-
-        return Student.objects.filter(
-            company=self.request.user.company
+        company = self.request.user.company
+        queryset = Student.objects.filter(
+            company=company,
+        )
+        return filter_students_for_user(
+            queryset,
+            self.request.user,
         )
 
     def perform_create(self, serializer):
@@ -62,25 +74,26 @@ class StudentListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class StudentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("students")
 
     serializer_class = StudentSerializer
 
     def get_queryset(self):
-
-        return Student.objects.filter(
-            company=self.request.user.company
+        company = self.request.user.company
+        queryset = Student.objects.filter(
+            company=company,
+        )
+        return filter_students_for_user(
+            queryset,
+            self.request.user,
         )
 
     def perform_update(self, serializer):
@@ -115,28 +128,19 @@ class StudentDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 
 # Application
 
 class ApplicationListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = ApplicationSerializer
 
@@ -209,18 +213,15 @@ class ApplicationListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class ApplicationDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = ApplicationSerializer
 
@@ -267,27 +268,18 @@ class ApplicationDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 # University
 
 class UniversityListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("universities")
 
     serializer_class = UniversitySerializer
 
@@ -332,17 +324,14 @@ class UniversityListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 class UniversityDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("universities")
 
     serializer_class = UniversitySerializer
 
@@ -380,28 +369,19 @@ class UniversityDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 
 # Document
 
 class DocumentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("documents")
 
     serializer_class = DocumentSerializer
 
@@ -427,17 +407,14 @@ class DocumentListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 class DocumentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("documents")
 
     serializer_class = DocumentSerializer
 
@@ -479,27 +456,18 @@ class DocumentDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 # Visa Case
 
 class VisaCaseListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("documents")
 
     serializer_class = VisaCaseSerializer
 
@@ -525,18 +493,15 @@ class VisaCaseListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class VisaCaseDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("documents")
 
     serializer_class = VisaCaseSerializer
 
@@ -578,27 +543,18 @@ class VisaCaseDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 # Course
 
 class CourseListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("universities")
 
     serializer_class = CourseSerializer
 
@@ -620,18 +576,15 @@ class CourseListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
     
 
 class CourseDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("universities")
 
     serializer_class = CourseSerializer
 
@@ -669,27 +622,18 @@ class CourseDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 # Offer Letter
 
 class OfferLetterListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = OfferLetterSerializer
 
@@ -715,18 +659,15 @@ class OfferLetterListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
     
 
 class OfferLetterDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = OfferLetterSerializer
 
@@ -768,25 +709,16 @@ class OfferLetterDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 class SupportTicketListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = SupportTicketSerializer
 
@@ -812,17 +744,14 @@ class SupportTicketListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 class SupportTicketDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = SupportTicketSerializer
 
@@ -864,27 +793,18 @@ class SupportTicketDetailAPIView(
 
         instance.delete()
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
 
 # Ticket Comment
 
 class TicketCommentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = TicketCommentSerializer
 
@@ -910,18 +830,15 @@ class TicketCommentListCreateAPIView(
             )
         )
 
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    @module_required('admissions')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
     
 
 class TicketCommentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+
+    permission_map = crm_permission_map("applications")
 
     serializer_class = TicketCommentSerializer
 
@@ -962,19 +879,3 @@ class TicketCommentDetailAPIView(
         )
 
         instance.delete()
-
-    @module_required('admissions')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    @module_required('admissions')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    @module_required('admissions')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('admissions')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)

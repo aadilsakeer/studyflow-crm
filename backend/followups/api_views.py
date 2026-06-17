@@ -5,6 +5,11 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from core.mixins import LeadCompanyFilteredMixin
 
 from leads.models import FollowUp
@@ -12,11 +17,13 @@ from .serializers import FollowUpSerializer
 
 
 class FollowUpListAPIView(
+    ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     ListCreateAPIView,
 ):
     queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
+    permission_map = crm_permission_map("followups")
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -99,8 +106,10 @@ class FollowUpListAPIView(
 
 
 class FollowUpDetailAPIView(
+    ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     RetrieveUpdateDestroyAPIView,
 ):
     queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
+    permission_map = crm_permission_map("followups")

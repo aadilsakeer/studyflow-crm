@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 
 import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/LoginPage";
+import { PermissionsProvider } from "./hooks/usePermissions";
 import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import FollowUpsPage from "./pages/FollowUpsPage";
@@ -56,9 +57,10 @@ function App() {
     }
 
     return (
-        <BrowserRouter>
-            <Toaster position="top-right" />
-            <Routes>
+        <PermissionsProvider>
+            <BrowserRouter>
+                <Toaster position="top-right" />
+                <Routes>
                 <Route
                     path="/"
                     element={
@@ -107,6 +109,7 @@ function App() {
                 </Route>
             </Routes>
         </BrowserRouter>
+        </PermissionsProvider>
     );
 }
 

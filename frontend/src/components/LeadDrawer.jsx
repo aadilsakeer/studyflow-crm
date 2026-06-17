@@ -47,6 +47,8 @@ import {
     showSuccess,
 } from "../utils/toast";
 
+import usePermissions from "../hooks/usePermissions";
+
 function LeadDrawer({
     open,
     onClose,
@@ -54,6 +56,8 @@ function LeadDrawer({
     onLeadUpdated,
     onLeadDeleted,
 }) {
+    const { can } = usePermissions();
+
     const [editMode, setEditMode] =
         useState(false);
 
@@ -672,31 +676,36 @@ function LeadDrawer({
                                 items={auditLogs}
                             />
 
-                            <Button
-                                variant="contained"
-                                fullWidth
-                                sx={{ mt: 3 }}
-                                onClick={() =>
-                                    setEditMode(true)
-                                }
-                            >
-                                Edit Lead
-                            </Button>
+                            {can("leads.change") && (
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    sx={{ mt: 3 }}
+                                    onClick={() =>
+                                        setEditMode(true)
+                                    }
+                                >
+                                    Edit Lead
+                                </Button>
+                            )}
 
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                sx={{ mt: 2 }}
-                                onClick={() =>
-                                    setCallLogOpen(
-                                        true
-                                    )
-                                }
-                            >
-                                Log Call
-                            </Button>
+                            {can("calllogs.add") && (
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    onClick={() =>
+                                        setCallLogOpen(
+                                            true
+                                        )
+                                    }
+                                >
+                                    Log Call
+                                </Button>
+                            )}
 
-                            {lead.status
+                            {can("leads.convert")
+                                && lead.status
                                 !== "converted" && (
                                 <Button
                                     variant="contained"
@@ -714,30 +723,34 @@ function LeadDrawer({
                                 </Button>
                             )}
 
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                fullWidth
-                                sx={{ mt: 2 }}
-                                onClick={
-                                    handleDelete
-                                }
-                            >
-                                Delete Lead
-                            </Button>
+                            {can("leads.delete") && (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    onClick={
+                                        handleDelete
+                                    }
+                                >
+                                    Delete Lead
+                                </Button>
+                            )}
 
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                sx={{ mt: 2 }}
-                                onClick={() =>
-                                    setFollowUpOpen(
-                                        true
-                                    )
-                                }
-                            >
-                                Add Follow Up
-                            </Button>
+                            {can("followups.add") && (
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    onClick={() =>
+                                        setFollowUpOpen(
+                                            true
+                                        )
+                                    }
+                                >
+                                    Add Follow Up
+                                </Button>
+                            )}
                         </>
                     )}
                 </Box>

@@ -11,9 +11,19 @@ from rest_framework.response import Response
 from rest_framework.pagination import (
     PageNumberPagination,
 )
+from rest_framework.permissions import IsAuthenticated
 
 from admissions.serializers import (
     StudentSerializer,
+)
+
+from accounts.access import filter_leads_for_user
+from accounts.constants import PERM_LEADS_CONVERT
+from accounts.permissions import (
+    IsCompanyMember,
+    HasPermission,
+    ActionPermissionMixin,
+    crm_permission_map,
 )
 
 from core.mixins import (
@@ -44,20 +54,16 @@ class LeadPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class LeadListAPIView(
-    CompanyCreateMixin,
-    ListCreateAPIView,
-):
-    queryset = Lead.objects.all()
-    serializer_class = LeadSerializer
-    pagination_class = LeadPagination
-
-    def get_queryset(self):
-        company = getattr(
+class LeadQuerysetMixin:
+    def get_company(self):
+        return getattr(
             self.request.user,
             "company",
             None,
         )
+
+    def get_lead_queryset(self):
+        company = self.get_company()
 
         if not company:
             return Lead.objects.none()
@@ -66,6 +72,26 @@ class LeadListAPIView(
             Q(company=company)
             | Q(company__isnull=True)
         )
+
+        return filter_leads_for_user(
+            queryset,
+            self.request.user,
+        )
+
+
+class LeadListAPIView(
+    LeadQuerysetMixin,
+    ActionPermissionMixin,
+    CompanyCreateMixin,
+    ListCreateAPIView,
+):
+    queryset = Lead.objects.all()
+    serializer_class = LeadSerializer
+    pagination_class = LeadPagination
+    permission_map = crm_permission_map("leads")
+
+    def get_queryset(self):
+        queryset = self.get_lead_queryset()
 
         search = self.request.query_params.get(
             "search",
@@ -88,6 +114,7 @@ class LeadListAPIView(
             )
 
         return queryset.order_by("-created_at")
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["request"] = self.request
@@ -102,35 +129,22 @@ class LeadListAPIView(
 
 
 class LeadDetailAPIView(
+    LeadQuerysetMixin,
+    ActionPermissionMixin,
     RetrieveUpdateDestroyAPIView,
 ):
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
+    permission_map = crm_permission_map("leads")
 
     def get_queryset(self):
-        company = getattr(
-            self.request.user,
-            "company",
-            None,
-        )
-
-        if not company:
-            return Lead.objects.none()
-
-        return Lead.objects.filter(
-            Q(company=company)
-            | Q(company__isnull=True)
-        )
+        return self.get_lead_queryset()
 
     def perform_update(self, serializer):
         instance = serializer.instance
         old_snapshot = snapshot_lead(instance)
 
-        company = getattr(
-            self.request.user,
-            "company",
-            None,
-        )
+        company = self.get_company()
 
         if (
             company
@@ -154,20 +168,26 @@ class LeadDetailAPIView(
         return context
 
 
-class LeadTimelineListAPIView(ListAPIView):
+class LeadTimelineListAPIView(
+    LeadQuerysetMixin,
+    ActionPermissionMixin,
+    ListAPIView,
+):
     serializer_class = LeadTimelineSerializer
+    permission_map = {"GET": "leads.view"}
 
     def get_queryset(self):
-        company = getattr(
-            self.request.user,
-            "company",
-            None,
-        )
+        company = self.get_company()
 
         if not company:
             return LeadTimeline.objects.none()
 
         lead_pk = self.kwargs["lead_pk"]
+
+        if not self.get_lead_queryset().filter(
+            pk=lead_pk,
+        ).exists():
+            return LeadTimeline.objects.none()
 
         return LeadTimeline.objects.filter(
             lead_id=lead_pk,
@@ -175,20 +195,26 @@ class LeadTimelineListAPIView(ListAPIView):
         ).order_by("-created_at")
 
 
-class LeadAuditLogListAPIView(ListAPIView):
+class LeadAuditLogListAPIView(
+    LeadQuerysetMixin,
+    ActionPermissionMixin,
+    ListAPIView,
+):
     serializer_class = LeadAuditLogSerializer
+    permission_map = {"GET": "leads.view"}
 
     def get_queryset(self):
-        company = getattr(
-            self.request.user,
-            "company",
-            None,
-        )
+        company = self.get_company()
 
         if not company:
             return LeadAuditLog.objects.none()
 
         lead_pk = self.kwargs["lead_pk"]
+
+        if not self.get_lead_queryset().filter(
+            pk=lead_pk,
+        ).exists():
+            return LeadAuditLog.objects.none()
 
         return LeadAuditLog.objects.filter(
             lead_id=lead_pk,
@@ -196,14 +222,18 @@ class LeadAuditLogListAPIView(ListAPIView):
         ).order_by("-changed_at")
 
 
-class LeadConvertAPIView(APIView):
+class LeadConvertAPIView(
+    LeadQuerysetMixin,
+    APIView,
+):
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyMember,
+        HasPermission(PERM_LEADS_CONVERT),
+    ]
 
     def post(self, request, pk):
-        company = getattr(
-            request.user,
-            "company",
-            None,
-        )
+        company = self.get_company()
 
         if not company:
             return Response(
@@ -217,10 +247,7 @@ class LeadConvertAPIView(APIView):
             )
 
         lead = get_object_or_404(
-            Lead.objects.filter(
-                Q(company=company)
-                | Q(company__isnull=True)
-            ),
+            self.get_lead_queryset(),
             pk=pk,
         )
 
