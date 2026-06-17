@@ -8,6 +8,7 @@ from .models import (
     University,
     Course,
     OfferLetter,
+    StudentDocument,
 )
 
 
@@ -148,4 +149,27 @@ class OfferLetterAdmin(admin.ModelAdmin):
 
     list_filter = (
         'status',
+    )
+
+
+@admin.register(StudentDocument)
+class StudentDocumentAdmin(admin.ModelAdmin):
+    list_display = (
+        'student',
+        'document_type',
+        'original_filename',
+        'company',
+        'is_deleted',
+        'created_at',
+    )
+
+    list_filter = (
+        'document_type',
+        'is_deleted',
+        'company',
+    )
+
+    search_fields = (
+        'original_filename',
+        'student__student_id',
     )

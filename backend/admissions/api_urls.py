@@ -25,6 +25,14 @@ from .api_views import (
     TicketCommentDetailAPIView,
 )
 
+from .student_document_views import (
+    StudentDocumentListCreateAPIView,
+    StudentDocumentDetailAPIView,
+    StudentDocumentDownloadAPIView,
+    StudentDocumentTrashListAPIView,
+    StudentDocumentRestoreAPIView,
+)
+
 urlpatterns = [
 
     path(
@@ -97,6 +105,36 @@ urlpatterns = [
         'documents/<int:pk>/',
         DocumentDetailAPIView.as_view(),
         name='document-detail'
+    ),
+
+    path(
+        'student-documents/',
+        StudentDocumentListCreateAPIView.as_view(),
+        name='student-document-list',
+    ),
+
+    path(
+        'student-documents/trash/',
+        StudentDocumentTrashListAPIView.as_view(),
+        name='student-document-trash',
+    ),
+
+    path(
+        'student-documents/<int:pk>/restore/',
+        StudentDocumentRestoreAPIView.as_view(),
+        name='student-document-restore',
+    ),
+
+    path(
+        'student-documents/<int:pk>/download/',
+        StudentDocumentDownloadAPIView.as_view(),
+        name='student-document-download',
+    ),
+
+    path(
+        'student-documents/<int:pk>/',
+        StudentDocumentDetailAPIView.as_view(),
+        name='student-document-detail',
     ),
 
     path(
