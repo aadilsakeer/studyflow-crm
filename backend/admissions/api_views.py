@@ -54,14 +54,39 @@ class StudentListCreateAPIView(
     serializer_class = StudentSerializer
 
     def get_queryset(self):
-        company = self.request.user.company
+        company = getattr(
+            self.request.user,
+            "company",
+            None,
+        )
+
+        if not company:
+            return Student.objects.none()
+
         queryset = Student.objects.filter(
             company=company,
+        ).select_related(
+            "lead",
+            "branch",
+            "assigned_counselor",
         )
+
+        search = self.request.query_params.get(
+            "search",
+        )
+
+        if search:
+            queryset = queryset.filter(
+                Q(student_id__icontains=search)
+                | Q(lead__first_name__icontains=search)
+                | Q(lead__last_name__icontains=search)
+                | Q(lead__phone__icontains=search)
+            )
+
         return filter_students_for_user(
             queryset,
             self.request.user,
-        )
+        ).order_by("-created_at")
 
     def perform_create(self, serializer):
 
@@ -94,14 +119,39 @@ class StudentDetailAPIView(
     serializer_class = StudentSerializer
 
     def get_queryset(self):
-        company = self.request.user.company
+        company = getattr(
+            self.request.user,
+            "company",
+            None,
+        )
+
+        if not company:
+            return Student.objects.none()
+
         queryset = Student.objects.filter(
             company=company,
+        ).select_related(
+            "lead",
+            "branch",
+            "assigned_counselor",
         )
+
+        search = self.request.query_params.get(
+            "search",
+        )
+
+        if search:
+            queryset = queryset.filter(
+                Q(student_id__icontains=search)
+                | Q(lead__first_name__icontains=search)
+                | Q(lead__last_name__icontains=search)
+                | Q(lead__phone__icontains=search)
+            )
+
         return filter_students_for_user(
             queryset,
             self.request.user,
-        )
+        ).order_by("-created_at")
 
     def perform_update(self, serializer):
 
@@ -161,6 +211,9 @@ class ApplicationListCreateAPIView(
             student__company=(
                 self.request.user.company
             )
+        ).select_related(
+            "student",
+            "student__lead",
         )
 
         student_id = self.request.query_params.get(
@@ -241,6 +294,9 @@ class ApplicationDetailAPIView(
 
         return Application.objects.filter(
             student__company=self.request.user.company
+        ).select_related(
+            "student",
+            "student__lead",
         )
 
     def perform_update(self, serializer):

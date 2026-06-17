@@ -29,7 +29,10 @@ class CallLogListAPIView(
         return context
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related(
+            "lead",
+            "called_by",
+        )
 
         lead_id = self.request.query_params.get(
             "lead",
