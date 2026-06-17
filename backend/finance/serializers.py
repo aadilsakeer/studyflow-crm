@@ -13,32 +13,98 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Payment
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "student",
+            "application",
+            "payment_type",
+            "amount",
+            "payment_date",
+            "reference_number",
+            "status",
+            "remarks",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "created_at",
+        )
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invoice
-        fields = '__all__'
+        fields = (
+            "id",
+            "invoice_number",
+            "student",
+            "payment",
+            "invoice_date",
+            "due_date",
+            "amount",
+            "status",
+            "created_at",
+        )
+        read_only_fields = (
+            "invoice_number",
+            "created_at",
+        )
 
 
 class ReceiptSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Receipt
-        fields = '__all__'
+        fields = (
+            "id",
+            "receipt_number",
+            "payment",
+            "receipt_date",
+            "amount",
+            "remarks",
+            "created_at",
+        )
+        read_only_fields = (
+            "receipt_number",
+            "created_at",
+        )
 
 
 class RefundSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Refund
-        fields = '__all__'
+        fields = (
+            "id",
+            "payment",
+            "amount",
+            "reason",
+            "status",
+            "refund_date",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Expense
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "title",
+            "category",
+            "amount",
+            "expense_date",
+            "remarks",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "created_at",
+        )

@@ -16,10 +16,18 @@ class CallLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CallLog
-        fields = "__all__"
-        read_only_fields = (
-            "call_time",
+        fields = (
+            "id",
+            "lead",
             "called_by",
+            "outcome",
+            "notes",
+            "call_time",
+            "called_by_name",
+        )
+        read_only_fields = (
+            "called_by",
+            "call_time",
         )
 
     def validate_lead(self, lead):

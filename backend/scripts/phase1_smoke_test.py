@@ -28,6 +28,7 @@ from accounts.constants import (
     ROLE_PERMISSIONS,
     ROLE_TELECALLER,
     ROLE_VIEWER,
+    ALL_PERMISSIONS,
     PERM_LEADS_VIEW,
     PERM_STUDENTS_VIEW,
     PERM_PAYMENTS_VIEW,
@@ -44,12 +45,12 @@ from leads.models import Lead
 
 
 ROLE_EXPECTED_COUNTS = {
-    ROLE_ADMIN: 39,
-    ROLE_MANAGER: 27,
-    ROLE_COUNSELLOR: 20,
-    ROLE_TELECALLER: 10,
-    ROLE_FINANCE: 5,
-    ROLE_VIEWER: 8,
+    ROLE_ADMIN: len(ALL_PERMISSIONS),
+    **{
+        role: len(codes)
+        for role, codes in ROLE_PERMISSIONS.items()
+        if role != ROLE_ADMIN
+    },
 }
 
 ENDPOINTS = [

@@ -58,6 +58,7 @@ class LeadCompanyFilteredMixin:
 
         return queryset.filter(
             lead__company=company,
+            lead__is_deleted=False,
         )
 
 

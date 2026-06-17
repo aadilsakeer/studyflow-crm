@@ -200,18 +200,33 @@ REDIS_URL = os.getenv(
     'redis://127.0.0.1:6379/1',
 )
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': REDIS_URL,
-        'OPTIONS': {
-            'CLIENT_CLASS': (
-                'django_redis.client.DefaultClient'
+USE_REDIS = os.getenv(
+    'USE_REDIS',
+    'False' if DEBUG else 'True',
+) == 'True'
+
+if USE_REDIS:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': (
+                    'django_redis.client.DefaultClient'
+                ),
+            },
+            'KEY_PREFIX': 'studyflowcrm',
+        },
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': (
+                'django.core.cache.backends'
+                '.locmem.LocMemCache'
             ),
         },
-        'KEY_PREFIX': 'studyflowcrm',
-    },
-}
+    }
 
 CELERY_BROKER_URL = os.getenv(
     'CELERY_BROKER_URL',

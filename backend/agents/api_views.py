@@ -1,6 +1,10 @@
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 
-from licensing.decorators import module_required
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
 
 from .models import (
     Agent,
@@ -13,81 +17,119 @@ from .serializers import (
 )
 
 
+def _user_company(request):
+    return getattr(request.user, "company", None)
+
+
 class AgentListCreateAPIView(
-    generics.ListCreateAPIView
+    ActionPermissionMixin,
+    generics.ListCreateAPIView,
 ):
 
-    queryset = Agent.objects.all()
+    permission_map = crm_permission_map("agents")
     serializer_class = AgentSerializer
 
-    @module_required('agents')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get_queryset(self):
+        company = _user_company(self.request)
 
-    @module_required('agents')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        if not company:
+            return Agent.objects.none()
+
+        return Agent.objects.filter(company=company)
+
+    def perform_create(self, serializer):
+        company = _user_company(self.request)
+
+        if not company:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Your account is not linked "
+                        "to a company."
+                    ),
+                },
+            )
+
+        serializer.save(company=company)
 
 
 class AgentDetailAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ActionPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
-    queryset = Agent.objects.all()
+    permission_map = crm_permission_map("agents")
     serializer_class = AgentSerializer
 
-    @module_required('agents')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    def get_queryset(self):
+        company = _user_company(self.request)
 
-    @module_required('agents')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        if not company:
+            return Agent.objects.none()
 
-    @module_required('agents')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('agents')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+        return Agent.objects.filter(company=company)
 
 
 class AgentCommissionListCreateAPIView(
-    generics.ListCreateAPIView
+    ActionPermissionMixin,
+    generics.ListCreateAPIView,
 ):
 
-    queryset = AgentCommission.objects.all()
+    permission_map = crm_permission_map("agents")
     serializer_class = AgentCommissionSerializer
 
-    @module_required('agents')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get_queryset(self):
+        company = _user_company(self.request)
 
-    @module_required('agents')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        if not company:
+            return AgentCommission.objects.none()
+
+        return AgentCommission.objects.filter(
+            agent__company=company,
+        )
+
+    def perform_create(self, serializer):
+        company = _user_company(self.request)
+
+        if not company:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Your account is not linked "
+                        "to a company."
+                    ),
+                },
+            )
+
+        agent = serializer.validated_data.get("agent")
+
+        if agent.company_id != company.pk:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Agent does not belong to "
+                        "your company."
+                    ),
+                },
+            )
+
+        serializer.save()
 
 
 class AgentCommissionDetailAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ActionPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
-    queryset = AgentCommission.objects.all()
+    permission_map = crm_permission_map("agents")
     serializer_class = AgentCommissionSerializer
 
-    @module_required('agents')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    def get_queryset(self):
+        company = _user_company(self.request)
 
-    @module_required('agents')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        if not company:
+            return AgentCommission.objects.none()
 
-    @module_required('agents')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('agents')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+        return AgentCommission.objects.filter(
+            agent__company=company,
+        )

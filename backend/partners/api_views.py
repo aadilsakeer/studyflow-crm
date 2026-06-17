@@ -1,5 +1,10 @@
 from rest_framework import generics
-from licensing.decorators import module_required
+from rest_framework.exceptions import ValidationError
+
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
 
 from .models import (
     PartnerUniversity,
@@ -16,182 +21,220 @@ from .serializers import (
 )
 
 
-# Universities
+def _user_company(request):
+    return getattr(request.user, "company", None)
+
+
+def _partner_queryset(model, company):
+    if not company:
+        return model.objects.none()
+
+    return model.objects.filter(
+        university__company=company,
+    )
+
+
+def _validate_partner_university(university, company):
+    if university.company_id != company.pk:
+        raise ValidationError(
+            {
+                "detail": (
+                    "University does not belong to "
+                    "your company."
+                ),
+            },
+        )
+
 
 class PartnerUniversityListCreateAPIView(
-    generics.ListCreateAPIView
+    ActionPermissionMixin,
+    generics.ListCreateAPIView,
 ):
 
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerUniversitySerializer
 
     def get_queryset(self):
+        company = _user_company(self.request)
+
+        if not company:
+            return PartnerUniversity.objects.none()
 
         return PartnerUniversity.objects.filter(
-            company=self.request.user.company
+            company=company,
         )
 
-    def perform_create(
-        self,
-        serializer
-    ):
+    def perform_create(self, serializer):
+        company = _user_company(self.request)
 
-        serializer.save(
-            company=self.request.user.company
-        )
-@module_required('partners')
-def get(self, request, *args, **kwargs):
-    return self.list(request, *args, **kwargs)
+        if not company:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Your account is not linked "
+                        "to a company."
+                    ),
+                },
+            )
 
-
-@module_required('partners')
-def post(self, request, *args, **kwargs):
-    return self.create(request, *args, **kwargs)
+        serializer.save(company=company)
 
 
 class PartnerUniversityDetailAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ActionPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerUniversitySerializer
 
     def get_queryset(self):
+        company = _user_company(self.request)
+
+        if not company:
+            return PartnerUniversity.objects.none()
 
         return PartnerUniversity.objects.filter(
-            company=self.request.user.company
+            company=company,
         )
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
-    @module_required('partners')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-# Contacts
 
 class PartnerContactListCreateAPIView(
-    generics.ListCreateAPIView
+    ActionPermissionMixin,
+    generics.ListCreateAPIView,
 ):
 
-    queryset = PartnerContact.objects.all()
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerContactSerializer
 
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get_queryset(self):
+        return _partner_queryset(
+            PartnerContact,
+            _user_company(self.request),
+        )
 
-    @module_required('partners')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        company = _user_company(self.request)
+
+        if not company:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Your account is not linked "
+                        "to a company."
+                    ),
+                },
+            )
+
+        university = serializer.validated_data["university"]
+        _validate_partner_university(university, company)
+        serializer.save()
 
 
 class PartnerContactDetailAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ActionPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
-    queryset = PartnerContact.objects.all()
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerContactSerializer
 
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    def get_queryset(self):
+        return _partner_queryset(
+            PartnerContact,
+            _user_company(self.request),
+        )
 
-    @module_required('partners')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-
-# Agreements
 
 class PartnerAgreementListCreateAPIView(
-    generics.ListCreateAPIView
+    ActionPermissionMixin,
+    generics.ListCreateAPIView,
 ):
 
-    queryset = PartnerAgreement.objects.all()
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerAgreementSerializer
 
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get_queryset(self):
+        return _partner_queryset(
+            PartnerAgreement,
+            _user_company(self.request),
+        )
 
-    @module_required('partners')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        company = _user_company(self.request)
+
+        if not company:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Your account is not linked "
+                        "to a company."
+                    ),
+                },
+            )
+
+        university = serializer.validated_data["university"]
+        _validate_partner_university(university, company)
+        serializer.save()
+
 
 class PartnerAgreementDetailAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ActionPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
-    queryset = PartnerAgreement.objects.all()
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerAgreementSerializer
 
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    def get_queryset(self):
+        return _partner_queryset(
+            PartnerAgreement,
+            _user_company(self.request),
+        )
 
-    @module_required('partners')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-# Commissions
 
 class PartnerCommissionListCreateAPIView(
-    generics.ListCreateAPIView
+    ActionPermissionMixin,
+    generics.ListCreateAPIView,
 ):
 
-    queryset = PartnerCommission.objects.all()
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerCommissionSerializer
 
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get_queryset(self):
+        return _partner_queryset(
+            PartnerCommission,
+            _user_company(self.request),
+        )
 
-    @module_required('partners')
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-    
+    def perform_create(self, serializer):
+        company = _user_company(self.request)
+
+        if not company:
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Your account is not linked "
+                        "to a company."
+                    ),
+                },
+            )
+
+        university = serializer.validated_data["university"]
+        _validate_partner_university(university, company)
+        serializer.save()
+
+
 class PartnerCommissionDetailAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ActionPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
-    queryset = PartnerCommission.objects.all()
+    permission_map = crm_permission_map("partners")
     serializer_class = PartnerCommissionSerializer
 
-    @module_required('partners')
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    @module_required('partners')
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    @module_required('partners')
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+    def get_queryset(self):
+        return _partner_queryset(
+            PartnerCommission,
+            _user_company(self.request),
+        )

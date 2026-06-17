@@ -7,6 +7,23 @@ class ClientPortalAccessSerializer(
     serializers.ModelSerializer
 ):
 
+    password = serializers.CharField(
+        write_only=True,
+        required=False,
+    )
+
     class Meta:
         model = ClientPortalAccess
-        fields = '__all__'
+        fields = (
+            "id",
+            "student",
+            "username",
+            "password",
+            "is_active",
+            "last_login",
+            "created_at",
+        )
+        read_only_fields = (
+            "last_login",
+            "created_at",
+        )

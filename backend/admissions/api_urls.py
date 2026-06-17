@@ -3,8 +3,12 @@ from django.urls import path
 from .api_views import (
     StudentListCreateAPIView,
     StudentDetailAPIView,
+    StudentTrashListAPIView,
+    StudentRestoreAPIView,
     ApplicationListCreateAPIView,
     ApplicationDetailAPIView,
+    ApplicationTrashListAPIView,
+    ApplicationRestoreAPIView,
     UniversityListCreateAPIView,
     UniversityDetailAPIView,
     DocumentListCreateAPIView,
@@ -30,6 +34,18 @@ urlpatterns = [
     ),
 
     path(
+        'students/trash/',
+        StudentTrashListAPIView.as_view(),
+        name='student-trash'
+    ),
+
+    path(
+        'students/<int:pk>/restore/',
+        StudentRestoreAPIView.as_view(),
+        name='student-restore'
+    ),
+
+    path(
         'students/<int:pk>/',
         StudentDetailAPIView.as_view(),
         name='student-detail'
@@ -39,6 +55,18 @@ urlpatterns = [
         'applications/',
         ApplicationListCreateAPIView.as_view(),
         name='application-list'
+    ),
+
+    path(
+        'applications/trash/',
+        ApplicationTrashListAPIView.as_view(),
+        name='application-trash'
+    ),
+
+    path(
+        'applications/<int:pk>/restore/',
+        ApplicationRestoreAPIView.as_view(),
+        name='application-restore'
     ),
 
     path(

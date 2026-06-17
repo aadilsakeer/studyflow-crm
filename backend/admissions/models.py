@@ -3,9 +3,10 @@ from django.db import models
 from leads.models import Lead
 from accounts.models import CustomUser
 from core.models import Company, Branch
+from core.soft_delete import SoftDeleteModel
 
 
-class Student(models.Model):
+class Student(SoftDeleteModel):
 
     STATUS_CHOICES = [
         ('counselling', 'Counselling'),
@@ -46,7 +47,6 @@ class Student(models.Model):
 
     student_id = models.CharField(
         max_length=50,
-        unique=True
     )
 
     passport_number = models.CharField(
@@ -88,17 +88,24 @@ class Student(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student_id"],
+                condition=models.Q(is_deleted=False),
+                name="unique_student_id_alive",
+            ),
+        ]
         indexes = [
             models.Index(
-                fields=["company", "-created_at"],
-                name="student_company_created_idx",
+                fields=["company", "is_deleted", "-created_at"],
+                name="student_co_del_created_idx",
             ),
         ]
 
     def __str__(self):
         return self.student_id
 
-class Application(models.Model):
+class Application(SoftDeleteModel):
 
     STATUS_CHOICES = [
         ('draft', 'Draft'),
@@ -143,8 +150,8 @@ class Application(models.Model):
     class Meta:
         indexes = [
             models.Index(
-                fields=["student", "-created_at"],
-                name="app_student_created_idx",
+                fields=["student", "is_deleted", "-created_at"],
+                name="app_stu_del_created_idx",
             ),
         ]
 

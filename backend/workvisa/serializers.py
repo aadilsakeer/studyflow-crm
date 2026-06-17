@@ -13,7 +13,21 @@ class WorkVisaCaseSerializer(
 
     class Meta:
         model = WorkVisaCase
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "candidate",
+            "assigned_staff",
+            "destination_country",
+            "visa_type",
+            "status",
+            "remarks",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "created_at",
+        )
 
 
 class WorkVisaDocumentSerializer(
@@ -22,7 +36,13 @@ class WorkVisaDocumentSerializer(
 
     class Meta:
         model = WorkVisaDocument
-        fields = '__all__'
+        fields = (
+            "id",
+            "visa_case",
+            "document_name",
+            "status",
+            "remarks",
+        )
 
 
 class WorkVisaTimelineSerializer(
@@ -31,4 +51,13 @@ class WorkVisaTimelineSerializer(
 
     class Meta:
         model = WorkVisaTimeline
-        fields = '__all__'
+        fields = (
+            "id",
+            "visa_case",
+            "title",
+            "description",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )

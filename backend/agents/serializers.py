@@ -10,7 +10,20 @@ class AgentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Agent
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "name",
+            "phone",
+            "email",
+            "city",
+            "is_active",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "created_at",
+        )
 
 
 class AgentCommissionSerializer(
@@ -19,4 +32,14 @@ class AgentCommissionSerializer(
 
     class Meta:
         model = AgentCommission
-        fields = '__all__'
+        fields = (
+            "id",
+            "agent",
+            "student_name",
+            "amount",
+            "is_paid",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )

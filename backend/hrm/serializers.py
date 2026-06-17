@@ -16,7 +16,19 @@ class AttendanceSerializer(
 
     class Meta:
         model = Attendance
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "employee",
+            "attendance_date",
+            "status",
+            "check_in",
+            "check_out",
+            "remarks",
+        )
+        read_only_fields = (
+            "company",
+        )
 
 
 class LeaveRequestSerializer(
@@ -25,7 +37,18 @@ class LeaveRequestSerializer(
 
     class Meta:
         model = LeaveRequest
-        fields = '__all__'
+        fields = (
+            "id",
+            "employee",
+            "start_date",
+            "end_date",
+            "reason",
+            "status",
+            "applied_at",
+        )
+        read_only_fields = (
+            "applied_at",
+        )
 
 
 class EmployeeLetterSerializer(
@@ -34,7 +57,18 @@ class EmployeeLetterSerializer(
 
     class Meta:
         model = EmployeeLetter
-        fields = '__all__'
+        fields = (
+            "id",
+            "employee",
+            "letter_type",
+            "issue_date",
+            "subject",
+            "content",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )
 
 
 class ResignationSerializer(
@@ -43,7 +77,18 @@ class ResignationSerializer(
 
     class Meta:
         model = Resignation
-        fields = '__all__'
+        fields = (
+            "id",
+            "employee",
+            "resignation_date",
+            "last_working_day",
+            "reason",
+            "status",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )
 
 
 class DepartmentSerializer(
@@ -52,7 +97,15 @@ class DepartmentSerializer(
 
     class Meta:
         model = Department
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "name",
+            "description",
+        )
+        read_only_fields = (
+            "company",
+        )
 
 
 class PayrollSerializer(
@@ -61,4 +114,19 @@ class PayrollSerializer(
 
     class Meta:
         model = Payroll
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "employee",
+            "month",
+            "year",
+            "basic_salary",
+            "deductions",
+            "net_salary",
+            "status",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "created_at",
+        )

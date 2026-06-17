@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/LoginPage";
 import { PermissionsProvider } from "./hooks/usePermissions";
+import { logout as logoutApi } from "./services/auth";
 import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import FollowUpsPage from "./pages/FollowUpsPage";
@@ -40,7 +41,13 @@ function App() {
         setToken(localStorage.getItem("access"));
     }
 
-    function handleLogout() {
+    async function handleLogout() {
+        try {
+            await logoutApi();
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
         localStorage.removeItem("username");

@@ -20,7 +20,16 @@ class FollowUpSerializer(
 
     class Meta:
         model = FollowUp
-        fields = "__all__"
+        fields = (
+            "id",
+            "lead",
+            "assigned_to",
+            "follow_up_date",
+            "notes",
+            "completed",
+            "completed_at",
+            "lead_name",
+        )
         read_only_fields = (
             "completed_at",
         )

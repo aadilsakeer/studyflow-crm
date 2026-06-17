@@ -9,4 +9,22 @@ class AuditLogSerializer(
 
     class Meta:
         model = AuditLog
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "user",
+            "module",
+            "action",
+            "object_id",
+            "description",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "user",
+            "module",
+            "action",
+            "object_id",
+            "description",
+            "created_at",
+        )

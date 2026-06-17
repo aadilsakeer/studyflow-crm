@@ -6,6 +6,8 @@ from .api_views import (
     LeadTimelineListAPIView,
     LeadAuditLogListAPIView,
     LeadConvertAPIView,
+    LeadTrashListAPIView,
+    LeadRestoreAPIView,
 )
 
 urlpatterns = [
@@ -13,6 +15,16 @@ urlpatterns = [
         "",
         LeadListAPIView.as_view(),
         name="lead-list",
+    ),
+    path(
+        "trash/",
+        LeadTrashListAPIView.as_view(),
+        name="lead-trash",
+    ),
+    path(
+        "<int:pk>/restore/",
+        LeadRestoreAPIView.as_view(),
+        name="lead-restore",
     ),
     path(
         "<int:pk>/convert/",

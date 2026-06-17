@@ -20,3 +20,21 @@ export async function getCurrentUser() {
 
     return response.data;
 }
+
+export async function logout() {
+    const refresh = localStorage.getItem("refresh");
+
+    if (!refresh) {
+        return;
+    }
+
+    try {
+        await api.post("/token/blacklist/", {
+            refresh,
+        });
+    } catch (error) {
+        if (error.response?.status !== 401) {
+            throw error;
+        }
+    }
+}

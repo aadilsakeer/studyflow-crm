@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import CustomUser
 from core.models import Company, Branch
+from core.soft_delete import SoftDeleteModel
 
 
 class LeadSource(models.Model):
@@ -17,7 +18,7 @@ class LeadTag(models.Model):
         return self.name
 
 
-class Lead(models.Model):
+class Lead(SoftDeleteModel):
 
     STATUS_CHOICES = [
         ('new', 'New'),
@@ -127,17 +128,18 @@ class Lead(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["company", "phone"],
-                name="unique_lead_phone_per_company",
+                condition=models.Q(is_deleted=False),
+                name="unique_lead_phone_alive",
             ),
         ]
         indexes = [
             models.Index(
-                fields=["company", "status"],
-                name="lead_company_status_idx",
+                fields=["company", "is_deleted", "status"],
+                name="lead_co_del_status_idx",
             ),
             models.Index(
-                fields=["company", "-created_at"],
-                name="lead_company_created_idx",
+                fields=["company", "is_deleted", "-created_at"],
+                name="lead_co_del_created_idx",
             ),
         ]
 

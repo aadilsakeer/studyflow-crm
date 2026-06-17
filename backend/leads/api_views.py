@@ -9,13 +9,18 @@ from rest_framework.generics import (
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
+from admissions.models import Student
 from admissions.serializers import (
     StudentSerializer,
 )
 
 from accounts.access import filter_leads_for_user
-from accounts.constants import PERM_LEADS_CONVERT
+from accounts.constants import (
+    PERM_LEADS_CONVERT,
+    PERM_LEADS_RESTORE,
+)
 from accounts.permissions import (
     IsCompanyMember,
     permission_required,
@@ -61,6 +66,7 @@ class LeadQuerysetMixin:
 
         queryset = Lead.objects.filter(
             company=company,
+            company__isnull=False,
         )
 
         return filter_leads_for_user(
@@ -143,6 +149,36 @@ class LeadDetailAPIView(
             lead,
             old_snapshot,
             self.request.user,
+        )
+
+    def perform_destroy(self, instance):
+        if Student.objects.filter(
+            lead=instance,
+        ).exists():
+            raise ValidationError(
+                {
+                    "detail": (
+                        "Cannot delete a lead that "
+                        "has a student record."
+                    ),
+                },
+            )
+
+        user = self.request.user
+        instance.soft_delete(user)
+
+        LeadTimeline.objects.create(
+            lead=instance,
+            action="deleted",
+            description="Lead moved to trash",
+            performed_by=user,
+        )
+        LeadAuditLog.objects.create(
+            lead=instance,
+            field_changed="is_deleted",
+            old_value="False",
+            new_value="True",
+            changed_by=user,
         )
 
     def get_serializer_context(self):
@@ -252,4 +288,88 @@ class LeadConvertAPIView(
         return Response(
             serializer.data,
             status=201,
+        )
+
+
+class LeadTrashListAPIView(
+    LeadQuerysetMixin,
+    ActionPermissionMixin,
+    ListAPIView,
+):
+    serializer_class = LeadSerializer
+    permission_map = {"GET": "leads.restore"}
+
+    def get_queryset(self):
+        company = self.get_company()
+
+        if not company:
+            return Lead.all_objects.none()
+
+        queryset = Lead.all_objects.dead().filter(
+            company=company,
+        )
+
+        return filter_leads_for_user(
+            queryset,
+            self.request.user,
+        ).order_by("-deleted_at")
+
+
+class LeadRestoreAPIView(
+    LeadQuerysetMixin,
+    APIView,
+):
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyMember,
+        permission_required(PERM_LEADS_RESTORE),
+    ]
+
+    def post(self, request, pk):
+        company = self.get_company()
+
+        if not company:
+            return Response(
+                {"detail": "Company not found."},
+                status=400,
+            )
+
+        lead = get_object_or_404(
+            Lead.all_objects.dead().filter(
+                company=company,
+            ),
+            pk=pk,
+        )
+
+        if Lead.objects.filter(
+            company=company,
+            phone=lead.phone,
+        ).exists():
+            raise ValidationError(
+                {
+                    "detail": (
+                        "An active lead with this "
+                        "phone already exists."
+                    ),
+                },
+            )
+
+        lead.restore()
+
+        LeadTimeline.objects.create(
+            lead=lead,
+            action="restored",
+            description="Lead restored from trash",
+            performed_by=request.user,
+        )
+        LeadAuditLog.objects.create(
+            lead=lead,
+            field_changed="is_deleted",
+            old_value="True",
+            new_value="False",
+            changed_by=request.user,
+        )
+
+        return Response(
+            LeadSerializer(lead).data,
         )

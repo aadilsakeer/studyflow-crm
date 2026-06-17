@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Lead
 
 
@@ -6,12 +7,38 @@ class LeadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lead
-        fields = "__all__"
-        read_only_fields = (
+        fields = (
+            "id",
+            "company",
+            "branch",
+            "first_name",
+            "last_name",
+            "phone",
+            "email",
+            "country_interest",
+            "city",
+            "visa_type",
+            "budget",
+            "source",
+            "assigned_to",
+            "tags",
+            "status",
+            "score",
+            "remarks",
+            "is_deleted",
+            "deleted_at",
+            "deleted_by",
             "created_at",
             "updated_at",
+        )
+        read_only_fields = (
             "company",
             "score",
+            "is_deleted",
+            "deleted_at",
+            "deleted_by",
+            "created_at",
+            "updated_at",
         )
 
     def _get_company(self):

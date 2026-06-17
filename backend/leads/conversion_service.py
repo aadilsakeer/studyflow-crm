@@ -7,7 +7,7 @@ from leads.models import Lead, LeadTimeline
 
 
 def generate_student_id(company):
-    count = Student.objects.filter(
+    count = Student.all_objects.filter(
         company=company,
     ).count()
 
@@ -16,6 +16,13 @@ def generate_student_id(company):
 
 @transaction.atomic
 def convert_lead_to_student(lead, user):
+    if lead.is_deleted:
+        raise ValidationError(
+            {
+                "detail": "Cannot convert a deleted lead.",
+            },
+        )
+
     if lead.status == "converted":
         raise ValidationError(
             {

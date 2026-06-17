@@ -103,6 +103,7 @@ class DashboardService:
     def get_recent_activities(company, limit=10):
         timelines = LeadTimeline.objects.filter(
             lead__company=company,
+            lead__is_deleted=False,
         ).select_related(
             "lead",
             "performed_by",

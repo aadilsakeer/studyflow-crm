@@ -112,9 +112,11 @@ class PaymentDetailAPIView(
 
     
 class ExpenseListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
 
+    permission_map = crm_permission_map("payments")
     serializer_class = ExpenseSerializer
 
     def get_queryset(self):
@@ -145,9 +147,11 @@ class ExpenseListCreateAPIView(
 
 
 class ExpenseDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
 
+    permission_map = crm_permission_map("payments")
     serializer_class = ExpenseSerializer
 
     def get_queryset(self):
@@ -279,9 +283,11 @@ class InvoiceDetailAPIView(
 
     
 class ReceiptListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
 
+    permission_map = crm_permission_map("payments")
     serializer_class = ReceiptSerializer
 
     def get_queryset(self):
@@ -310,9 +316,11 @@ class ReceiptListCreateAPIView(
 
 
 class ReceiptDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
 
+    permission_map = crm_permission_map("payments")
     serializer_class = ReceiptSerializer
 
     def get_queryset(self):
@@ -359,9 +367,11 @@ class ReceiptDetailAPIView(
     
 #refunds
 class RefundListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
 
+    permission_map = crm_permission_map("payments")
     serializer_class = RefundSerializer
 
     def get_queryset(self):
@@ -390,9 +400,11 @@ class RefundListCreateAPIView(
 
 
 class RefundDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
 
+    permission_map = crm_permission_map("payments")
     serializer_class = RefundSerializer
 
     def get_queryset(self):

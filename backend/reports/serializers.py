@@ -12,7 +12,21 @@ class ReportSerializer(
 
     class Meta:
         model = Report
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "title",
+            "report_type",
+            "generated_by",
+            "file",
+            "status",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "generated_by",
+            "created_at",
+        )
 
 
 class ReportScheduleSerializer(
@@ -21,7 +35,19 @@ class ReportScheduleSerializer(
 
     class Meta:
         model = ReportSchedule
-        fields = '__all__'
+        fields = (
+            "id",
+            "company",
+            "report_type",
+            "frequency",
+            "email_to",
+            "is_active",
+            "created_at",
+        )
+        read_only_fields = (
+            "company",
+            "created_at",
+        )
 
 
 class ReportSummarySerializer(

@@ -3,7 +3,6 @@ from rest_framework import serializers
 from core.validators import (
     get_request_company,
     validate_application_in_company,
-    validate_lead_in_company,
     validate_student_in_company,
     validate_ticket_in_company,
 )
@@ -35,11 +34,38 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = "__all__"
-        read_only_fields = (
-            "student_id",
+        fields = (
+            "id",
             "lead",
             "company",
+            "branch",
+            "portal_access",
+            "assigned_counselor",
+            "student_id",
+            "passport_number",
+            "destination_country",
+            "preferred_university",
+            "intake",
+            "status",
+            "notes",
+            "is_deleted",
+            "deleted_at",
+            "deleted_by",
+            "created_at",
+            "updated_at",
+            "lead_name",
+            "lead_phone",
+            "lead_email",
+        )
+        read_only_fields = (
+            "lead",
+            "company",
+            "student_id",
+            "is_deleted",
+            "deleted_at",
+            "deleted_by",
+            "created_at",
+            "updated_at",
         )
 
     def get_lead_name(self, obj):
@@ -66,7 +92,27 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Application
-        fields = "__all__"
+        fields = (
+            "id",
+            "student",
+            "university_name",
+            "course_name",
+            "intake",
+            "application_status",
+            "notes",
+            "is_deleted",
+            "deleted_at",
+            "deleted_by",
+            "created_at",
+            "student_name",
+            "student_code",
+        )
+        read_only_fields = (
+            "is_deleted",
+            "deleted_at",
+            "deleted_by",
+            "created_at",
+        )
 
     def get_student_name(self, obj):
         lead = obj.student.lead
@@ -92,7 +138,17 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = "__all__"
+        fields = (
+            "id",
+            "application",
+            "document_name",
+            "status",
+            "remarks",
+            "uploaded_at",
+        )
+        read_only_fields = (
+            "uploaded_at",
+        )
 
     def validate_application(self, application):
         company = get_request_company(
@@ -108,7 +164,19 @@ class VisaCaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VisaCase
-        fields = "__all__"
+        fields = (
+            "id",
+            "application",
+            "submission_date",
+            "biometrics_date",
+            "decision_date",
+            "status",
+            "remarks",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )
 
     def validate_application(self, application):
         company = get_request_company(
@@ -124,21 +192,47 @@ class UniversitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = University
-        fields = "__all__"
+        fields = (
+            "id",
+            "name",
+            "country",
+            "city",
+            "website",
+            "is_active",
+        )
 
 
 class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = "__all__"
+        fields = (
+            "id",
+            "university",
+            "name",
+            "level",
+            "duration",
+            "tuition_fee",
+        )
 
 
 class OfferLetterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OfferLetter
-        fields = "__all__"
+        fields = (
+            "id",
+            "application",
+            "offer_number",
+            "status",
+            "issue_date",
+            "acceptance_deadline",
+            "notes",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )
 
     def validate_application(self, application):
         company = get_request_company(
@@ -154,7 +248,17 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SupportTicket
-        fields = "__all__"
+        fields = (
+            "id",
+            "student",
+            "subject",
+            "description",
+            "status",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+        )
 
     def validate_student(self, student):
         company = get_request_company(
@@ -170,7 +274,17 @@ class TicketCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketComment
-        fields = "__all__"
+        fields = (
+            "id",
+            "ticket",
+            "user",
+            "comment",
+            "created_at",
+        )
+        read_only_fields = (
+            "user",
+            "created_at",
+        )
 
     def validate_ticket(self, ticket):
         company = get_request_company(
