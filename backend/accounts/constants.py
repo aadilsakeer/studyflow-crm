@@ -47,6 +47,7 @@ PERM_DOCUMENTS_VIEW = "documents.view"
 PERM_DOCUMENTS_ADD = "documents.add"
 PERM_DOCUMENTS_CHANGE = "documents.change"
 PERM_DOCUMENTS_DELETE = "documents.delete"
+PERM_DOCUMENTS_RESTORE = "documents.restore"
 
 PERM_PAYMENTS_VIEW = "payments.view"
 PERM_PAYMENTS_ADD = "payments.add"
@@ -138,6 +139,7 @@ ALL_PERMISSIONS = [
     (PERM_DOCUMENTS_ADD, "Add Documents"),
     (PERM_DOCUMENTS_CHANGE, "Change Documents"),
     (PERM_DOCUMENTS_DELETE, "Delete Documents"),
+    (PERM_DOCUMENTS_RESTORE, "Restore Documents"),
     (PERM_PAYMENTS_VIEW, "View Payments"),
     (PERM_PAYMENTS_ADD, "Add Payments"),
     (PERM_PAYMENTS_CHANGE, "Change Payments"),

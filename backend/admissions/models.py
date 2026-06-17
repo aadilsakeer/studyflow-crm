@@ -1,4 +1,6 @@
 from django.db import models
+import os
+import uuid
 
 from leads.models import Lead
 from accounts.models import CustomUser
@@ -396,3 +398,99 @@ class TicketComment(models.Model):
 
     def __str__(self):
         return f"{self.ticket} - {self.user}"
+
+
+def student_document_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    return (
+        f"student_documents/"
+        f"{instance.company_id}/"
+        f"{instance.student_id}/"
+        f"{safe_name}"
+    )
+
+
+class StudentDocument(SoftDeleteModel):
+
+    DOCUMENT_TYPE_CHOICES = [
+        ('passport', 'Passport'),
+        ('10th_marksheet', '10th Marksheet'),
+        ('12th_marksheet', '12th Marksheet'),
+        ('degree_certificate', 'Degree Certificate'),
+        ('ielts', 'IELTS'),
+        ('pte', 'PTE'),
+        ('sop', 'SOP'),
+        ('lor', 'LOR'),
+        ('resume', 'Resume'),
+        ('other', 'Other'),
+    ]
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name='documents',
+    )
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+    )
+
+    document_type = models.CharField(
+        max_length=50,
+        choices=DOCUMENT_TYPE_CHOICES,
+    )
+
+    file = models.FileField(
+        upload_to=student_document_upload_path,
+    )
+
+    original_filename = models.CharField(
+        max_length=255,
+    )
+
+    file_size = models.PositiveIntegerField()
+
+    mime_type = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    notes = models.TextField(
+        blank=True,
+    )
+
+    uploaded_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='uploaded_student_documents',
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['student', '-created_at'],
+                name='studdoc_student_created_idx',
+            ),
+            models.Index(
+                fields=['company', 'document_type'],
+                name='studdoc_company_type_idx',
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.student.student_id} - "
+            f"{self.get_document_type_display()}"
+        )
