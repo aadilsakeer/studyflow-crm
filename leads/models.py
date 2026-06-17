@@ -52,7 +52,6 @@ class Lead(models.Model):
 
     phone = models.CharField(
         max_length=20,
-        unique=True,
         db_index=True
     )
 
@@ -124,6 +123,14 @@ class Lead(models.Model):
         auto_now=True
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "phone"],
+                name="unique_lead_phone_per_company",
+            ),
+        ]
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -176,6 +183,11 @@ class FollowUp(models.Model):
 
     completed = models.BooleanField(
         default=False
+    )
+
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
     )
 
     def __str__(self):

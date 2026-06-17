@@ -21,3 +21,9 @@ class DashboardSerializer(
         max_digits=15,
         decimal_places=2
     )
+
+    todays_follow_ups = serializers.IntegerField()
+
+    pending_follow_ups = serializers.IntegerField()
+
+    completed_today = serializers.IntegerField()

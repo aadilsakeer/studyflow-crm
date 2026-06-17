@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'dashboard',
     'clientportal',
     'whatsapp',
+    'followups',
+    'calllogs',
     'corsheaders',
 ]
 
@@ -175,4 +177,5 @@ LOGIN_REDIRECT_URL = "/api/agents/"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]

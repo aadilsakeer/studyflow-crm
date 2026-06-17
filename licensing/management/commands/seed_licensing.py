@@ -20,9 +20,8 @@ class Command(BaseCommand):
             ("Knowledge Base", "knowledgebase"),
             ("Client Portal", "clientportal"),
             ("Notifications", "notifications"),
-            ('Dashboard', 'dashboard'),
-            ('Client Portal', 'clientportal'),
-            ('WhatsApp', 'whatsapp'),
+            ("Dashboard", "dashboard"),
+            ("WhatsApp", "whatsapp"),
         ]
 
         for name, code in modules:

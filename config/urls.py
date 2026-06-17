@@ -9,7 +9,6 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # JWT Authentication
     path(
         'api/token/',
         TokenObtainPairView.as_view(),
@@ -22,73 +21,93 @@ urlpatterns = [
         name='token_refresh'
     ),
 
-    # Leads APIs
+    path(
+        'api/',
+        include('accounts.api_urls')
+    ),
+
     path(
         'api/leads/',
         include('leads.api_urls')
     ),
 
-    # Admissions APIs
     path(
         'api/',
         include('admissions.api_urls')
     ),
+
     path(
-         'api/reports/',
+        'api/reports/',
         include('reports.api_urls')
     ),
+
     path(
-         'api/dashboard/',
-         include('core.api_urls')
-        ),
-    path(
-    'api/partners/',
-    include('partners.api_urls')
-),
-path(
-    'api/agents/',
-    include('agents.api_urls')
-),
-path(
-    'api-auth/',
-    include('rest_framework.urls')
-),
-path(
-    'api/recruitment/',
-    include('recruitment.api_urls')
-),
-path(
-    'api/workvisa/',
-    include('workvisa.api_urls')
-),
-path(
-    'api/auditlogs/',
-    include('auditlogs.api_urls')
-),
-path(
-    'api/finance/',
-    include('finance.api_urls')
-),
-path(
-    'api/hrm/',
-    include('hrm.api_urls')
-),
-path(
-    'api/dashboard/',
-    include('dashboard.api_urls')
-),
-path(
-    'api/clientportal/',
-    include('clientportal.api_urls')
-),
-path(
-    'api/whatsapp/',
-    include('whatsapp.api_urls')
-),
-path(
-    "api/followups/",
-    include(
-        "followups.api_urls"
+        'api/dashboard/',
+        include('dashboard.api_urls')
     ),
-),
+
+    path(
+        'api/partners/',
+        include('partners.api_urls')
+    ),
+
+    path(
+        'api/agents/',
+        include('agents.api_urls')
+    ),
+
+    path(
+        'api-auth/',
+        include('rest_framework.urls')
+    ),
+
+    path(
+        'api/recruitment/',
+        include('recruitment.api_urls')
+    ),
+
+    path(
+        'api/workvisa/',
+        include('workvisa.api_urls')
+    ),
+
+    path(
+        'api/auditlogs/',
+        include('auditlogs.api_urls')
+    ),
+
+    path(
+        'api/finance/',
+        include('finance.api_urls')
+    ),
+
+    path(
+        'api/hrm/',
+        include('hrm.api_urls')
+    ),
+
+    path(
+        'api/clientportal/',
+        include('clientportal.api_urls')
+    ),
+
+    path(
+        'api/whatsapp/',
+        include('whatsapp.api_urls')
+    ),
+
+    path(
+        'api/followups/',
+        include('followups.api_urls')
+    ),
+
+    path(
+        'api/calllogs/',
+        include('calllogs.api_urls')
+    ),
+
+    path(
+        'api/notifications/',
+        include('notifications.api_urls')
+    ),
 ]

@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from rest_framework import generics
 
 from licensing.decorators import module_required
@@ -138,11 +140,58 @@ class ApplicationListCreateAPIView(
 
     serializer_class = ApplicationSerializer
 
-    def get_queryset(self):
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
 
-        return Application.objects.filter(
-            student__company=self.request.user.company
+    def get_queryset(self):
+        queryset = Application.objects.filter(
+            student__company=(
+                self.request.user.company
+            )
         )
+
+        student_id = self.request.query_params.get(
+            "student",
+        )
+        status = self.request.query_params.get(
+            "status",
+        )
+        search = self.request.query_params.get(
+            "search",
+        )
+
+        if student_id:
+            queryset = queryset.filter(
+                student_id=student_id,
+            )
+
+        if status:
+            queryset = queryset.filter(
+                application_status=status,
+            )
+
+        if search:
+            queryset = queryset.filter(
+                Q(
+                    university_name__icontains=search,
+                )
+                | Q(
+                    course_name__icontains=search,
+                )
+                | Q(
+                    student__student_id__icontains=search,
+                )
+                | Q(
+                    student__lead__first_name__icontains=search,
+                )
+                | Q(
+                    student__lead__last_name__icontains=search,
+                )
+            )
+
+        return queryset.order_by("-created_at")
 
     def perform_create(self, serializer):
 
@@ -174,6 +223,11 @@ class ApplicationDetailAPIView(
 ):
 
     serializer_class = ApplicationSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
 
     def get_queryset(self):
 
@@ -238,8 +292,29 @@ class UniversityListCreateAPIView(
     serializer_class = UniversitySerializer
 
     def get_queryset(self):
+        queryset = University.objects.filter(
+            is_active=True,
+        )
 
-        return University.objects.all()
+        country = self.request.query_params.get(
+            "country",
+        )
+        search = self.request.query_params.get(
+            "search",
+        )
+
+        if country:
+            queryset = queryset.filter(
+                country__iexact=country,
+            )
+
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search)
+                | Q(city__icontains=search)
+            )
+
+        return queryset.order_by("name")
 
     def perform_create(self, serializer):
 

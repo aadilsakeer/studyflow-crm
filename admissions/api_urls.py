@@ -7,6 +7,18 @@ from .api_views import (
     ApplicationDetailAPIView,
     UniversityListCreateAPIView,
     UniversityDetailAPIView,
+    DocumentListCreateAPIView,
+    DocumentDetailAPIView,
+    VisaCaseListCreateAPIView,
+    VisaCaseDetailAPIView,
+    CourseListCreateAPIView,
+    CourseDetailAPIView,
+    OfferLetterListCreateAPIView,
+    OfferLetterDetailAPIView,
+    SupportTicketListCreateAPIView,
+    SupportTicketDetailAPIView,
+    TicketCommentListCreateAPIView,
+    TicketCommentDetailAPIView,
 )
 
 urlpatterns = [
@@ -45,6 +57,78 @@ urlpatterns = [
         'universities/<int:pk>/',
         UniversityDetailAPIView.as_view(),
         name='university-detail'
+    ),
+
+    path(
+        'documents/',
+        DocumentListCreateAPIView.as_view(),
+        name='document-list'
+    ),
+
+    path(
+        'documents/<int:pk>/',
+        DocumentDetailAPIView.as_view(),
+        name='document-detail'
+    ),
+
+    path(
+        'visa-cases/',
+        VisaCaseListCreateAPIView.as_view(),
+        name='visa-case-list'
+    ),
+
+    path(
+        'visa-cases/<int:pk>/',
+        VisaCaseDetailAPIView.as_view(),
+        name='visa-case-detail'
+    ),
+
+    path(
+        'courses/',
+        CourseListCreateAPIView.as_view(),
+        name='course-list'
+    ),
+
+    path(
+        'courses/<int:pk>/',
+        CourseDetailAPIView.as_view(),
+        name='course-detail'
+    ),
+
+    path(
+        'offer-letters/',
+        OfferLetterListCreateAPIView.as_view(),
+        name='offer-letter-list'
+    ),
+
+    path(
+        'offer-letters/<int:pk>/',
+        OfferLetterDetailAPIView.as_view(),
+        name='offer-letter-detail'
+    ),
+
+    path(
+        'support-tickets/',
+        SupportTicketListCreateAPIView.as_view(),
+        name='support-ticket-list'
+    ),
+
+    path(
+        'support-tickets/<int:pk>/',
+        SupportTicketDetailAPIView.as_view(),
+        name='support-ticket-detail'
+    ),
+
+    path(
+        'ticket-comments/',
+        TicketCommentListCreateAPIView.as_view(),
+        name='ticket-comment-list'
+    ),
+
+    path(
+        'ticket-comments/<int:pk>/',
+        TicketCommentDetailAPIView.as_view(),
+        name='ticket-comment-detail'
     ),
 
 ]

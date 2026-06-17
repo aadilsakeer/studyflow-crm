@@ -1,5 +1,3 @@
-from django.utils import timezone
-
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
@@ -7,16 +5,16 @@ from rest_framework.generics import (
 
 from core.mixins import LeadCompanyFilteredMixin
 
-from leads.models import FollowUp
-from .serializers import FollowUpSerializer
+from leads.models import CallLog
+from .serializers import CallLogSerializer
 
 
-class FollowUpListAPIView(
+class CallLogListAPIView(
     LeadCompanyFilteredMixin,
     ListCreateAPIView,
 ):
-    queryset = FollowUp.objects.all()
-    serializer_class = FollowUpSerializer
+    queryset = CallLog.objects.all()
+    serializer_class = CallLogSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -24,41 +22,13 @@ class FollowUpListAPIView(
         lead_id = self.request.query_params.get(
             "lead",
         )
-        completed = self.request.query_params.get(
-            "completed",
-        )
-        date_filter = self.request.query_params.get(
-            "date",
-        )
 
         if lead_id:
             queryset = queryset.filter(
                 lead_id=lead_id,
             )
 
-        if completed is not None:
-            queryset = queryset.filter(
-                completed=(
-                    completed.lower() == "true"
-                ),
-            )
-
-        today = timezone.localdate()
-
-        if date_filter == "today":
-            queryset = queryset.filter(
-                follow_up_date__date=today,
-            )
-
-        if date_filter == "completed_today":
-            queryset = queryset.filter(
-                completed=True,
-                completed_at__date=today,
-            )
-
-        return queryset.order_by(
-            "-follow_up_date",
-        )
+        return queryset.order_by("-call_time")
 
     def perform_create(self, serializer):
         company = getattr(
@@ -91,16 +61,18 @@ class FollowUpListAPIView(
             )
 
             raise PermissionDenied(
-                "You cannot add follow-ups "
-                "to this lead."
+                "You cannot log calls "
+                "for this lead."
             )
 
-        serializer.save()
+        serializer.save(
+            called_by=self.request.user,
+        )
 
 
-class FollowUpDetailAPIView(
+class CallLogDetailAPIView(
     LeadCompanyFilteredMixin,
     RetrieveUpdateDestroyAPIView,
 ):
-    queryset = FollowUp.objects.all()
-    serializer_class = FollowUpSerializer
+    queryset = CallLog.objects.all()
+    serializer_class = CallLogSerializer
