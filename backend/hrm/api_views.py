@@ -3,6 +3,11 @@ from rest_framework import generics
 from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from .models import (
     Attendance,
     LeaveRequest,
@@ -25,8 +30,10 @@ from .serializers import (
 # Attendance
 
 class AttendanceListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = AttendanceSerializer
 
@@ -64,8 +71,10 @@ class AttendanceListCreateAPIView(
 
 
 class AttendanceDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = AttendanceSerializer
 
@@ -121,8 +130,10 @@ class AttendanceDetailAPIView(
 # Leave Request
 
 class LeaveRequestListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = LeaveRequestSerializer
 
@@ -157,8 +168,10 @@ class LeaveRequestListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 class LeaveRequestDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = LeaveRequestSerializer
 
@@ -217,8 +230,10 @@ class LeaveRequestDetailAPIView(
         return self.destroy(request, *args, **kwargs)
     
 class DepartmentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = DepartmentSerializer
 
@@ -256,8 +271,10 @@ class DepartmentListCreateAPIView(
 
 
 class DepartmentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = DepartmentSerializer
 
@@ -316,8 +333,10 @@ class DepartmentDetailAPIView(
         return self.destroy(request, *args, **kwargs)
 
 class EmployeeLetterListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = EmployeeLetterSerializer
 
@@ -351,8 +370,10 @@ class EmployeeLetterListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 class EmployeeLetterDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = EmployeeLetterSerializer
 
@@ -409,8 +430,10 @@ class EmployeeLetterDetailAPIView(
         return self.destroy(request, *args, **kwargs)
     
 class ResignationListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = ResignationSerializer
 
@@ -445,8 +468,10 @@ class ResignationListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 class ResignationDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = ResignationSerializer
 
@@ -505,8 +530,10 @@ class ResignationDetailAPIView(
         return self.destroy(request, *args, **kwargs)
     
 class PayrollListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = PayrollSerializer
 
@@ -544,8 +571,10 @@ class PayrollListCreateAPIView(
 
 
 class PayrollDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("hrm")
 
     serializer_class = PayrollSerializer
 

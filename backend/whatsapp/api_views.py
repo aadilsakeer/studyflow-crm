@@ -3,6 +3,11 @@ from rest_framework import generics
 from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from .models import (
     WhatsAppAccount,
     WhatsAppMessage,
@@ -17,8 +22,10 @@ from .serializers import (
 
 
 class WhatsAppAccountListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("whatsapp")
 
     serializer_class = WhatsAppAccountSerializer
 
@@ -56,8 +63,10 @@ class WhatsAppAccountListCreateAPIView(
 
 
 class WhatsAppAccountDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("whatsapp")
 
     serializer_class = WhatsAppAccountSerializer
 
@@ -85,8 +94,10 @@ class WhatsAppAccountDetailAPIView(
 
 
 class WhatsAppMessageListAPIView(
+    ActionPermissionMixin,
     generics.ListAPIView
 ):
+    permission_map = crm_permission_map("whatsapp")
 
     serializer_class = WhatsAppMessageSerializer
 
@@ -101,8 +112,10 @@ class WhatsAppMessageListAPIView(
         return self.list(request, *args, **kwargs)
 
 class WhatsAppServerAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateAPIView
 ):
+    permission_map = crm_permission_map("whatsapp")
 
     serializer_class = WhatsAppServerSerializer
 

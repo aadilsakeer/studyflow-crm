@@ -3,14 +3,21 @@ from rest_framework import generics
 from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from .models import ClientPortalAccess
 from .serializers import ClientPortalAccessSerializer
 from .services import ClientPortalAuthService
 
 
 class ClientPortalAccessListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("clientportal")
 
     serializer_class = ClientPortalAccessSerializer
 
@@ -50,8 +57,10 @@ class ClientPortalAccessListCreateAPIView(
 
 
 class ClientPortalAccessDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("clientportal")
 
     serializer_class = ClientPortalAccessSerializer
 

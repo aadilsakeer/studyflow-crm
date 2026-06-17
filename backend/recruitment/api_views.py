@@ -3,6 +3,11 @@ from rest_framework import generics
 from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from .models import (
     Employer,
     JobOpening,
@@ -23,8 +28,10 @@ from .serializers import (
 # Employer
 
 class EmployerListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = EmployerSerializer
 
@@ -56,8 +63,10 @@ class EmployerListCreateAPIView(
 
 
 class EmployerDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = EmployerSerializer
 
@@ -116,8 +125,10 @@ class EmployerDetailAPIView(
 
 # Job Opening
 class JobOpeningListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = JobOpeningSerializer
 
@@ -152,8 +163,10 @@ class JobOpeningListCreateAPIView(
 
 
 class JobOpeningDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = JobOpeningSerializer
 
@@ -212,8 +225,10 @@ class JobOpeningDetailAPIView(
 # Candidate
 
 class CandidateListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = CandidateSerializer
 
@@ -250,8 +265,10 @@ class CandidateListCreateAPIView(
 
 
 class CandidateDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = CandidateSerializer
 
@@ -310,8 +327,10 @@ class CandidateDetailAPIView(
 
 # Interview
 class InterviewListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = InterviewSerializer
 
@@ -345,8 +364,10 @@ class InterviewListCreateAPIView(
         return self.create(request, *args, **kwargs)
     
 class InterviewDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = InterviewSerializer
 
@@ -406,8 +427,10 @@ class InterviewDetailAPIView(
 # Deployment
 
 class DeploymentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = DeploymentSerializer
 
@@ -442,8 +465,10 @@ class DeploymentListCreateAPIView(
 
 
 class DeploymentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("recruitment")
 
     serializer_class = DeploymentSerializer
 

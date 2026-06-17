@@ -1,17 +1,28 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
+
+from accounts.constants import PERM_NOTIFICATIONS_CHANGE
+from accounts.permissions import (
+    ActionPermissionMixin,
+    IsCompanyMember,
+    permission_required,
+    crm_permission_map,
+)
 
 from .models import Notification
 from .serializers import NotificationSerializer
 
 
 class NotificationListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("notifications")
 
     serializer_class = NotificationSerializer
 
@@ -51,8 +62,10 @@ class NotificationListCreateAPIView(
 
 
 class NotificationDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("notifications")
 
     serializer_class = NotificationSerializer
 
@@ -114,6 +127,11 @@ class NotificationDetailAPIView(
 class MarkNotificationReadAPIView(
     APIView
 ):
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyMember,
+        permission_required(PERM_NOTIFICATIONS_CHANGE),
+    ]
 
     @module_required('notifications')
     def post(self, request, pk):

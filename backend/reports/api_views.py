@@ -1,7 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from licensing.decorators import module_required
+
+from accounts.constants import PERM_REPORTS_VIEW
+from accounts.permissions import (
+    IsCompanyMember,
+    permission_required,
+)
 
 from .services import (
     ReportService,
@@ -14,7 +21,15 @@ from .services import (
 )
 
 
-class ReportSummaryAPIView(APIView):
+class LicensedReportAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyMember,
+        permission_required(PERM_REPORTS_VIEW),
+    ]
+
+
+class ReportSummaryAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):
@@ -26,7 +41,7 @@ class ReportSummaryAPIView(APIView):
         return Response(data)
 
 
-class FinanceReportAPIView(APIView):
+class FinanceReportAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):
@@ -38,7 +53,7 @@ class FinanceReportAPIView(APIView):
         return Response(data)
 
 
-class LeadConversionReportAPIView(APIView):
+class LeadConversionReportAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):
@@ -50,7 +65,7 @@ class LeadConversionReportAPIView(APIView):
         return Response(data)
 
 
-class StaffPerformanceAPIView(APIView):
+class StaffPerformanceAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):
@@ -62,7 +77,7 @@ class StaffPerformanceAPIView(APIView):
         return Response(data)
 
 
-class CountryAnalyticsAPIView(APIView):
+class CountryAnalyticsAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):
@@ -74,7 +89,7 @@ class CountryAnalyticsAPIView(APIView):
         return Response(data)
 
 
-class RecruitmentAnalyticsAPIView(APIView):
+class RecruitmentAnalyticsAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):
@@ -86,7 +101,7 @@ class RecruitmentAnalyticsAPIView(APIView):
         return Response(data)
 
 
-class WorkVisaAnalyticsAPIView(APIView):
+class WorkVisaAnalyticsAPIView(LicensedReportAPIView):
 
     @module_required('reports')
     def get(self, request):

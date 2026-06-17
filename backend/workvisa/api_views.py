@@ -3,6 +3,11 @@ from rest_framework import generics
 from licensing.decorators import module_required
 from auditlogs.services import AuditLogService
 
+from accounts.permissions import (
+    ActionPermissionMixin,
+    crm_permission_map,
+)
+
 from .models import (
     WorkVisaCase,
     WorkVisaDocument,
@@ -19,8 +24,10 @@ from .serializers import (
 # Work Visa Cases
 
 class WorkVisaCaseListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("workvisa")
 
     serializer_class = WorkVisaCaseSerializer
 
@@ -60,8 +67,10 @@ class WorkVisaCaseListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 class WorkVisaCaseDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("workvisa")
 
     serializer_class = WorkVisaCaseSerializer
 
@@ -122,8 +131,10 @@ class WorkVisaCaseDetailAPIView(
 # Documents
 
 class WorkVisaDocumentListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("workvisa")
 
     serializer_class = WorkVisaDocumentSerializer
 
@@ -158,8 +169,10 @@ class WorkVisaDocumentListCreateAPIView(
         return self.create(request, *args, **kwargs)
 
 class WorkVisaDocumentDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("workvisa")
 
     serializer_class = WorkVisaDocumentSerializer
 
@@ -220,8 +233,10 @@ class WorkVisaDocumentDetailAPIView(
 # Timeline
 
 class WorkVisaTimelineListCreateAPIView(
+    ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    permission_map = crm_permission_map("workvisa")
 
     serializer_class = WorkVisaTimelineSerializer
 
@@ -241,8 +256,10 @@ class WorkVisaTimelineListCreateAPIView(
 
 
 class WorkVisaTimelineDetailAPIView(
+    ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    permission_map = crm_permission_map("workvisa")
 
     serializer_class = WorkVisaTimelineSerializer
 
