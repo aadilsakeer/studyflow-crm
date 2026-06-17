@@ -62,7 +62,10 @@ class CallLogListAPIView(
             "lead",
         )
 
-        if lead.company_id != company.id:
+        if (
+            not lead.company_id
+            or lead.company_id != company.id
+        ):
             from rest_framework.exceptions import (
                 PermissionDenied,
             )

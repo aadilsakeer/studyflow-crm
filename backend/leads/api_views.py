@@ -69,8 +69,7 @@ class LeadQuerysetMixin:
             return Lead.objects.none()
 
         queryset = Lead.objects.filter(
-            Q(company=company)
-            | Q(company__isnull=True)
+            company=company,
         )
 
         return filter_leads_for_user(
@@ -143,18 +142,7 @@ class LeadDetailAPIView(
     def perform_update(self, serializer):
         instance = serializer.instance
         old_snapshot = snapshot_lead(instance)
-
-        company = self.get_company()
-
-        if (
-            company
-            and instance.company_id is None
-        ):
-            lead = serializer.save(
-                company=company,
-            )
-        else:
-            lead = serializer.save()
+        lead = serializer.save()
 
         log_lead_changes(
             lead,

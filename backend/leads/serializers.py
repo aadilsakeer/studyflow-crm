@@ -10,6 +10,8 @@ class LeadSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "created_at",
             "updated_at",
+            "company",
+            "score",
         )
 
     def _get_company(self):
