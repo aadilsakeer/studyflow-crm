@@ -130,6 +130,16 @@ class Lead(models.Model):
                 name="unique_lead_phone_per_company",
             ),
         ]
+        indexes = [
+            models.Index(
+                fields=["company", "status"],
+                name="lead_company_status_idx",
+            ),
+            models.Index(
+                fields=["company", "-created_at"],
+                name="lead_company_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -190,6 +200,14 @@ class FollowUp(models.Model):
         blank=True,
     )
 
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["lead", "completed", "follow_up_date"],
+                name="followup_lead_status_date_idx",
+            ),
+        ]
+
     def __str__(self):
         return str(self.follow_up_date)
 
@@ -217,6 +235,14 @@ class LeadTimeline(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["lead", "-created_at"],
+                name="timeline_lead_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return self.action
@@ -248,6 +274,14 @@ class LeadAuditLog(models.Model):
     changed_at = models.DateTimeField(
         auto_now_add=True
     )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["lead", "-changed_at"],
+                name="auditlog_lead_changed_idx",
+            ),
+        ]
 
     def __str__(self):
         return self.field_changed

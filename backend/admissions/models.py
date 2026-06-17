@@ -87,6 +87,14 @@ class Student(models.Model):
         auto_now=True
     )
 
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["company", "-created_at"],
+                name="student_company_created_idx",
+            ),
+        ]
+
     def __str__(self):
         return self.student_id
 
@@ -131,6 +139,14 @@ class Application(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["student", "-created_at"],
+                name="app_student_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.student.student_id} - {self.university_name}"
