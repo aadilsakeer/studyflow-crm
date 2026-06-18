@@ -1,0 +1,65 @@
+# StudyFlow CRM — local dev services
+#
+# OpenWA gateway (rmyndharis/OpenWA — NOT openwa/wa-automate):
+#   API:       http://localhost:2785/api
+#   Dashboard: http://localhost:2785
+#   Swagger:   http://localhost:2785/api/docs
+#
+# CRM WhatsApp settings:
+#   Base URL: http://localhost:2785/api
+#   API Key:  globvio-openwa-key  (matches API_MASTER_KEY below)
+#
+# Start:  docker compose -f docker-compose.dev.yml up -d --build openwa
+# Logs:   docker compose -f docker-compose.dev.yml logs -f openwa
+# Stop:   docker compose -f docker-compose.dev.yml down
+
+services:
+  openwa:
+    # Prebuilt image (faster — no local build):
+    # image: ghcr.io/rmyndharis/openwa:latest
+    build:
+      context: ./OpenWA-main
+      dockerfile: Dockerfile
+    container_name: globvio-openwa
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:2785:2785"
+    environment:
+      NODE_ENV: development
+      PORT: 2785
+      HOME: /tmp
+      XDG_CONFIG_HOME: /tmp/.config
+      XDG_CACHE_HOME: /tmp/.cache
+      API_MASTER_KEY: globvio-openwa-key
+      DATABASE_TYPE: sqlite
+      DATABASE_NAME: /app/data/openwa.sqlite
+      DATABASE_SYNCHRONIZE: "true"
+      ENGINE_TYPE: whatsapp-web.js
+      SESSION_DATA_PATH: /app/data/sessions
+      PUPPETEER_HEADLESS: "true"
+      PUPPETEER_ARGS: --no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-gpu
+      STORAGE_TYPE: local
+      STORAGE_LOCAL_PATH: /app/data/media
+      WEBHOOK_TIMEOUT: 10000
+      WEBHOOK_MAX_RETRIES: 3
+      QUEUE_ENABLED: "false"
+    volumes:
+      - openwa-data:/app/data
+    shm_size: "512mb"
+    security_opt:
+      - seccomp:unconfined
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:2785/api/health/ready', (r) => process.exit(r.statusCode === 200 ? 0 : 1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  openwa-data:

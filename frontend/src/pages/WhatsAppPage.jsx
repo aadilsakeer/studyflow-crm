@@ -37,26 +37,43 @@ function WhatsAppPage() {
     const load = useCallback(async () => {
         setLoading(true);
 
-        try {
-            const [serverData, statusData, messageData] =
-                await Promise.all([
-                    getWhatsAppServer(),
-                    getWhatsAppSessionStatus(),
-                    getWhatsAppMessages(),
-                ]);
+        const [serverResult, statusResult, messagesResult] =
+            await Promise.allSettled([
+                getWhatsAppServer(),
+                getWhatsAppSessionStatus(),
+                getWhatsAppMessages(),
+            ]);
 
+        let hadError = false;
+
+        if (serverResult.status === "fulfilled") {
+            const serverData = serverResult.value;
             setServerForm({
                 base_url: serverData.base_url || "",
                 api_key: "",
                 is_active: serverData.is_active ?? true,
             });
-            setSession(statusData);
-            setMessages(messageData.slice(0, 20));
-        } catch {
-            showError("Failed to load WhatsApp settings.");
-        } finally {
-            setLoading(false);
+        } else {
+            hadError = true;
         }
+
+        if (statusResult.status === "fulfilled") {
+            setSession(statusResult.value);
+        } else {
+            setSession({ connected: false, session_id: null });
+        }
+
+        if (messagesResult.status === "fulfilled") {
+            setMessages(messagesResult.value.slice(0, 20));
+        } else {
+            setMessages([]);
+        }
+
+        if (hadError) {
+            showError("Failed to load WhatsApp server settings.");
+        }
+
+        setLoading(false);
     }, []);
 
     useEffect(() => {
@@ -85,7 +102,7 @@ function WhatsAppPage() {
     async function handleConnect() {
         try {
             const data = await connectWhatsAppSession();
-            setQrData(data.qr);
+            setQrData(data.qr || data);
             setSession({
                 connected: data.is_connected,
                 session_id: data.session_id,
@@ -99,7 +116,7 @@ function WhatsAppPage() {
     async function handleRefreshQR() {
         try {
             const data = await getWhatsAppQR();
-            setQrData(data.qr);
+            setQrData(data.qr || data);
         } catch {
             showError("QR code not available yet.");
         }
@@ -120,8 +137,8 @@ function WhatsAppPage() {
 
     const qrValue =
         qrData?.qr
-        || qrData?.data
         || qrData?.image
+        || qrData?.data
         || qrData?.value
         || null;
 
@@ -161,6 +178,10 @@ function WhatsAppPage() {
                         sx={{ mb: 2 }}
                         placeholder="http://localhost:2785/api"
                     />
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 2 }}>
+                        Use the OpenWA REST API URL (include /api). API key must match
+                        API_MASTER_KEY in docker-compose.dev.yml.
+                    </Typography>
                     <TextField
                         label="API Key"
                         type="password"

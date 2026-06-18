@@ -34,5 +34,11 @@ export async function sendWhatsAppMessage(data) {
 
 export async function getWhatsAppMessages() {
     const response = await api.get("/whatsapp/messages/");
-    return response.data;
+    const data = response.data;
+
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    return data.results || [];
 }

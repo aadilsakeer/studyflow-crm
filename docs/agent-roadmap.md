@@ -312,11 +312,17 @@ Features:
 
 ---
 
-## [x] Phase 7 WhatsApp Integration
+## [ ] Phase 7 WhatsApp Integration
 
-Status: COMPLETE
+Status: IN PROGRESS — requires OpenWA gateway (OpenWA-main), not openwa/wa-automate
 
-Gateway: [OpenWA](https://github.com/rmyndharis/OpenWA) (self-hosted)
+Gateway: [OpenWA](https://github.com/rmyndharis/OpenWA) v0.2.3 (OpenWA-main bundle)
+
+Docker: `docker compose -f docker-compose.dev.yml up -d --build openwa`
+
+CRM settings:
+* Base URL: `http://localhost:2785/api`
+* API Key: `globvio-openwa-key`
 
 Features:
 

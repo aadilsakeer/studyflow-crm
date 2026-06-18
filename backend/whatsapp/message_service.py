@@ -1,7 +1,14 @@
 from django.utils import timezone
 
 from .models import WhatsAppAccount, WhatsAppMessage, WhatsAppReminderLog
-from .openwa_client import OpenWAError, get_client_for_company, normalize_chat_id
+from .openwa_client import (
+    OpenWAError,
+    extract_qr_payload,
+    extract_session_id,
+    get_client_for_company,
+    is_session_connected,
+    normalize_chat_id,
+)
 
 
 def session_name_for_user(user):
@@ -26,12 +33,22 @@ def get_connected_account(company, user=None):
 
 
 def connect_user_session(user, phone_number=''):
-    client, server = get_client_for_company(user.company)
+    client, _server = get_client_for_company(user.company)
 
     if not client:
         raise OpenWAError(
-            'OpenWA server is not configured for this company.',
+            'OpenWA server is not configured for this company. '
+            'Set Base URL to http://localhost:2785/api and a valid API key.',
         )
+
+    try:
+        client.health_ready()
+    except OpenWAError as exc:
+        raise OpenWAError(
+            'OpenWA gateway is unreachable. '
+            'Start it with: docker compose -f docker-compose.dev.yml up -d --build openwa. '
+            f'Details: {exc}',
+        ) from exc
 
     account, _created = WhatsAppAccount.objects.get_or_create(
         user=user,
@@ -46,22 +63,42 @@ def connect_user_session(user, phone_number=''):
         account.phone_number = phone_number
 
     name = session_name_for_user(user)
+    session = None
 
     if account.session_id.startswith('pending-'):
-        session = client.create_session(name)
-        account.session_id = (
-            session.get('id')
-            or session.get('sessionId')
-            or session.get('name')
-            or name
-        )
+        session = client.ensure_session(name)
+        session_id = extract_session_id(session)
 
-    client.start_session(account.session_id)
+        if not session_id:
+            raise OpenWAError(
+                'OpenWA did not return a session id.',
+            )
+
+        account.session_id = session_id
+    else:
+        try:
+            session = client.get_session(account.session_id)
+        except OpenWAError:
+            session = client.ensure_session(name)
+            session_id = extract_session_id(session)
+
+            if session_id:
+                account.session_id = session_id
+
+    client.safe_start_session(account.session_id)
 
     try:
-        qr = client.get_qr(account.session_id)
+        qr_raw = client.get_qr(account.session_id)
     except OpenWAError:
-        qr = {}
+        qr_raw = {}
+
+    qr = extract_qr_payload(qr_raw, session)
+    account.is_connected = is_session_connected(
+        session or {},
+    )
+
+    if account.is_connected:
+        account.last_connected_at = timezone.now()
 
     account.save()
 
@@ -71,7 +108,11 @@ def connect_user_session(user, phone_number=''):
 def refresh_session_status(account):
     client, _server = get_client_for_company(account.company)
 
-    if not client or not account.session_id:
+    if (
+        not client
+        or not account.session_id
+        or account.session_id.startswith('pending-')
+    ):
         return account
 
     try:
@@ -81,22 +122,9 @@ def refresh_session_status(account):
         account.save(update_fields=['is_connected'])
         return account
 
-    status = (
-        session.get('status')
-        or session.get('state')
-        or ''
-    ).lower()
+    account.is_connected = is_session_connected(session)
 
-    connected = status in (
-        'connected',
-        'ready',
-        'working',
-        'open',
-    )
-
-    account.is_connected = connected
-
-    if connected:
+    if account.is_connected:
         account.last_connected_at = timezone.now()
 
     account.save(
@@ -134,7 +162,16 @@ def send_whatsapp_message(
 
     if not account:
         raise OpenWAError(
-            'No connected WhatsApp session found.',
+            'No connected WhatsApp session found. '
+            'Open WhatsApp settings and connect a session first.',
+        )
+
+    if not account.is_connected:
+        refresh_session_status(account)
+
+    if not account.is_connected:
+        raise OpenWAError(
+            'WhatsApp session is not connected. Scan the QR code first.',
         )
 
     chat_id = normalize_chat_id(recipient_number)
