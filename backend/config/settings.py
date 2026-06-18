@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'licensing',
     'auditlogs',
     'activity',
+    'automation',
     'partners',
     'agents',
     'dashboard',
@@ -246,6 +247,15 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = (
     'django_celery_beat.schedulers:DatabaseScheduler'
 )
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'workflow-reminders-hourly': {
+        'task': 'automation.dispatch_workflow_reminders',
+        'schedule': crontab(minute=0),
+    },
+}
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
