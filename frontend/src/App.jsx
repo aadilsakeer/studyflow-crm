@@ -22,67 +22,17 @@ import JourneyBoardPage from "./pages/JourneyBoardPage";
 import LeadImportPage from "./pages/LeadImportPage";
 import LeadTimelinePage from "./pages/LeadTimelinePage";
 import StudentTimelinePage from "./pages/StudentTimelinePage";
+import PortalLoginPage from "./pages/portal/PortalLoginPage";
+import PortalLayout from "./layouts/PortalLayout";
 
-function App() {
-    const [token, setToken] = useState(
-        () => localStorage.getItem("access")
-    );
-
-    useEffect(() => {
-        function handleLogout() {
-            setToken(null);
-        }
-
-        window.addEventListener(
-            "auth:logout",
-            handleLogout
-        );
-
-        return () => {
-            window.removeEventListener(
-                "auth:logout",
-                handleLogout
-            );
-        };
-    }, []);
-
-    function handleLogin() {
-        setToken(localStorage.getItem("access"));
-    }
-
-    async function handleLogout() {
-        try {
-            await logoutApi();
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        localStorage.removeItem("username");
-        setToken(null);
-    }
-
-    if (!token) {
-        return (
-            <>
-                <Toaster position="top-right" />
-                <LoginPage onLogin={handleLogin} />
-            </>
-        );
-    }
-
+function CrmRoutes({ onLogout }) {
     return (
         <PermissionsProvider>
-            <BrowserRouter>
-                <Toaster position="top-right" />
-                <Routes>
+            <Routes>
                 <Route
                     path="/"
                     element={
-                        <MainLayout
-                            onLogout={handleLogout}
-                        />
+                        <MainLayout onLogout={onLogout} />
                     }
                 >
                     <Route
@@ -127,27 +77,19 @@ function App() {
                     />
                     <Route
                         path="applications"
-                        element={
-                            <ApplicationsPage />
-                        }
+                        element={<ApplicationsPage />}
                     />
                     <Route
                         path="universities"
-                        element={
-                            <UniversitiesPage />
-                        }
+                        element={<UniversitiesPage />}
                     />
                     <Route
                         path="student-documents"
-                        element={
-                            <StudentDocumentsPage />
-                        }
+                        element={<StudentDocumentsPage />}
                     />
                     <Route
                         path="offer-letters"
-                        element={
-                            <OfferLettersPage />
-                        }
+                        element={<OfferLettersPage />}
                     />
                     <Route
                         path="visa-cases"
@@ -159,8 +101,68 @@ function App() {
                     />
                 </Route>
             </Routes>
-        </BrowserRouter>
         </PermissionsProvider>
+    );
+}
+
+function App() {
+    const [token, setToken] = useState(
+        () => localStorage.getItem("access"),
+    );
+
+    useEffect(() => {
+        function handleLogout() {
+            setToken(null);
+        }
+
+        window.addEventListener("auth:logout", handleLogout);
+
+        return () => {
+            window.removeEventListener("auth:logout", handleLogout);
+        };
+    }, []);
+
+    function handleLogin() {
+        setToken(localStorage.getItem("access"));
+    }
+
+    async function handleLogout() {
+        try {
+            await logoutApi();
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("username");
+        setToken(null);
+    }
+
+    return (
+        <BrowserRouter>
+            <Toaster position="top-right" />
+            <Routes>
+                <Route
+                    path="/portal/login"
+                    element={<PortalLoginPage />}
+                />
+                <Route
+                    path="/portal/*"
+                    element={<PortalLayout />}
+                />
+                <Route
+                    path="/*"
+                    element={
+                        token ? (
+                            <CrmRoutes onLogout={handleLogout} />
+                        ) : (
+                            <LoginPage onLogin={handleLogin} />
+                        )
+                    }
+                />
+            </Routes>
+        </BrowserRouter>
     );
 }
 

@@ -101,6 +101,11 @@ urlpatterns = [
     ),
 
     path(
+        'api/portal/',
+        include('clientportal.portal_urls'),
+    ),
+
+    path(
         'api/clientportal/',
         include('clientportal.api_urls')
     ),

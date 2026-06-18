@@ -284,7 +284,9 @@ Features:
 
 ---
 
-## [ ] Phase 5 Student Portal
+## [x] Phase 5 Student Portal
+
+Status: COMPLETE
 
 Features:
 
