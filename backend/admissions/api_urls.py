@@ -27,8 +27,11 @@ from .api_views import (
 
 from .student_document_views import (
     StudentDocumentListCreateAPIView,
+    StudentDocumentRequestAPIView,
     StudentDocumentDetailAPIView,
     StudentDocumentDownloadAPIView,
+    StudentDocumentPreviewAPIView,
+    StudentDocumentReviewAPIView,
     StudentDocumentTrashListAPIView,
     StudentDocumentRestoreAPIView,
 )
@@ -108,9 +111,9 @@ urlpatterns = [
     ),
 
     path(
-        'student-documents/',
-        StudentDocumentListCreateAPIView.as_view(),
-        name='student-document-list',
+        'student-documents/request/',
+        StudentDocumentRequestAPIView.as_view(),
+        name='student-document-request',
     ),
 
     path(
@@ -132,9 +135,42 @@ urlpatterns = [
     ),
 
     path(
+        'student-documents/<int:pk>/preview/',
+        StudentDocumentPreviewAPIView.as_view(),
+        name='student-document-preview',
+    ),
+
+    path(
+        'student-documents/<int:pk>/review/',
+        StudentDocumentReviewAPIView.as_view(),
+        kwargs={'action': 'review'},
+        name='student-document-review',
+    ),
+
+    path(
+        'student-documents/<int:pk>/approve/',
+        StudentDocumentReviewAPIView.as_view(),
+        kwargs={'action': 'approve'},
+        name='student-document-approve',
+    ),
+
+    path(
+        'student-documents/<int:pk>/reject/',
+        StudentDocumentReviewAPIView.as_view(),
+        kwargs={'action': 'reject'},
+        name='student-document-reject',
+    ),
+
+    path(
         'student-documents/<int:pk>/',
         StudentDocumentDetailAPIView.as_view(),
         name='student-document-detail',
+    ),
+
+    path(
+        'student-documents/',
+        StudentDocumentListCreateAPIView.as_view(),
+        name='student-document-list',
     ),
 
     path(

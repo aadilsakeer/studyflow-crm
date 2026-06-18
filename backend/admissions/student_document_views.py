@@ -2,8 +2,9 @@ import mimetypes
 
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import (
     FormParser,
@@ -26,6 +27,8 @@ from accounts.permissions import (
 
 from .models import Student, StudentDocument
 from .student_document_serializers import (
+    StudentDocumentRequestSerializer,
+    StudentDocumentReviewSerializer,
     StudentDocumentSerializer,
 )
 
@@ -58,25 +61,36 @@ class StudentDocumentQuerysetMixin:
         ).select_related(
             'student',
             'uploaded_by',
+            'approved_by',
             'company',
         )
 
-        student_id = self.request.query_params.get(
-            'student',
-        )
-        document_type = self.request.query_params.get(
-            'document_type',
-        )
+        for param, field in (
+            ('student', 'student_id'),
+            ('document_type', 'document_type'),
+            ('status', 'status'),
+            ('category', None),
+        ):
+            value = self.request.query_params.get(param)
 
-        if student_id:
-            queryset = queryset.filter(
-                student_id=student_id,
-            )
+            if not value:
+                continue
 
-        if document_type:
-            queryset = queryset.filter(
-                document_type=document_type,
-            )
+            if param == 'category':
+                types = [
+                    key
+                    for key, cat in (
+                        StudentDocument.CATEGORY_MAP.items()
+                    )
+                    if cat == value
+                ]
+                queryset = queryset.filter(
+                    document_type__in=types,
+                )
+            else:
+                queryset = queryset.filter(
+                    **{field: value},
+                )
 
         return queryset.order_by('-created_at')
 
@@ -109,6 +123,35 @@ class StudentDocumentListCreateAPIView(
             object_id=document.id,
             description=(
                 f'Uploaded {document.get_document_type_display()} '
+                f'for student {document.student.student_id}'
+            ),
+        )
+
+
+class StudentDocumentRequestAPIView(
+    StudentDocumentQuerysetMixin,
+    ActionPermissionMixin,
+    generics.CreateAPIView,
+):
+    permission_map = {'POST': 'documents.add'}
+    serializer_class = StudentDocumentRequestSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+    def perform_create(self, serializer):
+        document = serializer.save()
+
+        AuditLogService.log(
+            company=self.request.user.company,
+            user=self.request.user,
+            module='Student Documents',
+            action='request',
+            object_id=document.id,
+            description=(
+                f'Requested {document.get_document_type_display()} '
                 f'for student {document.student.student_id}'
             ),
         )
@@ -163,8 +206,36 @@ class StudentDocumentDetailAPIView(
         )
 
 
-class StudentDocumentDownloadAPIView(
+class StudentDocumentFileResponseMixin(
     StudentDocumentQuerysetMixin,
+):
+
+    def build_file_response(
+        self,
+        document,
+        as_attachment,
+    ):
+        if not document.file:
+            raise Http404
+
+        content_type = (
+            document.mime_type
+            or mimetypes.guess_type(
+                document.original_filename,
+            )[0]
+            or 'application/octet-stream'
+        )
+
+        return FileResponse(
+            document.file.open('rb'),
+            content_type=content_type,
+            as_attachment=as_attachment,
+            filename=document.original_filename,
+        )
+
+
+class StudentDocumentDownloadAPIView(
+    StudentDocumentFileResponseMixin,
     ActionPermissionMixin,
     APIView,
 ):
@@ -176,9 +247,6 @@ class StudentDocumentDownloadAPIView(
             pk=pk,
         )
 
-        if not document.file:
-            raise Http404
-
         disposition = request.query_params.get(
             'disposition',
             'attachment',
@@ -189,22 +257,115 @@ class StudentDocumentDownloadAPIView(
                 {'disposition': 'Use inline or attachment.'},
             )
 
-        content_type = (
-            document.mime_type
-            or mimetypes.guess_type(
-                document.original_filename,
-            )[0]
-            or 'application/octet-stream'
+        return self.build_file_response(
+            document,
+            disposition == 'attachment',
         )
 
-        response = FileResponse(
-            document.file.open('rb'),
-            content_type=content_type,
-            as_attachment=(disposition == 'attachment'),
-            filename=document.original_filename,
+
+class StudentDocumentPreviewAPIView(
+    StudentDocumentFileResponseMixin,
+    ActionPermissionMixin,
+    APIView,
+):
+    permission_map = {'GET': 'documents.view'}
+
+    def get(self, request, pk):
+        document = get_object_or_404(
+            self.get_document_queryset(),
+            pk=pk,
         )
 
-        return response
+        return self.build_file_response(
+            document,
+            False,
+        )
+
+
+class StudentDocumentReviewAPIView(
+    StudentDocumentQuerysetMixin,
+    ActionPermissionMixin,
+    APIView,
+):
+    permission_map = {'POST': 'documents.change'}
+
+    def post(self, request, pk, *args, **kwargs):
+        action = kwargs.get('action')
+        document = get_object_or_404(
+            self.get_document_queryset(),
+            pk=pk,
+        )
+
+        serializer = StudentDocumentReviewSerializer(
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        if action == 'review':
+            document.status = 'under_review'
+            if data.get('notes'):
+                document.notes = data['notes']
+            document.save(
+                update_fields=['status', 'notes', 'updated_at'],
+            )
+            log_action = 'review'
+            description = (
+                f'Marked document #{document.id} under review'
+            )
+        elif action == 'approve':
+            if not document.file:
+                raise ValidationError(
+                    {'detail': 'Cannot approve without a file.'},
+                )
+            document.status = 'approved'
+            document.approved_by = request.user
+            document.approved_at = timezone.now()
+            document.rejection_remarks = ''
+            if data.get('notes'):
+                document.notes = data['notes']
+            document.save()
+            log_action = 'approve'
+            description = (
+                f'Approved {document.get_document_type_display()} '
+                f'for student {document.student.student_id}'
+            )
+        elif action == 'reject':
+            document.status = 'rejected'
+            document.approved_by = None
+            document.approved_at = None
+            document.rejection_remarks = data.get(
+                'rejection_remarks',
+                '',
+            )
+            if data.get('notes'):
+                document.notes = data['notes']
+            document.save()
+            log_action = 'reject'
+            description = (
+                f'Rejected {document.get_document_type_display()} '
+                f'for student {document.student.student_id}'
+            )
+        else:
+            raise ValidationError(
+                {'detail': 'Invalid review action.'},
+            )
+
+        AuditLogService.log(
+            company=request.user.company,
+            user=request.user,
+            module='Student Documents',
+            action=log_action,
+            object_id=document.id,
+            description=description,
+        )
+
+        return Response(
+            StudentDocumentSerializer(
+                document,
+                context={'request': request},
+            ).data,
+        )
 
 
 class StudentDocumentTrashListAPIView(
@@ -234,6 +395,7 @@ class StudentDocumentTrashListAPIView(
         ).select_related(
             'student',
             'uploaded_by',
+            'approved_by',
         ).order_by('-deleted_at')
 
     def get_serializer_context(self):
@@ -258,7 +420,7 @@ class StudentDocumentRestoreAPIView(
         if not company:
             return Response(
                 {'detail': 'Company not found.'},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         allowed_students = filter_students_for_user(
@@ -290,9 +452,9 @@ class StudentDocumentRestoreAPIView(
             ),
         )
 
-        serializer = StudentDocumentSerializer(
-            document,
-            context={'request': request},
+        return Response(
+            StudentDocumentSerializer(
+                document,
+                context={'request': request},
+            ).data,
         )
-
-        return Response(serializer.data)
