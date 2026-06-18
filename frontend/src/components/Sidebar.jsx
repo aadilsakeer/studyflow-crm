@@ -5,6 +5,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import EventIcon from "@mui/icons-material/Event";
 import ForumIcon from "@mui/icons-material/Forum";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -57,6 +58,11 @@ const navItems = [
         label: "Communications",
         path: "/communications",
         icon: <ForumIcon />,
+    },
+    {
+        label: "WhatsApp",
+        path: "/whatsapp",
+        icon: <WhatsAppIcon />,
     },
     {
         label: "Students",

@@ -19,6 +19,7 @@ import {
     createEmailLog,
     createWhatsAppLog,
 } from "../services/communications";
+import { sendWhatsAppMessage } from "../services/whatsapp";
 import { showError, showSuccess } from "../utils/toast";
 
 function CommunicationHubPanel({
@@ -116,19 +117,31 @@ function CommunicationHubPanel({
 
     async function handleAddWhatsApp() {
         try {
-            await createWhatsAppLog({
-                lead: leadId || null,
-                student: studentId || null,
-                ...whatsappForm,
-            });
+            if (can("whatsapp.add")) {
+                await sendWhatsAppMessage({
+                    lead: leadId || null,
+                    student: studentId || null,
+                    recipient_number:
+                        whatsappForm.contact_number,
+                    message: whatsappForm.message,
+                });
+                showSuccess("WhatsApp sent via OpenWA.");
+            } else {
+                await createWhatsAppLog({
+                    lead: leadId || null,
+                    student: studentId || null,
+                    ...whatsappForm,
+                });
+                showSuccess("WhatsApp logged.");
+            }
+
             setWhatsAppForm((prev) => ({
                 ...prev,
                 message: "",
             }));
-            showSuccess("WhatsApp logged.");
             load();
         } catch {
-            showError("Failed to log WhatsApp.");
+            showError("Failed to send WhatsApp.");
         }
     }
 
@@ -243,7 +256,9 @@ function CommunicationHubPanel({
                         variant="outlined"
                         onClick={handleAddWhatsApp}
                     >
-                        Log WhatsApp
+                        {can("whatsapp.add")
+                            ? "Send WhatsApp"
+                            : "Log WhatsApp"}
                     </Button>
                 </Stack>
             )}

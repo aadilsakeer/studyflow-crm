@@ -7,6 +7,14 @@ from core.models import Company, Task
 from deadlines.models import Deadline
 from leads.models import FollowUp
 
+from whatsapp.message_service import send_whatsapp_reminder
+from whatsapp.templates import (
+    build_document_reminder_message,
+    build_follow_up_message,
+    build_offer_reminder_message,
+    build_visa_update_message,
+)
+
 from .notification_service import send_workflow_notification
 
 OFFER_EXPIRY_DAYS = 7
@@ -45,6 +53,21 @@ def process_follow_up_reminders(company, now, summary):
             ),
         ):
             summary['follow_up'] += 1
+
+        wa_key = f'wa:follow_up:{item.id}:{now.date()}'
+
+        if send_whatsapp_reminder(
+            company=company,
+            alert_key=wa_key,
+            recipient_number=item.lead.phone,
+            message=build_follow_up_message(
+                item.lead,
+                company.name,
+            ),
+            message_type='follow_up',
+            lead=item.lead,
+        ):
+            summary['whatsapp_sent'] += 1
 
     tasks = Task.objects.filter(
         company=company,
@@ -102,6 +125,22 @@ def process_missing_document_reminders(company, today, summary):
         ):
             summary['missing_document'] += 1
 
+        wa_key = f'wa:missing_document:{document.id}:{today}'
+
+        if send_whatsapp_reminder(
+            company=company,
+            alert_key=wa_key,
+            recipient_number=document.student.lead.phone,
+            message=build_document_reminder_message(
+                document.student,
+                document,
+            ),
+            message_type='document_reminder',
+            lead=document.student.lead,
+            student=document.student,
+        ):
+            summary['whatsapp_sent'] += 1
+
 
 def process_offer_expiry_alerts(company, today, summary):
     cutoff = today + timedelta(days=OFFER_EXPIRY_DAYS)
@@ -138,6 +177,22 @@ def process_offer_expiry_alerts(company, today, summary):
             ),
         ):
             summary['offer_expiry'] += 1
+
+        wa_key = f'wa:offer_expiry:{offer.id}:{offer.expiry_date}'
+
+        if send_whatsapp_reminder(
+            company=company,
+            alert_key=wa_key,
+            recipient_number=offer.student.lead.phone,
+            message=build_offer_reminder_message(
+                offer.student,
+                offer,
+            ),
+            message_type='offer_reminder',
+            lead=offer.student.lead,
+            student=offer.student,
+        ):
+            summary['whatsapp_sent'] += 1
 
 
 def process_visa_appointment_reminders(company, today, summary):
@@ -177,6 +232,24 @@ def process_visa_appointment_reminders(company, today, summary):
             ),
         ):
             summary['visa_appointment'] += 1
+
+        wa_key = (
+            f'wa:visa_appointment:{case.id}:{case.appointment_date}'
+        )
+
+        if send_whatsapp_reminder(
+            company=company,
+            alert_key=wa_key,
+            recipient_number=case.student.lead.phone,
+            message=build_visa_update_message(
+                case.student,
+                case,
+            ),
+            message_type='visa_update',
+            lead=case.student.lead,
+            student=case.student,
+        ):
+            summary['whatsapp_sent'] += 1
 
 
 def process_application_deadline_reminders(company, today, summary):
@@ -257,6 +330,7 @@ def run_company_reminders(company):
         'offer_expiry': 0,
         'visa_appointment': 0,
         'application_deadline': 0,
+        'whatsapp_sent': 0,
     }
 
     process_follow_up_reminders(company, now, summary)
@@ -268,7 +342,7 @@ def run_company_reminders(company):
     summary['total'] = sum(
         summary[key]
         for key in summary
-        if key not in ('company_id', 'total')
+        if key not in ('company_id', 'total', 'whatsapp_sent')
     )
 
     return summary

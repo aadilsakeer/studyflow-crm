@@ -23,6 +23,7 @@ import LeadImportPage from "./pages/LeadImportPage";
 import LeadTimelinePage from "./pages/LeadTimelinePage";
 import StudentTimelinePage from "./pages/StudentTimelinePage";
 import CommunicationsPage from "./pages/CommunicationsPage";
+import WhatsAppPage from "./pages/WhatsAppPage";
 import PortalLoginPage from "./pages/portal/PortalLoginPage";
 import PortalLayout from "./layouts/PortalLayout";
 
@@ -75,6 +76,10 @@ function CrmRoutes({ onLogout }) {
                     <Route
                         path="communications"
                         element={<CommunicationsPage />}
+                    />
+                    <Route
+                        path="whatsapp"
+                        element={<WhatsAppPage />}
                     />
                     <Route
                         path="students"

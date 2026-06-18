@@ -41,8 +41,11 @@ class WhatsAppMessageSerializer(
             "id",
             "company",
             "account",
+            "lead",
+            "student",
             "recipient_number",
             "message",
+            "message_type",
             "status",
             "created_at",
         )

@@ -312,10 +312,16 @@ Features:
 
 ---
 
-## [ ] Phase 7 WhatsApp Integration
+## [x] Phase 7 WhatsApp Integration
+
+Status: COMPLETE
+
+Gateway: [OpenWA](https://github.com/rmyndharis/OpenWA) (self-hosted)
 
 Features:
 
+* OpenWA session connect + QR
+* Send WhatsApp from CRM
 * Follow-up Messages
 * Document Reminders
 * Offer Reminders

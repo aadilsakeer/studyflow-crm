@@ -110,7 +110,9 @@ def _whatsapp_message_queryset(*, company, lead=None, student=None):
     )
 
     return qs.filter(
-        Q(recipient_number=lead.phone)
+        Q(lead=lead)
+        | Q(student__lead=lead)
+        | Q(recipient_number=lead.phone)
         | Q(recipient_number__endswith=lead.phone[-10:]),
     )
 

@@ -51,6 +51,14 @@ class WhatsAppMessage(models.Model):
         ('failed', 'Failed'),
     ]
 
+    MESSAGE_TYPE_CHOICES = [
+        ('manual', 'Manual'),
+        ('follow_up', 'Follow-up'),
+        ('document_reminder', 'Document Reminder'),
+        ('offer_reminder', 'Offer Reminder'),
+        ('visa_update', 'Visa Update'),
+    ]
+
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE
@@ -61,11 +69,33 @@ class WhatsAppMessage(models.Model):
         on_delete=models.CASCADE
     )
 
+    lead = models.ForeignKey(
+        'leads.Lead',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='whatsapp_messages',
+    )
+
+    student = models.ForeignKey(
+        'admissions.Student',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='whatsapp_messages',
+    )
+
     recipient_number = models.CharField(
         max_length=20
     )
 
     message = models.TextField()
+
+    message_type = models.CharField(
+        max_length=30,
+        choices=MESSAGE_TYPE_CHOICES,
+        default='manual',
+    )
 
     status = models.CharField(
         max_length=20,
@@ -83,6 +113,34 @@ class WhatsAppMessage(models.Model):
 
     def __str__(self):
         return self.recipient_number
+
+
+class WhatsAppReminderLog(models.Model):
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+    )
+
+    alert_key = models.CharField(
+        max_length=160,
+        unique=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['company', '-created_at'],
+                name='wa_reminder_co_created_idx',
+            ),
+        ]
+
+    def __str__(self):
+        return self.alert_key
     
 class WhatsAppServer(models.Model):
 

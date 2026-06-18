@@ -6,6 +6,12 @@ from .api_views import (
     WhatsAppMessageListAPIView,
     WhatsAppServerAPIView,
 )
+from .integration_views import (
+    WhatsAppSendAPIView,
+    WhatsAppSessionConnectAPIView,
+    WhatsAppSessionQRAPIView,
+    WhatsAppSessionStatusAPIView,
+)
 
 urlpatterns = [
 
@@ -30,6 +36,30 @@ urlpatterns = [
     'server/',
     WhatsAppServerAPIView.as_view(),
     name='whatsapp-server'
-),
+    ),
+
+    path(
+        'send/',
+        WhatsAppSendAPIView.as_view(),
+        name='whatsapp-send',
+    ),
+
+    path(
+        'session/connect/',
+        WhatsAppSessionConnectAPIView.as_view(),
+        name='whatsapp-session-connect',
+    ),
+
+    path(
+        'session/status/',
+        WhatsAppSessionStatusAPIView.as_view(),
+        name='whatsapp-session-status',
+    ),
+
+    path(
+        'session/qr/',
+        WhatsAppSessionQRAPIView.as_view(),
+        name='whatsapp-session-qr',
+    ),
 
 ]

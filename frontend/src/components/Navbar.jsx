@@ -24,6 +24,7 @@ const PAGE_TITLES = {
     "/leads": "Leads",
     "/follow-ups": "Follow Ups",
     "/communications": "Communications",
+    "/whatsapp": "WhatsApp",
     "/tasks": "Tasks",
     "/reports": "Reports",
     "/students": "Students",
