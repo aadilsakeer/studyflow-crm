@@ -4,7 +4,7 @@
 
 Name: Globvio CRM
 
-Type: Study Abroad CRM
+Type: Study Abroad CRM SaaS
 
 Stack:
 
@@ -52,10 +52,55 @@ Stack:
 * Soft Delete Framework
 * Trash APIs
 * Restore APIs
+* Recycle Bin
 
-### Workflow
+### Admissions Platform
 
-* Activity Timeline (Phase 4.1)
+* Student Documents
+* Offer Letters
+* Visa Processing
+* Counsellor Pipeline
+* Student Journey Board
+
+### Operations
+
+* Telecaller Assignment
+* Excel Lead Import
+* Activity Timeline
+* Task & Follow-Up System
+* Workflow Automation
+
+### Reporting
+
+* Advanced Reporting
+* KPI Dashboards
+* CSV Export
+* Excel Export
+
+### Communication
+
+* Communication Hub
+* WhatsApp Integration
+
+### Student Experience
+
+* Student Portal
+
+### SaaS Platform
+
+* SaaS Foundation
+* Subscription Plans
+* Billing
+* Stripe Integration
+* Razorpay Integration
+* White Label
+* Support Desk
+* Health Checks
+
+### Launch Status
+
+* SaaS MVP Ready
+* Launch Readiness: 96%
 
 ---
 
@@ -82,285 +127,187 @@ Never rebuild existing systems.
 
 # Remaining Roadmap
 
-## [ ] Phase 2.1 Student Documents Module
+## [x] Phase 8.5 Platform Operations
 
-Features:
-
-* Academic Documents
-* Identity Documents
-* Language Test Documents
-* Financial Documents
-* Professional Documents
-* Upload
-* Review
-* Approve
-* Reject
-* Audit Logging
-* Soft Delete
-* Restore
-* Recycle Bin Integration
+Status: COMPLETE — owner dashboard, tenant ops, subscription ops, support queue, impersonation, activity logs
 
 ---
 
-## [ ] Phase 2.2 Offer Letter Module
+## [ ] Phase 8.6 Production Operations
 
-Features:
+### Payments
 
-* Conditional Offer
-* Unconditional Offer
-* Expiry Tracking
-* Acceptance Tracking
-* Deposit Tracking
+* Live Stripe Validation
+* Live Razorpay Validation
 
----
+### Email
 
-## [ ] Phase 2.3 Visa Processing Module
+* SMTP Provider Integration
+* Transactional Email Verification
 
-Features:
+### Backups
 
-* Visa Workflow
-* Appointment Tracking
-* Fee Tracking
-* Status Tracking
-* Decision Tracking
+* Automated Backups
+* Backup Verification
+* Restore Testing
 
----
+### Monitoring
 
-## [ ] Phase 2.4 Recycle Bin UI
+* Application Monitoring
+* Error Monitoring
+* Health Alerts
 
-Features:
+### Operations Dashboard
 
-* Deleted Records
-* Restore
-* Audit Trail
-* Admin Access
-
-Use existing soft delete backend.
+* System Health
+* Failed Jobs
+* Queue Status
+* Backup Status
 
 ---
 
-## [ ] Phase 3.1 Telecaller Assignment System
+## [ ] Phase 8.7 Security Operations
 
-Features:
+### Authentication Security
 
-* Assign Lead
-* Bulk Assignment
-* Round Robin
-* Reassignment
-* Workload Tracking
+* Two-Factor Authentication (2FA)
+* Password Policy Enforcement
+* Session Management Review
 
----
+### Monitoring
 
-## [ ] Phase 3.2 Excel Lead Import
+* Login Monitoring
+* Suspicious Login Detection
+* Security Audit Dashboard
 
-Features:
+### Administration
 
-* CSV Import
-* XLSX Import
-* Column Mapping
-* Duplicate Detection
-* Assignment During Import
-* Import Logs
+* Session Revocation
+* User Security Events
 
 ---
 
-## [ ] Phase 3.3 Counsellor Pipeline
+## [ ] Phase 9 AI Lead Intelligence
 
-Features:
+### AI Lead Scoring
 
-* Lead Evaluation
-* Student Conversion
-* Country Recommendation
-* Application Readiness
+* Hot
+* Warm
+* Cold
 
----
+### Lead Prioritization
 
-## [ ] Phase 3.4 Student Journey Board
+* Conversion Probability
+* Follow-Up Priority
+* Best Leads First
 
-Workflow:
+### AI Counsellor Assistant
 
-Lead
-↓
-Student
-↓
-Documents
-↓
-Application
-↓
-Offer
-↓
-Visa
-↓
-Departure
-↓
-Arrived
+* Student Summary
+* Case Summary
+* Recommended Actions
+* Email Drafts
+* WhatsApp Drafts
 
 ---
 
-## [x] Phase 4.1 Activity Timeline
+## [ ] Phase 10 Workflow Builder 2.0
 
-Status: COMPLETE
+### Workflow Builder
 
-Track:
+* Trigger
+* Condition
+* Action
 
-* Lead Events
-* Assignment Events
-* Student Events
-* Document Events
-* Offer Events
-* Visa Events
+### Automation Examples
 
----
+* Lead Created
+* Document Approved
+* Offer Received
+* Visa Approved
 
-## [x] Phase 4.2 Task & Follow-Up System
+### Tenant Configurable Workflows
 
-Status: COMPLETE
-
-Task Types:
-
-* Follow-up Call
-* Document Collection
-* Application Submission
-* Offer Review
-* Visa Appointment
-* General Task
-
-Features:
-
-* Assignment
-* Priority
-* Due Date
-* Status
-* Notes
-* Dashboard Widgets
-* Reminder Support
-
-Roles:
-
-* Telecaller
-* Counsellor
-* Visa Team
-* Admin
+* Custom Automation Rules
 
 ---
 
-## [x] Phase 4.3 Advanced Reporting
+## [ ] Phase 11 Email Platform
 
-Status: COMPLETE
+### Templates
 
-Reports:
+* Admission
+* Offer
+* Visa
+* Follow-Up
 
-* Lead Source ROI
-* Telecaller Performance
-* Counsellor Performance
-* Country Performance
-* University Performance
-* Offer Conversion
-* Visa Success Rate
-* Revenue
+### Campaigns
 
-Features:
-
-* Date Filters
-* CSV Export
-* Excel Export
-* Charts
+* Bulk Email
+* Scheduled Email
+* Email Tracking
 
 ---
 
-## [x] Phase 4.4 Workflow Automation
+## [ ] Phase 12 Knowledge Base
 
-Status: COMPLETE
+### Internal Knowledge
 
-Using Celery.
+* SOPs
+* Process Guides
+* University Guides
 
-Features:
+### Customer Knowledge Base
 
-* Follow-up Reminders
-* Missing Document Reminders
-* Offer Expiry Alerts
-* Visa Appointment Reminders
-* Application Deadline Reminders
-
----
-
-## [x] Phase 5 Student Portal
-
-Status: COMPLETE
-
-Features:
-
-* Document Upload
-* Application Tracking
-* Offer Tracking
-* Visa Tracking
-* Activity Timeline
+* Help Center
+* FAQs
 
 ---
 
-## [x] Phase 6 Communication Hub
+## [ ] Phase 13 Document Intelligence
 
-Status: COMPLETE
+### AI Document Analysis
 
-Features:
-
-* Call Logs
-* Notes
-* Email Logs
-* WhatsApp Logs
-* Unified Communication History
+* Passport Validation
+* IELTS Expiry Detection
+* Missing Document Detection
+* Financial Document Validation
 
 ---
 
-## [ ] Phase 7 WhatsApp Integration
+## [ ] Phase 14 Mobile Apps
 
-Status: IN PROGRESS — requires OpenWA gateway (OpenWA-main), not openwa/wa-automate
+### Mobile Applications
 
-Gateway: [OpenWA](https://github.com/rmyndharis/OpenWA) v0.2.3 (OpenWA-main bundle)
-
-Docker: `docker compose -f docker-compose.dev.yml up -d --build openwa`
-
-CRM settings:
-* Base URL: `http://localhost:2785/api`
-* API Key: `globvio-openwa-key`
-
-Features:
-
-* OpenWA session connect + QR
-* Send WhatsApp from CRM
-* Follow-up Messages
-* Document Reminders
-* Offer Reminders
-* Visa Updates
+* Counsellor App
+* Telecaller App
+* Student App
 
 ---
 
-## [ ] Phase 8 Commercial SaaS
+## [ ] Phase 15 Enterprise Features
 
-Features:
+### Enterprise Security
 
-* Subscription Plans
-* Billing
-* Usage Limits
-* White Label
-* Tenant Branding
+* SSO
 
----
+### Enterprise Platform
 
-## [ ] Phase 9 AI Layer
+* API Keys
+* Webhooks
+* Custom Domains
+* Custom Email Domains
 
-Features:
+### Enterprise Analytics
 
-* AI Lead Scoring
-* AI Counsellor Assistant
-* AI Document Checker
-* AI Workflow Suggestions
+* Advanced Analytics
+* Enterprise Reporting
 
 ---
 
 # Execution Rule
 
-Start from the first incomplete phase.
+Start from first incomplete phase.
 
 Complete ONE phase only.
 
@@ -370,7 +317,7 @@ After completion:
 
 * Commit
 * Push branch
-* Update roadmap status
+* Update roadmap
 * Report results
 * Stop
 
