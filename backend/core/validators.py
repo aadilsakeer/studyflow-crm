@@ -39,10 +39,11 @@ def validate_student_in_company(student, company):
 
 
 def validate_application_in_company(application, company):
-    return validate_student_in_company(
+    validate_student_in_company(
         application.student,
         company,
     )
+    return application
 
 
 def validate_ticket_in_company(ticket, company):

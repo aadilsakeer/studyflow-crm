@@ -320,8 +320,8 @@ class DashboardAnalyticsService:
             application__student__is_deleted=False,
         )
         visa_qs = VisaCase.objects.filter(
-            application__student__company=company,
-            application__student__is_deleted=False,
+            company=company,
+            is_deleted=False,
             status='approved',
         )
         payment_qs = Payment.objects.filter(

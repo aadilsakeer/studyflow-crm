@@ -11,10 +11,8 @@ from .models import (
     Student,
     Application,
     Document,
-    VisaCase,
     University,
     Course,
-    OfferLetter,
     SupportTicket,
     TicketComment
 )
@@ -160,34 +158,6 @@ class DocumentSerializer(serializers.ModelSerializer):
         )
 
 
-class VisaCaseSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = VisaCase
-        fields = (
-            "id",
-            "application",
-            "submission_date",
-            "biometrics_date",
-            "decision_date",
-            "status",
-            "remarks",
-            "created_at",
-        )
-        read_only_fields = (
-            "created_at",
-        )
-
-    def validate_application(self, application):
-        company = get_request_company(
-            self.context,
-        )
-        return validate_application_in_company(
-            application,
-            company,
-        )
-
-
 class UniversitySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -213,34 +183,6 @@ class CourseSerializer(serializers.ModelSerializer):
             "level",
             "duration",
             "tuition_fee",
-        )
-
-
-class OfferLetterSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = OfferLetter
-        fields = (
-            "id",
-            "application",
-            "offer_number",
-            "status",
-            "issue_date",
-            "acceptance_deadline",
-            "notes",
-            "created_at",
-        )
-        read_only_fields = (
-            "created_at",
-        )
-
-    def validate_application(self, application):
-        company = get_request_company(
-            self.context,
-        )
-        return validate_application_in_company(
-            application,
-            company,
         )
 
 

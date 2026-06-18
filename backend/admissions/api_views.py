@@ -27,10 +27,8 @@ from .models import (
     Student,
     Application,
     Document,
-    VisaCase,
     University,
     Course,
-    OfferLetter,
     SupportTicket,
     TicketComment
 )
@@ -39,10 +37,8 @@ from .serializers import (
     StudentSerializer,
     ApplicationSerializer,
     DocumentSerializer,
-    VisaCaseSerializer,
     UniversitySerializer,
     CourseSerializer,
-    OfferLetterSerializer,
     SupportTicketSerializer,
     TicketCommentSerializer
 )
@@ -543,96 +539,6 @@ class DocumentDetailAPIView(
 
 
 
-
-# Visa Case
-
-class VisaCaseListCreateAPIView(
-    AdmissionsSerializerContextMixin,
-    ActionPermissionMixin,
-    generics.ListCreateAPIView
-):
-
-    permission_map = crm_permission_map("documents")
-
-    serializer_class = VisaCaseSerializer
-
-    def get_queryset(self):
-
-        return VisaCase.objects.filter(
-            application__student__company=self.request.user.company
-        )
-
-    def perform_create(self, serializer):
-
-        visa_case = serializer.save()
-
-        AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
-            module='Admissions',
-            action='create',
-            object_id=visa_case.id,
-            description=(
-                f'Created visa case '
-                f'{visa_case.id}'
-            )
-        )
-
-
-
-
-class VisaCaseDetailAPIView(
-    AdmissionsSerializerContextMixin,
-    ActionPermissionMixin,
-    generics.RetrieveUpdateDestroyAPIView
-):
-
-    permission_map = crm_permission_map("documents")
-
-    serializer_class = VisaCaseSerializer
-
-    def get_queryset(self):
-
-        return VisaCase.objects.filter(
-            application__student__company=self.request.user.company
-        )
-
-    def perform_update(self, serializer):
-
-        visa_case = serializer.save()
-
-        AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
-            module='Admissions',
-            action='update',
-            object_id=visa_case.id,
-            description=(
-                f'Updated visa case '
-                f'{visa_case.id}'
-            )
-        )
-
-    def perform_destroy(self, instance):
-
-        AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
-            module='Admissions',
-            action='delete',
-            object_id=instance.id,
-            description=(
-                f'Deleted visa case '
-                f'{instance.id}'
-            )
-        )
-
-        instance.delete()
-
-
-
-
-
 # Course
 
 class CourseListCreateAPIView(
@@ -699,95 +605,6 @@ class CourseDetailAPIView(
             description=(
                 f'Deleted course '
                 f'{instance.name}'
-            )
-        )
-
-        instance.delete()
-
-
-
-
-
-# Offer Letter
-
-class OfferLetterListCreateAPIView(
-    AdmissionsSerializerContextMixin,
-    ActionPermissionMixin,
-    generics.ListCreateAPIView
-):
-
-    permission_map = crm_permission_map("applications")
-
-    serializer_class = OfferLetterSerializer
-
-    def get_queryset(self):
-
-        return OfferLetter.objects.filter(
-            application__student__company=self.request.user.company
-        )
-
-    def perform_create(self, serializer):
-
-        offer_letter = serializer.save()
-
-        AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
-            module='Admissions',
-            action='create',
-            object_id=offer_letter.id,
-            description=(
-                f'Created offer letter '
-                f'{offer_letter.id}'
-            )
-        )
-
-
-    
-
-class OfferLetterDetailAPIView(
-    AdmissionsSerializerContextMixin,
-    ActionPermissionMixin,
-    generics.RetrieveUpdateDestroyAPIView
-):
-
-    permission_map = crm_permission_map("applications")
-
-    serializer_class = OfferLetterSerializer
-
-    def get_queryset(self):
-
-        return OfferLetter.objects.filter(
-            application__student__company=self.request.user.company
-        )
-
-    def perform_update(self, serializer):
-
-        offer_letter = serializer.save()
-
-        AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
-            module='Admissions',
-            action='update',
-            object_id=offer_letter.id,
-            description=(
-                f'Updated offer letter '
-                f'{offer_letter.id}'
-            )
-        )
-
-    def perform_destroy(self, instance):
-
-        AuditLogService.log(
-            company=self.request.user.company,
-            user=self.request.user,
-            module='Admissions',
-            action='delete',
-            object_id=instance.id,
-            description=(
-                f'Deleted offer letter '
-                f'{instance.id}'
             )
         )
 

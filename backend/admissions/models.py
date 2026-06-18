@@ -194,54 +194,130 @@ class Document(models.Model):
 
     def __str__(self):
         return self.document_name
-class VisaCase(models.Model):
+
+
+class VisaCase(SoftDeleteModel):
 
     STATUS_CHOICES = [
-        ('not_started', 'Not Started'),
-        ('preparing', 'Preparing'),
+        ('draft', 'Draft'),
         ('submitted', 'Submitted'),
-        ('biometrics_completed', 'Biometrics Completed'),
+        ('biometrics', 'Biometrics'),
+        ('processing', 'Processing'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
 
-    application = models.OneToOneField(
+    VISA_TYPE_CHOICES = [
+        ('student', 'Student Visa'),
+        ('dependent', 'Dependent Visa'),
+        ('short_term', 'Short Term'),
+        ('other', 'Other'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+    )
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name='visa_cases',
+    )
+
+    application = models.ForeignKey(
         Application,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='visa_cases',
+    )
+
+    offer_letter = models.ForeignKey(
+        'OfferLetter',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='visa_cases',
+    )
+
+    student_documents = models.ManyToManyField(
+        'StudentDocument',
+        blank=True,
+        related_name='visa_cases',
+    )
+
+    country = models.CharField(
+        max_length=100,
+    )
+
+    visa_type = models.CharField(
+        max_length=30,
+        choices=VISA_TYPE_CHOICES,
+        default='student',
+    )
+
+    visa_number = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    application_date = models.DateField(
+        null=True,
+        blank=True,
+    )
+
+    appointment_date = models.DateField(
+        null=True,
+        blank=True,
     )
 
     submission_date = models.DateField(
         null=True,
-        blank=True
-    )
-
-    biometrics_date = models.DateField(
-        null=True,
-        blank=True
+        blank=True,
     )
 
     decision_date = models.DateField(
         null=True,
-        blank=True
+        blank=True,
     )
 
     status = models.CharField(
-        max_length=50,
+        max_length=20,
         choices=STATUS_CHOICES,
-        default='not_started'
+        default='draft',
     )
 
-    remarks = models.TextField(
-        blank=True
+    notes = models.TextField(
+        blank=True,
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['company', '-created_at'],
+                name='visa_company_created_idx',
+            ),
+            models.Index(
+                fields=['student', 'status'],
+                name='visa_student_status_idx',
+            ),
+        ]
+
     def __str__(self):
-        return f"Visa - {self.application}"
-    
+        return (
+            f'Visa {self.visa_number or self.pk} '
+            f'- {self.student.student_id}'
+        )
+
 class University(models.Model):
 
     name = models.CharField(
@@ -299,51 +375,175 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-class OfferLetter(models.Model):
 
-    STATUS_CHOICES = [
+def offer_letter_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    return (
+        f"offer_letters/"
+        f"{instance.company_id}/"
+        f"{instance.student_id}/"
+        f"{safe_name}"
+    )
+
+
+class OfferLetter(SoftDeleteModel):
+
+    OFFER_TYPE_CHOICES = [
         ('conditional', 'Conditional'),
         ('unconditional', 'Unconditional'),
-        ('accepted', 'Accepted'),
-        ('declined', 'Declined'),
     ]
+
+    STATUS_CHOICES = [
+        ('received', 'Received'),
+        ('reviewed', 'Reviewed'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+        ('expired', 'Expired'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+    )
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name='offer_letters',
+    )
 
     application = models.ForeignKey(
         Application,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='offer_letters',
+    )
+
+    university = models.CharField(
+        max_length=255,
+    )
+
+    course = models.CharField(
+        max_length=255,
+    )
+
+    offer_type = models.CharField(
+        max_length=20,
+        choices=OFFER_TYPE_CHOICES,
+        default='conditional',
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='received',
     )
 
     offer_number = models.CharField(
         max_length=100,
-        unique=True
-    )
-
-    status = models.CharField(
-        max_length=50,
-        choices=STATUS_CHOICES,
-        default='conditional'
     )
 
     issue_date = models.DateField(
         null=True,
-        blank=True
+        blank=True,
     )
 
-    acceptance_deadline = models.DateField(
+    expiry_date = models.DateField(
         null=True,
-        blank=True
+        blank=True,
+    )
+
+    tuition_fee = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    deposit_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
 
     notes = models.TextField(
-        blank=True
+        blank=True,
+    )
+
+    offer_document = models.FileField(
+        upload_to=offer_letter_upload_path,
+        blank=True,
+        null=True,
+    )
+
+    original_filename = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    file_size = models.PositiveIntegerField(
+        default=0,
+    )
+
+    mime_type = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    student_document = models.ForeignKey(
+        'StudentDocument',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='offer_letters',
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['company', '-created_at'],
+                name='offer_company_created_idx',
+            ),
+            models.Index(
+                fields=['student', 'status'],
+                name='offer_student_status_idx',
+            ),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['company', 'offer_number'],
+                condition=models.Q(is_deleted=False),
+                name='uniq_offer_number_per_company_alive',
+            ),
+        ]
+
+    def refresh_expiry_status(self):
+        from django.utils import timezone
+
+        if (
+            self.expiry_date
+            and self.expiry_date < timezone.localdate()
+            and self.status in ('received', 'reviewed')
+        ):
+            self.status = 'expired'
+
+    def save(self, *args, **kwargs):
+        self.refresh_expiry_status()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.offer_number
+
+
 class SupportTicket(models.Model):
 
     STATUS_CHOICES = [
@@ -424,6 +624,7 @@ class StudentDocument(SoftDeleteModel):
         ('sop', 'SOP'),
         ('lor', 'LOR'),
         ('resume', 'Resume'),
+        ('university_offer_letter', 'University Offer Letter'),
         ('bank_statement', 'Bank Statement'),
         ('sponsor_letter', 'Sponsor Letter'),
         ('sponsor_id', 'Sponsor ID'),
@@ -455,6 +656,7 @@ class StudentDocument(SoftDeleteModel):
         'sop': 'application',
         'lor': 'application',
         'resume': 'application',
+        'university_offer_letter': 'application',
         'bank_statement': 'financial',
         'sponsor_letter': 'financial',
         'sponsor_id': 'financial',

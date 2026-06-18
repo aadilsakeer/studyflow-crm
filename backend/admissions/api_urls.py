@@ -13,16 +13,29 @@ from .api_views import (
     UniversityDetailAPIView,
     DocumentListCreateAPIView,
     DocumentDetailAPIView,
-    VisaCaseListCreateAPIView,
-    VisaCaseDetailAPIView,
     CourseListCreateAPIView,
     CourseDetailAPIView,
-    OfferLetterListCreateAPIView,
-    OfferLetterDetailAPIView,
     SupportTicketListCreateAPIView,
     SupportTicketDetailAPIView,
     TicketCommentListCreateAPIView,
     TicketCommentDetailAPIView,
+)
+
+from .offer_letter_views import (
+    OfferLetterListCreateAPIView,
+    OfferLetterDetailAPIView,
+    OfferLetterDownloadAPIView,
+    OfferLetterWorkflowAPIView,
+    OfferLetterTrashListAPIView,
+    OfferLetterRestoreAPIView,
+)
+
+from .visa_case_views import (
+    VisaCaseListCreateAPIView,
+    VisaCaseDetailAPIView,
+    VisaCaseWorkflowAPIView,
+    VisaCaseTrashListAPIView,
+    VisaCaseRestoreAPIView,
 )
 
 from .student_document_views import (
@@ -174,15 +187,55 @@ urlpatterns = [
     ),
 
     path(
-        'visa-cases/',
-        VisaCaseListCreateAPIView.as_view(),
-        name='visa-case-list'
+        'visa-cases/trash/',
+        VisaCaseTrashListAPIView.as_view(),
+        name='visa-case-trash',
+    ),
+
+    path(
+        'visa-cases/<int:pk>/restore/',
+        VisaCaseRestoreAPIView.as_view(),
+        name='visa-case-restore',
+    ),
+
+    path(
+        'visa-cases/<int:pk>/submit/',
+        VisaCaseWorkflowAPIView.as_view(),
+        kwargs={'action': 'submit'},
+        name='visa-case-submit',
+    ),
+
+    path(
+        'visa-cases/<int:pk>/process/',
+        VisaCaseWorkflowAPIView.as_view(),
+        kwargs={'action': 'process'},
+        name='visa-case-process',
+    ),
+
+    path(
+        'visa-cases/<int:pk>/approve/',
+        VisaCaseWorkflowAPIView.as_view(),
+        kwargs={'action': 'approve'},
+        name='visa-case-approve',
+    ),
+
+    path(
+        'visa-cases/<int:pk>/reject/',
+        VisaCaseWorkflowAPIView.as_view(),
+        kwargs={'action': 'reject'},
+        name='visa-case-reject',
     ),
 
     path(
         'visa-cases/<int:pk>/',
         VisaCaseDetailAPIView.as_view(),
-        name='visa-case-detail'
+        name='visa-case-detail',
+    ),
+
+    path(
+        'visa-cases/',
+        VisaCaseListCreateAPIView.as_view(),
+        name='visa-case-list',
     ),
 
     path(
@@ -198,15 +251,54 @@ urlpatterns = [
     ),
 
     path(
-        'offer-letters/',
-        OfferLetterListCreateAPIView.as_view(),
-        name='offer-letter-list'
+        'offer-letters/trash/',
+        OfferLetterTrashListAPIView.as_view(),
+        name='offer-letter-trash',
+    ),
+
+    path(
+        'offer-letters/<int:pk>/restore/',
+        OfferLetterRestoreAPIView.as_view(),
+        name='offer-letter-restore',
+    ),
+
+    path(
+        'offer-letters/<int:pk>/download/',
+        OfferLetterDownloadAPIView.as_view(),
+        name='offer-letter-download',
+    ),
+
+    path(
+        'offer-letters/<int:pk>/review/',
+        OfferLetterWorkflowAPIView.as_view(),
+        kwargs={'action': 'review'},
+        name='offer-letter-review',
+    ),
+
+    path(
+        'offer-letters/<int:pk>/accept/',
+        OfferLetterWorkflowAPIView.as_view(),
+        kwargs={'action': 'accept'},
+        name='offer-letter-accept',
+    ),
+
+    path(
+        'offer-letters/<int:pk>/reject/',
+        OfferLetterWorkflowAPIView.as_view(),
+        kwargs={'action': 'reject'},
+        name='offer-letter-reject',
     ),
 
     path(
         'offer-letters/<int:pk>/',
         OfferLetterDetailAPIView.as_view(),
-        name='offer-letter-detail'
+        name='offer-letter-detail',
+    ),
+
+    path(
+        'offer-letters/',
+        OfferLetterListCreateAPIView.as_view(),
+        name='offer-letter-list',
     ),
 
     path(

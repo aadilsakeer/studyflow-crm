@@ -80,18 +80,25 @@ class DocumentAdmin(admin.ModelAdmin):
 @admin.register(VisaCase)
 class VisaCaseAdmin(admin.ModelAdmin):
     list_display = (
-        'application',
+        'student',
+        'country',
+        'visa_type',
         'status',
         'submission_date',
-        'decision_date'
+        'decision_date',
+        'company',
     )
 
     search_fields = (
-        'application__university_name',
+        'student__student_id',
+        'visa_number',
+        'country',
     )
 
     list_filter = (
         'status',
+        'visa_type',
+        'country',
     )
 
 
@@ -139,18 +146,24 @@ class CourseAdmin(admin.ModelAdmin):
 class OfferLetterAdmin(admin.ModelAdmin):
     list_display = (
         'offer_number',
-        'application',
+        'student',
+        'university',
+        'offer_type',
         'status',
         'issue_date',
-        'acceptance_deadline'
+        'expiry_date',
+        'is_deleted',
     )
-
+    list_filter = (
+        'offer_type',
+        'status',
+        'is_deleted',
+        'company',
+    )
     search_fields = (
         'offer_number',
-    )
-
-    list_filter = (
-        'status',
+        'student__student_id',
+        'university',
     )
 
 

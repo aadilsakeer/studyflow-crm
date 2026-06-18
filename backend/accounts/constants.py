@@ -5,6 +5,7 @@ ROLE_COUNSELLOR = "Counsellor"
 ROLE_TELECALLER = "Telecaller"
 ROLE_FINANCE = "Finance"
 ROLE_VIEWER = "Viewer"
+ROLE_VISA_TEAM = "Visa Team"
 
 # Permission codes
 PERM_DASHBOARD_VIEW = "dashboard.view"
@@ -48,6 +49,22 @@ PERM_DOCUMENTS_ADD = "documents.add"
 PERM_DOCUMENTS_CHANGE = "documents.change"
 PERM_DOCUMENTS_DELETE = "documents.delete"
 PERM_DOCUMENTS_RESTORE = "documents.restore"
+
+PERM_OFFERLETTERS_VIEW = "offerletters.view"
+PERM_OFFERLETTERS_ADD = "offerletters.add"
+PERM_OFFERLETTERS_CHANGE = "offerletters.change"
+PERM_OFFERLETTERS_DELETE = "offerletters.delete"
+PERM_OFFERLETTERS_RESTORE = "offerletters.restore"
+
+PERM_VISAS_VIEW = "visas.view"
+PERM_VISAS_ADD = "visas.add"
+PERM_VISAS_CHANGE = "visas.change"
+PERM_VISAS_DELETE = "visas.delete"
+PERM_VISAS_RESTORE = "visas.restore"
+PERM_VISAS_SUBMIT = "visas.submit"
+PERM_VISAS_PROCESS = "visas.process"
+PERM_VISAS_APPROVE = "visas.approve"
+PERM_VISAS_REJECT = "visas.reject"
 
 PERM_PAYMENTS_VIEW = "payments.view"
 PERM_PAYMENTS_ADD = "payments.add"
@@ -140,6 +157,20 @@ ALL_PERMISSIONS = [
     (PERM_DOCUMENTS_CHANGE, "Change Documents"),
     (PERM_DOCUMENTS_DELETE, "Delete Documents"),
     (PERM_DOCUMENTS_RESTORE, "Restore Documents"),
+    (PERM_OFFERLETTERS_VIEW, "View Offer Letters"),
+    (PERM_OFFERLETTERS_ADD, "Add Offer Letters"),
+    (PERM_OFFERLETTERS_CHANGE, "Change Offer Letters"),
+    (PERM_OFFERLETTERS_DELETE, "Delete Offer Letters"),
+    (PERM_OFFERLETTERS_RESTORE, "Restore Offer Letters"),
+    (PERM_VISAS_VIEW, "View Visas"),
+    (PERM_VISAS_ADD, "Add Visas"),
+    (PERM_VISAS_CHANGE, "Change Visas"),
+    (PERM_VISAS_DELETE, "Delete Visas"),
+    (PERM_VISAS_RESTORE, "Restore Visas"),
+    (PERM_VISAS_SUBMIT, "Submit Visas"),
+    (PERM_VISAS_PROCESS, "Process Visas"),
+    (PERM_VISAS_APPROVE, "Approve Visas"),
+    (PERM_VISAS_REJECT, "Reject Visas"),
     (PERM_PAYMENTS_VIEW, "View Payments"),
     (PERM_PAYMENTS_ADD, "Add Payments"),
     (PERM_PAYMENTS_CHANGE, "Change Payments"),
@@ -219,6 +250,11 @@ ROLE_PERMISSIONS = {
         PERM_DOCUMENTS_ADD,
         PERM_DOCUMENTS_CHANGE,
         PERM_DOCUMENTS_DELETE,
+        PERM_OFFERLETTERS_VIEW,
+        PERM_OFFERLETTERS_ADD,
+        PERM_OFFERLETTERS_CHANGE,
+        PERM_OFFERLETTERS_DELETE,
+        PERM_VISAS_VIEW,
     ],
     ROLE_COUNSELLOR: [
         PERM_DASHBOARD_VIEW,
@@ -242,6 +278,25 @@ ROLE_PERMISSIONS = {
         PERM_DOCUMENTS_VIEW,
         PERM_DOCUMENTS_ADD,
         PERM_DOCUMENTS_CHANGE,
+        PERM_OFFERLETTERS_VIEW,
+        PERM_OFFERLETTERS_ADD,
+        PERM_OFFERLETTERS_CHANGE,
+        PERM_VISAS_VIEW,
+        PERM_VISAS_ADD,
+        PERM_VISAS_CHANGE,
+        PERM_VISAS_SUBMIT,
+    ],
+    ROLE_VISA_TEAM: [
+        PERM_DASHBOARD_VIEW,
+        PERM_STUDENTS_VIEW,
+        PERM_APPLICATIONS_VIEW,
+        PERM_DOCUMENTS_VIEW,
+        PERM_OFFERLETTERS_VIEW,
+        PERM_VISAS_VIEW,
+        PERM_VISAS_CHANGE,
+        PERM_VISAS_PROCESS,
+        PERM_VISAS_APPROVE,
+        PERM_VISAS_REJECT,
     ],
     ROLE_TELECALLER: [
         PERM_DASHBOARD_VIEW,
