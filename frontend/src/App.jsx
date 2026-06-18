@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import FollowUpsPage from "./pages/FollowUpsPage";
 import TasksPage from "./pages/TasksPage";
+import ReportsPage from "./pages/ReportsPage";
 import StudentsPage from "./pages/StudentsPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import UniversitiesPage from "./pages/UniversitiesPage";
@@ -107,6 +108,10 @@ function App() {
                     <Route
                         path="leads"
                         element={<LeadsPage />}
+                    />
+                    <Route
+                        path="reports"
+                        element={<ReportsPage />}
                     />
                     <Route
                         path="tasks"

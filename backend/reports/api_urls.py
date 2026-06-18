@@ -7,7 +7,9 @@ from .api_views import (
     StaffPerformanceAPIView,
     CountryAnalyticsAPIView,
     RecruitmentAnalyticsAPIView,
-    WorkVisaAnalyticsAPIView
+    WorkVisaAnalyticsAPIView,
+    AdvancedReportAPIView,
+    AdvancedReportExportAPIView,
 )
 urlpatterns = [
 
@@ -43,6 +45,16 @@ urlpatterns = [
         'recruitment-analytics/',
         RecruitmentAnalyticsAPIView.as_view(),
         name='recruitment-analytics'
+    ),
+    path(
+        'advanced/export/',
+        AdvancedReportExportAPIView.as_view(),
+        name='advanced-report-export',
+    ),
+    path(
+        'advanced/',
+        AdvancedReportAPIView.as_view(),
+        name='advanced-report',
     ),
     path(
         'workvisa-analytics/',

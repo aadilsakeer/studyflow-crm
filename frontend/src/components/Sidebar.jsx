@@ -5,6 +5,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import EventIcon from "@mui/icons-material/Event";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import FolderIcon from "@mui/icons-material/Folder";
 import MailIcon from "@mui/icons-material/Mail";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
@@ -35,6 +36,11 @@ const navItems = [
         label: "Leads",
         path: "/leads",
         icon: <PeopleIcon />,
+    },
+    {
+        label: "Reports",
+        path: "/reports",
+        icon: <AssessmentIcon />,
     },
     {
         label: "Tasks",

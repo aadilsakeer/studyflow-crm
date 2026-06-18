@@ -24,6 +24,7 @@ const PAGE_TITLES = {
     "/leads": "Leads",
     "/follow-ups": "Follow Ups",
     "/tasks": "Tasks",
+    "/reports": "Reports",
     "/students": "Students",
     "/applications": "Applications",
     "/universities": "Universities",

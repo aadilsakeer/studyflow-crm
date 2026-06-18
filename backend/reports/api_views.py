@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -19,6 +21,8 @@ from .services import (
     RecruitmentAnalyticsService,
     WorkVisaAnalyticsService,
 )
+from .advanced_analytics import AdvancedReportService
+from .export_utils import export_reports_csv, export_reports_xlsx
 
 
 class LicensedReportAPIView(APIView):
@@ -111,3 +115,54 @@ class WorkVisaAnalyticsAPIView(LicensedReportAPIView):
         )
 
         return Response(data)
+
+
+class AdvancedReportAPIView(LicensedReportAPIView):
+
+    @module_required('reports')
+    def get(self, request):
+        range_key = request.query_params.get('range', '30d')
+
+        data = AdvancedReportService.get_reports(
+            request.user.company,
+            range_key,
+        )
+
+        return Response(data)
+
+
+class AdvancedReportExportAPIView(LicensedReportAPIView):
+
+    @module_required('reports')
+    def get(self, request):
+        range_key = request.query_params.get('range', '30d')
+        export_format = request.query_params.get(
+            'format',
+            'csv',
+        ).lower()
+
+        reports = AdvancedReportService.get_reports(
+            request.user.company,
+            range_key,
+        )
+
+        if export_format == 'xlsx':
+            content = export_reports_xlsx(reports)
+            response = HttpResponse(
+                content,
+                content_type=(
+                    'application/vnd.openxmlformats-'
+                    'officedocument.spreadsheetml.sheet'
+                ),
+            )
+            response['Content-Disposition'] = (
+                'attachment; filename="advanced-report.xlsx"'
+            )
+            return response
+
+        content = export_reports_csv(reports)
+        response = HttpResponse(content, content_type='text/csv')
+        response['Content-Disposition'] = (
+            'attachment; filename="advanced-report.csv"'
+        )
+        return response

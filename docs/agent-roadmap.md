@@ -244,7 +244,9 @@ Roles:
 
 ---
 
-## [ ] Phase 4.3 Advanced Reporting
+## [x] Phase 4.3 Advanced Reporting
+
+Status: COMPLETE
 
 Reports:
 
