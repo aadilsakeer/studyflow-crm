@@ -1,26 +1,15 @@
 from django.utils import timezone
 
+from activity.models import StudentTimeline
+from core.task_service import get_task_summary
 from leads.models import FollowUp, LeadTimeline
-
-from recruitment.models import (
-    Candidate,
-)
-
-from workvisa.models import (
-    WorkVisaCase,
-)
-
-from accounts.models import (
-    CustomUser,
-)
-
-from .analytics import DashboardAnalyticsService
-
 
 class DashboardService:
 
     @staticmethod
     def empty_dashboard():
+        from .analytics import DashboardAnalyticsService
+
         empty = (
             DashboardAnalyticsService.empty_analytics()
         )
@@ -33,13 +22,25 @@ class DashboardService:
             "pending_follow_ups": 0,
             "completed_today": 0,
             "recent_activities": [],
+            "todays_tasks": 0,
+            "pending_tasks": 0,
+            "overdue_tasks": 0,
+            "completed_today_tasks": 0,
+            "due_reminders": 0,
         }
 
     @staticmethod
     def get_dashboard_data(
         company,
         range_key='30d',
+        user=None,
     ):
+        from accounts.models import CustomUser
+        from recruitment.models import Candidate
+        from workvisa.models import WorkVisaCase
+
+        from .analytics import DashboardAnalyticsService
+
         if not company:
             return DashboardService.empty_dashboard()
 
@@ -89,13 +90,14 @@ class DashboardService:
                 DashboardService.get_recent_activities(
                     company,
                 ),
+            **get_task_summary(company, user),
         }
 
         return data
 
     @staticmethod
     def get_recent_activities(company, limit=10):
-        timelines = LeadTimeline.objects.filter(
+        lead_items = LeadTimeline.objects.filter(
             lead__company=company,
             lead__is_deleted=False,
         ).select_related(
@@ -105,9 +107,19 @@ class DashboardService:
             "-created_at",
         )[:limit]
 
+        student_items = StudentTimeline.objects.filter(
+            student__company=company,
+            student__is_deleted=False,
+        ).select_related(
+            "student",
+            "performed_by",
+        ).order_by(
+            "-created_at",
+        )[:limit]
+
         activities = []
 
-        for item in timelines:
+        for item in lead_items:
             performed_by = None
 
             if item.performed_by:
@@ -117,10 +129,13 @@ class DashboardService:
                 )
 
             activities.append({
-                "id": item.id,
+                "id": f"lead-{item.id}",
+                "entity_type": "lead",
+                "entity_id": item.lead_id,
+                "event_type": item.event_type,
                 "action": item.action,
                 "description": item.description,
-                "lead_name": (
+                "entity_name": (
                     f"{item.lead.first_name} "
                     f"{item.lead.last_name}".strip()
                 ),
@@ -128,4 +143,30 @@ class DashboardService:
                 "created_at": item.created_at.isoformat(),
             })
 
-        return activities
+        for item in student_items:
+            performed_by = None
+
+            if item.performed_by:
+                performed_by = (
+                    item.performed_by.get_full_name()
+                    or item.performed_by.username
+                )
+
+            activities.append({
+                "id": f"student-{item.id}",
+                "entity_type": "student",
+                "entity_id": item.student_id,
+                "event_type": item.event_type,
+                "action": item.action,
+                "description": item.description,
+                "entity_name": item.student.student_id,
+                "performed_by": performed_by,
+                "created_at": item.created_at.isoformat(),
+            })
+
+        activities.sort(
+            key=lambda row: row["created_at"],
+            reverse=True,
+        )
+
+        return activities[:limit]

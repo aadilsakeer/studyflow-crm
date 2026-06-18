@@ -9,10 +9,18 @@ import { logout as logoutApi } from "./services/auth";
 import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
 import FollowUpsPage from "./pages/FollowUpsPage";
+import TasksPage from "./pages/TasksPage";
 import StudentsPage from "./pages/StudentsPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import UniversitiesPage from "./pages/UniversitiesPage";
-import ComingSoonPage from "./pages/ComingSoonPage";
+import StudentDocumentsPage from "./pages/StudentDocumentsPage";
+import OfferLettersPage from "./pages/OfferLettersPage";
+import VisaCasesPage from "./pages/VisaCasesPage";
+import RecycleBinPage from "./pages/RecycleBinPage";
+import JourneyBoardPage from "./pages/JourneyBoardPage";
+import LeadImportPage from "./pages/LeadImportPage";
+import LeadTimelinePage from "./pages/LeadTimelinePage";
+import StudentTimelinePage from "./pages/StudentTimelinePage";
 
 function App() {
     const [token, setToken] = useState(
@@ -81,8 +89,28 @@ function App() {
                         element={<DashboardPage />}
                     />
                     <Route
+                        path="journey-board"
+                        element={<JourneyBoardPage />}
+                    />
+                    <Route
+                        path="leads/:leadId/timeline"
+                        element={<LeadTimelinePage />}
+                    />
+                    <Route
+                        path="students/:studentId/timeline"
+                        element={<StudentTimelinePage />}
+                    />
+                    <Route
+                        path="leads/import"
+                        element={<LeadImportPage />}
+                    />
+                    <Route
                         path="leads"
                         element={<LeadsPage />}
+                    />
+                    <Route
+                        path="tasks"
+                        element={<TasksPage />}
                     />
                     <Route
                         path="follow-ups"
@@ -105,13 +133,24 @@ function App() {
                         }
                     />
                     <Route
-                        path="visa-cases"
+                        path="student-documents"
                         element={
-                            <ComingSoonPage
-                                title="Visa Cases"
-                                description="Visa case management will be added in a later phase."
-                            />
+                            <StudentDocumentsPage />
                         }
+                    />
+                    <Route
+                        path="offer-letters"
+                        element={
+                            <OfferLettersPage />
+                        }
+                    />
+                    <Route
+                        path="visa-cases"
+                        element={<VisaCasesPage />}
+                    />
+                    <Route
+                        path="recycle-bin"
+                        element={<RecycleBinPage />}
                     />
                 </Route>
             </Routes>

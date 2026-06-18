@@ -22,7 +22,13 @@ export const NAV_PERMISSIONS = {
     "/": "dashboard.view",
     "/leads": "leads.view",
     "/follow-ups": "followups.view",
+    "/tasks": "tasks.view",
     "/students": "students.view",
     "/applications": "applications.view",
     "/universities": "universities.view",
+    "/student-documents": "documents.view",
+    "/offer-letters": "offerletters.view",
+    "/visa-cases": "visas.view",
+    "/recycle-bin": null,
+    "/leads/import": "leads.import",
 };

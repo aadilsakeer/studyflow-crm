@@ -4,6 +4,11 @@ import SchoolIcon from "@mui/icons-material/School";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import EventIcon from "@mui/icons-material/Event";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import FolderIcon from "@mui/icons-material/Folder";
+import MailIcon from "@mui/icons-material/Mail";
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import DeleteIcon from "@mui/icons-material/Delete";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import {
@@ -32,6 +37,11 @@ const navItems = [
         icon: <PeopleIcon />,
     },
     {
+        label: "Tasks",
+        path: "/tasks",
+        icon: <TaskAltIcon />,
+    },
+    {
         label: "Follow Ups",
         path: "/follow-ups",
         icon: <EventIcon />,
@@ -51,15 +61,44 @@ const navItems = [
         path: "/universities",
         icon: <AccountBalanceIcon />,
     },
+    {
+        label: "Documents",
+        path: "/student-documents",
+        icon: <FolderIcon />,
+    },
+    {
+        label: "Offer Letters",
+        path: "/offer-letters",
+        icon: <MailIcon />,
+    },
+    {
+        label: "Visa Cases",
+        path: "/visa-cases",
+        icon: <FlightTakeoffIcon />,
+    },
+    {
+        label: "Recycle Bin",
+        path: "/recycle-bin",
+        icon: <DeleteIcon />,
+        restoreOnly: true,
+    },
 ];
 
 function Sidebar({ onLogout }) {
     const navigate = useNavigate();
     const location = useLocation();
-    const { can } = usePermissions();
+    const { can, canAny } = usePermissions();
 
     const visibleItems = navItems.filter(
         (item) => {
+            if (item.restoreOnly) {
+                return canAny([
+                    "documents.restore",
+                    "offerletters.restore",
+                    "visas.restore",
+                ]);
+            }
+
             const perm =
                 NAV_PERMISSIONS[item.path];
 

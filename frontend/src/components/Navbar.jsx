@@ -23,10 +23,15 @@ const PAGE_TITLES = {
     "/": "Dashboard",
     "/leads": "Leads",
     "/follow-ups": "Follow Ups",
+    "/tasks": "Tasks",
     "/students": "Students",
     "/applications": "Applications",
     "/universities": "Universities",
+    "/student-documents": "Student Documents",
+    "/offer-letters": "Offer Letters",
     "/visa-cases": "Visa Cases",
+    "/recycle-bin": "Recycle Bin",
+    "/leads/import": "Import Leads",
 };
 
 function Navbar({ onLogout }) {

@@ -51,6 +51,11 @@ urlpatterns = [
     ),
 
     path(
+        'api/activity/',
+        include('activity.api_urls'),
+    ),
+
+    path(
         'api/dashboard/',
         include('dashboard.api_urls')
     ),
@@ -103,6 +108,11 @@ urlpatterns = [
     path(
         'api/whatsapp/',
         include('whatsapp.api_urls')
+    ),
+
+    path(
+        'api/tasks/',
+        include('core.task_urls'),
     ),
 
     path(

@@ -16,11 +16,20 @@ PERM_LEADS_CHANGE = "leads.change"
 PERM_LEADS_DELETE = "leads.delete"
 PERM_LEADS_CONVERT = "leads.convert"
 PERM_LEADS_RESTORE = "leads.restore"
+PERM_LEADS_ASSIGN = "leads.assign"
+PERM_LEADS_IMPORT = "leads.import"
+PERM_LEADS_QUALIFY = "leads.qualify"
+PERM_LEADS_ASSIGN_COUNSELLOR = "leads.assign_counsellor"
 
 PERM_FOLLOWUPS_VIEW = "followups.view"
 PERM_FOLLOWUPS_ADD = "followups.add"
 PERM_FOLLOWUPS_CHANGE = "followups.change"
 PERM_FOLLOWUPS_DELETE = "followups.delete"
+
+PERM_TASKS_VIEW = "tasks.view"
+PERM_TASKS_ADD = "tasks.add"
+PERM_TASKS_CHANGE = "tasks.change"
+PERM_TASKS_DELETE = "tasks.delete"
 
 PERM_CALLLOGS_VIEW = "calllogs.view"
 PERM_CALLLOGS_ADD = "calllogs.add"
@@ -130,10 +139,18 @@ ALL_PERMISSIONS = [
     (PERM_LEADS_DELETE, "Delete Leads"),
     (PERM_LEADS_CONVERT, "Convert Leads"),
     (PERM_LEADS_RESTORE, "Restore Leads"),
+    (PERM_LEADS_ASSIGN, "Assign Leads"),
+    (PERM_LEADS_IMPORT, "Import Leads"),
+    (PERM_LEADS_QUALIFY, "Qualify Leads"),
+    (PERM_LEADS_ASSIGN_COUNSELLOR, "Assign Counsellor"),
     (PERM_FOLLOWUPS_VIEW, "View Follow Ups"),
     (PERM_FOLLOWUPS_ADD, "Add Follow Ups"),
     (PERM_FOLLOWUPS_CHANGE, "Change Follow Ups"),
     (PERM_FOLLOWUPS_DELETE, "Delete Follow Ups"),
+    (PERM_TASKS_VIEW, "View Tasks"),
+    (PERM_TASKS_ADD, "Add Tasks"),
+    (PERM_TASKS_CHANGE, "Change Tasks"),
+    (PERM_TASKS_DELETE, "Delete Tasks"),
     (PERM_CALLLOGS_VIEW, "View Call Logs"),
     (PERM_CALLLOGS_ADD, "Add Call Logs"),
     (PERM_CALLLOGS_CHANGE, "Change Call Logs"),
@@ -227,10 +244,18 @@ ROLE_PERMISSIONS = {
         PERM_LEADS_CHANGE,
         PERM_LEADS_DELETE,
         PERM_LEADS_CONVERT,
+        PERM_LEADS_ASSIGN,
+        PERM_LEADS_IMPORT,
+        PERM_LEADS_QUALIFY,
+        PERM_LEADS_ASSIGN_COUNSELLOR,
         PERM_FOLLOWUPS_VIEW,
         PERM_FOLLOWUPS_ADD,
         PERM_FOLLOWUPS_CHANGE,
         PERM_FOLLOWUPS_DELETE,
+        PERM_TASKS_VIEW,
+        PERM_TASKS_ADD,
+        PERM_TASKS_CHANGE,
+        PERM_TASKS_DELETE,
         PERM_CALLLOGS_VIEW,
         PERM_CALLLOGS_ADD,
         PERM_CALLLOGS_CHANGE,
@@ -262,9 +287,13 @@ ROLE_PERMISSIONS = {
         PERM_LEADS_ADD,
         PERM_LEADS_CHANGE,
         PERM_LEADS_CONVERT,
+        PERM_LEADS_QUALIFY,
         PERM_FOLLOWUPS_VIEW,
         PERM_FOLLOWUPS_ADD,
         PERM_FOLLOWUPS_CHANGE,
+        PERM_TASKS_VIEW,
+        PERM_TASKS_ADD,
+        PERM_TASKS_CHANGE,
         PERM_CALLLOGS_VIEW,
         PERM_CALLLOGS_ADD,
         PERM_STUDENTS_VIEW,
@@ -297,6 +326,9 @@ ROLE_PERMISSIONS = {
         PERM_VISAS_PROCESS,
         PERM_VISAS_APPROVE,
         PERM_VISAS_REJECT,
+        PERM_TASKS_VIEW,
+        PERM_TASKS_ADD,
+        PERM_TASKS_CHANGE,
     ],
     ROLE_TELECALLER: [
         PERM_DASHBOARD_VIEW,
@@ -306,6 +338,9 @@ ROLE_PERMISSIONS = {
         PERM_FOLLOWUPS_VIEW,
         PERM_FOLLOWUPS_ADD,
         PERM_FOLLOWUPS_CHANGE,
+        PERM_TASKS_VIEW,
+        PERM_TASKS_ADD,
+        PERM_TASKS_CHANGE,
         PERM_CALLLOGS_VIEW,
         PERM_CALLLOGS_ADD,
         PERM_DOCUMENTS_VIEW,
@@ -323,6 +358,7 @@ ROLE_PERMISSIONS = {
         PERM_DASHBOARD_VIEW,
         PERM_LEADS_VIEW,
         PERM_FOLLOWUPS_VIEW,
+        PERM_TASKS_VIEW,
         PERM_CALLLOGS_VIEW,
         PERM_STUDENTS_VIEW,
         PERM_APPLICATIONS_VIEW,

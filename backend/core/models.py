@@ -75,6 +75,15 @@ class Branch(models.Model):
 
 class Task(models.Model):
 
+    TASK_TYPE_CHOICES = [
+        ('follow_up_call', 'Follow-up Call'),
+        ('document_collection', 'Document Collection'),
+        ('application_submission', 'Application Submission'),
+        ('offer_review', 'Offer Review'),
+        ('visa_appointment', 'Visa Appointment'),
+        ('general_task', 'General Task'),
+    ]
+
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('in_progress', 'In Progress'),
@@ -92,55 +101,112 @@ class Task(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True
+    )
+
+    task_type = models.CharField(
+        max_length=40,
+        choices=TASK_TYPE_CHOICES,
+        default='general_task',
+        db_index=True,
     )
 
     title = models.CharField(
-        max_length=255
+        max_length=255,
     )
 
     description = models.TextField(
-        blank=True
+        blank=True,
+    )
+
+    notes = models.TextField(
+        blank=True,
+    )
+
+    lead = models.ForeignKey(
+        'leads.Lead',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tasks',
+    )
+
+    student = models.ForeignKey(
+        'admissions.Student',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tasks',
     )
 
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='assigned_tasks'
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_tasks',
     )
 
     assigned_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='created_tasks'
+        related_name='created_tasks',
     )
 
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='pending'
+        default='pending',
+        db_index=True,
     )
 
     priority = models.CharField(
         max_length=20,
         choices=PRIORITY_CHOICES,
-        default='medium'
+        default='medium',
+        db_index=True,
     )
 
     due_date = models.DateTimeField(
         null=True,
-        blank=True
+        blank=True,
+        db_index=True,
+    )
+
+    reminder_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
     )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['company', 'status', '-due_date'],
+                name='task_co_status_due_idx',
+            ),
+            models.Index(
+                fields=['company', 'assigned_to', 'status'],
+                name='task_co_assign_status_idx',
+            ),
+            models.Index(
+                fields=['company', 'reminder_at'],
+                name='task_co_reminder_idx',
+            ),
+        ]
 
     def __str__(self):
         return self.title
