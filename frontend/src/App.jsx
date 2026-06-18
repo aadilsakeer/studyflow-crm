@@ -22,6 +22,7 @@ import JourneyBoardPage from "./pages/JourneyBoardPage";
 import LeadImportPage from "./pages/LeadImportPage";
 import LeadTimelinePage from "./pages/LeadTimelinePage";
 import StudentTimelinePage from "./pages/StudentTimelinePage";
+import CommunicationsPage from "./pages/CommunicationsPage";
 import PortalLoginPage from "./pages/portal/PortalLoginPage";
 import PortalLayout from "./layouts/PortalLayout";
 
@@ -70,6 +71,10 @@ function CrmRoutes({ onLogout }) {
                     <Route
                         path="follow-ups"
                         element={<FollowUpsPage />}
+                    />
+                    <Route
+                        path="communications"
+                        element={<CommunicationsPage />}
                     />
                     <Route
                         path="students"

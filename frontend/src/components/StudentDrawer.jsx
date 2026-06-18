@@ -30,12 +30,16 @@ import {
     showSuccess,
 } from "../utils/toast";
 
+import usePermissions from "../hooks/usePermissions";
+import CommunicationHubPanel from "./CommunicationHubPanel";
+
 function StudentDrawer({
     open,
     onClose,
     student,
     onUpdated,
 }) {
+    const { can } = usePermissions();
     const [editMode, setEditMode] =
         useState(false);
 
@@ -404,6 +408,18 @@ function StudentDrawer({
                         >
                             New Application
                         </Button>
+
+                        {can("communications.view") && (
+                            <>
+                                <Divider sx={{ my: 3 }} />
+                                <CommunicationHubPanel
+                                    leadId={student.lead}
+                                    studentId={student.id}
+                                    defaultEmail=""
+                                    defaultPhone=""
+                                />
+                            </>
+                        )}
 
                         <Button
                             variant="contained"

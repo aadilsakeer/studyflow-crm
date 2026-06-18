@@ -31,6 +31,11 @@ PERM_TASKS_ADD = "tasks.add"
 PERM_TASKS_CHANGE = "tasks.change"
 PERM_TASKS_DELETE = "tasks.delete"
 
+PERM_COMMUNICATIONS_VIEW = "communications.view"
+PERM_COMMUNICATIONS_ADD = "communications.add"
+PERM_COMMUNICATIONS_CHANGE = "communications.change"
+PERM_COMMUNICATIONS_DELETE = "communications.delete"
+
 PERM_CALLLOGS_VIEW = "calllogs.view"
 PERM_CALLLOGS_ADD = "calllogs.add"
 PERM_CALLLOGS_CHANGE = "calllogs.change"
@@ -151,6 +156,10 @@ ALL_PERMISSIONS = [
     (PERM_TASKS_ADD, "Add Tasks"),
     (PERM_TASKS_CHANGE, "Change Tasks"),
     (PERM_TASKS_DELETE, "Delete Tasks"),
+    (PERM_COMMUNICATIONS_VIEW, "View Communications"),
+    (PERM_COMMUNICATIONS_ADD, "Add Communications"),
+    (PERM_COMMUNICATIONS_CHANGE, "Change Communications"),
+    (PERM_COMMUNICATIONS_DELETE, "Delete Communications"),
     (PERM_CALLLOGS_VIEW, "View Call Logs"),
     (PERM_CALLLOGS_ADD, "Add Call Logs"),
     (PERM_CALLLOGS_CHANGE, "Change Call Logs"),
@@ -256,6 +265,9 @@ ROLE_PERMISSIONS = {
         PERM_TASKS_ADD,
         PERM_TASKS_CHANGE,
         PERM_TASKS_DELETE,
+        PERM_COMMUNICATIONS_VIEW,
+        PERM_COMMUNICATIONS_ADD,
+        PERM_COMMUNICATIONS_CHANGE,
         PERM_CALLLOGS_VIEW,
         PERM_CALLLOGS_ADD,
         PERM_CALLLOGS_CHANGE,
@@ -295,6 +307,8 @@ ROLE_PERMISSIONS = {
         PERM_TASKS_VIEW,
         PERM_TASKS_ADD,
         PERM_TASKS_CHANGE,
+        PERM_COMMUNICATIONS_VIEW,
+        PERM_COMMUNICATIONS_ADD,
         PERM_CALLLOGS_VIEW,
         PERM_CALLLOGS_ADD,
         PERM_STUDENTS_VIEW,
@@ -342,6 +356,8 @@ ROLE_PERMISSIONS = {
         PERM_TASKS_VIEW,
         PERM_TASKS_ADD,
         PERM_TASKS_CHANGE,
+        PERM_COMMUNICATIONS_VIEW,
+        PERM_COMMUNICATIONS_ADD,
         PERM_CALLLOGS_VIEW,
         PERM_CALLLOGS_ADD,
         PERM_DOCUMENTS_VIEW,
@@ -360,6 +376,7 @@ ROLE_PERMISSIONS = {
         PERM_LEADS_VIEW,
         PERM_FOLLOWUPS_VIEW,
         PERM_TASKS_VIEW,
+        PERM_COMMUNICATIONS_VIEW,
         PERM_CALLLOGS_VIEW,
         PERM_STUDENTS_VIEW,
         PERM_APPLICATIONS_VIEW,

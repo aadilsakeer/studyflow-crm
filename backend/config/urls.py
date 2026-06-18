@@ -131,6 +131,11 @@ urlpatterns = [
     ),
 
     path(
+        'api/communications/',
+        include('communications.api_urls'),
+    ),
+
+    path(
         'api/notifications/',
         include('notifications.api_urls')
     ),

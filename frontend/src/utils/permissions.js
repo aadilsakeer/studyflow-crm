@@ -22,6 +22,7 @@ export const NAV_PERMISSIONS = {
     "/": "dashboard.view",
     "/leads": "leads.view",
     "/follow-ups": "followups.view",
+    "/communications": "communications.view",
     "/tasks": "tasks.view",
     "/reports": "reports.view",
     "/students": "students.view",

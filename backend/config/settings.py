@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'whatsapp',
     'followups',
     'calllogs',
+    'communications',
     'corsheaders',
     'django_celery_beat',
 ]

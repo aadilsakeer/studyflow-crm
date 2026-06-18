@@ -31,10 +31,6 @@ import {
 } from "../services/followups";
 
 import {
-    getLeadCallLogs,
-} from "../services/calllogs";
-
-import {
     getLeadTimeline,
 } from "../services/timeline";
 
@@ -48,6 +44,8 @@ import {
 } from "../utils/toast";
 
 import usePermissions from "../hooks/usePermissions";
+import LeadPipelinePanel from "./LeadPipelinePanel";
+import CommunicationHubPanel from "./CommunicationHubPanel";
 
 function LeadDrawer({
     open,
@@ -75,10 +73,6 @@ function LeadDrawer({
 
     const [followUps,
         setFollowUps] =
-        useState([]);
-
-    const [callLogs,
-        setCallLogs] =
         useState([]);
 
     const [timeline,
@@ -127,18 +121,15 @@ function LeadDrawer({
         try {
             const [
                 followUpData,
-                callLogData,
                 timelineData,
                 auditData,
             ] = await Promise.all([
                 getLeadFollowUps(leadId),
-                getLeadCallLogs(leadId),
                 getLeadTimeline(leadId),
                 getLeadAuditLogs(leadId),
             ]);
 
             setFollowUps(followUpData);
-            setCallLogs(callLogData);
             setTimeline(timelineData);
             setAuditLogs(auditData);
         } catch (error) {
@@ -169,14 +160,6 @@ function LeadDrawer({
             console.error(error);
             showError("Failed to update follow up");
         }
-    }
-
-    function formatOutcome(value) {
-        return value
-            .replace(/_/g, " ")
-            .replace(/\b\w/g, (c) =>
-                c.toUpperCase()
-            );
     }
 
     if (!lead) return null;
@@ -363,25 +346,32 @@ function LeadDrawer({
                                 <MenuItem value="new">
                                     New
                                 </MenuItem>
-
-                                <MenuItem value="contacted">
-                                    Contacted
+                                <MenuItem value="assigned">
+                                    Assigned
                                 </MenuItem>
-
+                                <MenuItem value="called">
+                                    Called
+                                </MenuItem>
                                 <MenuItem value="interested">
                                     Interested
                                 </MenuItem>
-
-                                <MenuItem value="follow_up">
-                                    Follow Up
+                                <MenuItem value="not_interested">
+                                    Not Interested
                                 </MenuItem>
-
+                                <MenuItem value="follow_up">
+                                    Follow-up
+                                </MenuItem>
+                                <MenuItem value="documents_requested">
+                                    Documents Requested
+                                </MenuItem>
+                                <MenuItem value="documents_received">
+                                    Documents Received
+                                </MenuItem>
+                                <MenuItem value="counsellor_assigned">
+                                    Counsellor Assigned
+                                </MenuItem>
                                 <MenuItem value="converted">
                                     Converted
-                                </MenuItem>
-
-                                <MenuItem value="lost">
-                                    Lost
                                 </MenuItem>
                             </TextField>
 
@@ -561,94 +551,25 @@ function LeadDrawer({
 
                             <Divider sx={{ my: 3 }} />
 
-                            <Typography
-                                variant="h6"
-                                fontWeight={600}
-                            >
-                                Call Logs
-                            </Typography>
-
-                            {callLogs.length === 0 ? (
-                                <Typography
-                                    color="text.secondary"
-                                    sx={{ mt: 1 }}
-                                >
-                                    No calls logged
-                                </Typography>
-                            ) : (
-                                callLogs.map(
-                                    (item) => (
-                                        <Box
-                                            key={item.id}
-                                            sx={{
-                                                mt: 2,
-                                                p: 2,
-                                                border:
-                                                    "1px solid #E5E7EB",
-                                                borderRadius: 2,
-                                            }}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    display:
-                                                        "flex",
-                                                    alignItems:
-                                                        "center",
-                                                    justifyContent:
-                                                        "space-between",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                <Chip
-                                                    label={formatOutcome(
-                                                        item.outcome
-                                                    )}
-                                                    size="small"
-                                                    color="primary"
-                                                />
-
-                                                <Typography
-                                                    variant="caption"
-                                                    color="text.secondary"
-                                                >
-                                                    {new Date(
-                                                        item.call_time
-                                                    ).toLocaleString()}
-                                                </Typography>
-                                            </Box>
-
-                                            {item.notes && (
-                                                <Typography
-                                                    color="text.secondary"
-                                                    sx={{
-                                                        mt: 1,
-                                                    }}
-                                                >
-                                                    {
-                                                        item.notes
-                                                    }
-                                                </Typography>
-                                            )}
-
-                                            {item.called_by_name && (
-                                                <Typography
-                                                    variant="caption"
-                                                    color="text.secondary"
-                                                    display="block"
-                                                    sx={{
-                                                        mt: 0.5,
-                                                    }}
-                                                >
-                                                    by{" "}
-                                                    {
-                                                        item.called_by_name
-                                                    }
-                                                </Typography>
-                                            )}
-                                        </Box>
-                                    )
-                                )
+                            {can("communications.view") && (
+                                <>
+                                    <CommunicationHubPanel
+                                        leadId={lead.id}
+                                        defaultEmail={
+                                            lead.email || ""
+                                        }
+                                        defaultPhone={
+                                            lead.phone || ""
+                                        }
+                                    />
+                                    <Divider sx={{ my: 3 }} />
+                                </>
                             )}
+
+                            <LeadPipelinePanel
+                                lead={lead}
+                                onUpdated={onLeadUpdated}
+                            />
 
                             <Divider sx={{ my: 3 }} />
 
