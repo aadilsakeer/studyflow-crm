@@ -9,6 +9,8 @@ from .models import (
     Course,
     OfferLetter,
     StudentDocument,
+    DocumentChecklistTemplate,
+    DocumentChecklistTemplateItem,
 )
 
 
@@ -172,4 +174,27 @@ class StudentDocumentAdmin(admin.ModelAdmin):
     search_fields = (
         'original_filename',
         'student__student_id',
+        'document_number',
     )
+
+
+@admin.register(DocumentChecklistTemplate)
+class DocumentChecklistTemplateAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'code',
+        'company',
+        'is_active',
+    )
+    list_filter = ('code', 'is_active', 'company')
+
+
+@admin.register(DocumentChecklistTemplateItem)
+class DocumentChecklistTemplateItemAdmin(admin.ModelAdmin):
+    list_display = (
+        'template',
+        'document_type',
+        'is_required',
+        'sort_order',
+    )
+    list_filter = ('template', 'is_required')

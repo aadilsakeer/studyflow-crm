@@ -414,17 +414,57 @@ def student_document_upload_path(instance, filename):
 class StudentDocument(SoftDeleteModel):
 
     DOCUMENT_TYPE_CHOICES = [
-        ('passport', 'Passport'),
         ('10th_marksheet', '10th Marksheet'),
         ('12th_marksheet', '12th Marksheet'),
         ('degree_certificate', 'Degree Certificate'),
+        ('degree_transcript', 'Degree Transcript'),
+        ('passport', 'Passport'),
         ('ielts', 'IELTS'),
         ('pte', 'PTE'),
         ('sop', 'SOP'),
         ('lor', 'LOR'),
         ('resume', 'Resume'),
+        ('bank_statement', 'Bank Statement'),
+        ('sponsor_letter', 'Sponsor Letter'),
+        ('sponsor_id', 'Sponsor ID'),
+        ('income_proof', 'Income Proof'),
+        ('education_loan_letter', 'Education Loan Letter'),
+        ('experience_letter', 'Experience Letter'),
+        ('payslip', 'Payslip'),
+        ('employment_offer_letter', 'Employment Offer Letter'),
         ('other', 'Other'),
     ]
+
+    STATUS_CHOICES = [
+        ('requested', 'Requested'),
+        ('uploaded', 'Uploaded'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('expired', 'Expired'),
+    ]
+
+    CATEGORY_MAP = {
+        '10th_marksheet': 'academic',
+        '12th_marksheet': 'academic',
+        'degree_certificate': 'academic',
+        'degree_transcript': 'academic',
+        'passport': 'identity',
+        'ielts': 'language',
+        'pte': 'language',
+        'sop': 'application',
+        'lor': 'application',
+        'resume': 'application',
+        'bank_statement': 'financial',
+        'sponsor_letter': 'financial',
+        'sponsor_id': 'financial',
+        'income_proof': 'financial',
+        'education_loan_letter': 'financial',
+        'experience_letter': 'professional',
+        'payslip': 'professional',
+        'employment_offer_letter': 'professional',
+        'other': 'other',
+    }
 
     student = models.ForeignKey(
         Student,
@@ -442,15 +482,45 @@ class StudentDocument(SoftDeleteModel):
         choices=DOCUMENT_TYPE_CHOICES,
     )
 
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='requested',
+    )
+
+    document_number = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    issue_date = models.DateField(
+        null=True,
+        blank=True,
+    )
+
+    expiry_date = models.DateField(
+        null=True,
+        blank=True,
+    )
+
+    version = models.PositiveIntegerField(
+        default=1,
+    )
+
     file = models.FileField(
         upload_to=student_document_upload_path,
+        blank=True,
+        null=True,
     )
 
     original_filename = models.CharField(
         max_length=255,
+        blank=True,
     )
 
-    file_size = models.PositiveIntegerField()
+    file_size = models.PositiveIntegerField(
+        default=0,
+    )
 
     mime_type = models.CharField(
         max_length=100,
@@ -461,12 +531,29 @@ class StudentDocument(SoftDeleteModel):
         blank=True,
     )
 
+    rejection_remarks = models.TextField(
+        blank=True,
+    )
+
     uploaded_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='uploaded_student_documents',
+    )
+
+    approved_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_student_documents',
+    )
+
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True,
     )
 
     created_at = models.DateTimeField(
@@ -487,10 +574,118 @@ class StudentDocument(SoftDeleteModel):
                 fields=['company', 'document_type'],
                 name='studdoc_company_type_idx',
             ),
+            models.Index(
+                fields=['company', 'status'],
+                name='studdoc_company_status_idx',
+            ),
         ]
+
+    @property
+    def category(self):
+        return self.CATEGORY_MAP.get(
+            self.document_type,
+            'other',
+        )
+
+    def refresh_expiry_status(self):
+        from django.utils import timezone
+
+        if (
+            self.expiry_date
+            and self.expiry_date < timezone.localdate()
+            and self.status == 'approved'
+        ):
+            self.status = 'expired'
+
+    def save(self, *args, **kwargs):
+        self.refresh_expiry_status()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return (
             f"{self.student.student_id} - "
             f"{self.get_document_type_display()}"
+        )
+
+
+class DocumentChecklistTemplate(models.Model):
+
+    TEMPLATE_CODE_CHOICES = [
+        ('uk_student', 'UK Student'),
+        ('australia_student', 'Australia Student'),
+        ('canada_student', 'Canada Student'),
+        ('germany_student', 'Germany Student'),
+        ('work_visa_applicant', 'Work Visa Applicant'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    code = models.CharField(
+        max_length=50,
+        choices=TEMPLATE_CODE_CHOICES,
+    )
+
+    name = models.CharField(
+        max_length=255,
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['company', 'code'],
+                name='uniq_checklist_template_company_code',
+            ),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class DocumentChecklistTemplateItem(models.Model):
+
+    template = models.ForeignKey(
+        DocumentChecklistTemplate,
+        on_delete=models.CASCADE,
+        related_name='items',
+    )
+
+    document_type = models.CharField(
+        max_length=50,
+        choices=StudentDocument.DOCUMENT_TYPE_CHOICES,
+    )
+
+    is_required = models.BooleanField(
+        default=True,
+    )
+
+    sort_order = models.PositiveIntegerField(
+        default=0,
+    )
+
+    class Meta:
+        ordering = ['sort_order', 'id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['template', 'document_type'],
+                name='uniq_checklist_template_item_type',
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.template.name} - "
+            f"{self.document_type}"
         )
