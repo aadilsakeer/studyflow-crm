@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'reports',
     'licensing',
     'auditlogs',
+    'security',
     'activity',
     'automation',
     'partners',

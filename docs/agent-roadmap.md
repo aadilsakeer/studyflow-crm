@@ -139,7 +139,9 @@ Status: COMPLETE — live payment validation, SMTP, automated backups, monitorin
 
 ---
 
-## [ ] Phase 8.7 Security Operations
+## [x] Phase 8.7 Security Operations
+
+Status: COMPLETE — 2FA (TOTP + backup codes), password policy, login monitoring, suspicious detection, device tracking, session revocation, security dashboard, tenant isolation
 
 ### Authentication Security
 
@@ -157,6 +159,9 @@ Status: COMPLETE — live payment validation, SMTP, automated backups, monitorin
 
 * Session Revocation
 * User Security Events
+
+---
+
 ## [x] Phase 8.8 Platform Owner Console
 
 Status: COMPLETE — separate `/owner` platform, dashboard, company mgmt, deep view, impersonation
@@ -255,6 +260,100 @@ Status: COMPLETE — separate `/owner` platform, dashboard, company mgmt, deep v
 * Designations
 * Reporting Structure
 * Employee Documents
+####
+## Phase 8.13 Client Billing & Invoicing
+
+Goal:
+Allow consultancy clients to bill their own students/customers directly from Globvio.
+
+### Invoice Management
+
+* Create Invoice
+* Edit Invoice
+* Draft Invoice
+* Send Invoice
+* Cancel Invoice
+* Credit Note
+
+### Invoice Fields
+
+* Invoice Number
+* Student
+* Lead
+* Service Package
+* Currency
+* Tax/GST
+* Discount
+* Due Date
+* Notes
+
+### Services
+
+* Admission Processing
+* University Application
+* Visa Assistance
+* SOP Service
+* Education Loan Assistance
+* IELTS/PTE Coaching
+* Custom Services
+
+### Payments
+
+* Record Payment
+* Partial Payment
+* Advance Payment
+* Refund
+* Outstanding Balance
+
+### Invoice Delivery
+
+* Email Invoice
+* WhatsApp Invoice PDF
+* Download PDF
+* Print Invoice
+
+### Invoice Templates
+
+* Company Logo
+* Company Details
+* GST Details
+* Custom Branding
+
+### Reports
+
+* Revenue Report
+* Outstanding Report
+* Payment Report
+* Service Revenue Report
+
+### Automation
+
+* Due Date Reminder
+* Overdue Reminder
+* Payment Confirmation
+* Receipt Generation
+
+### Student Portal
+
+* View Invoices
+* Download Invoice
+* View Payment History
+
+### SaaS Controls
+
+* Enable/Disable Invoice Module
+* Invoice Limits By Plan
+* Storage Tracking
+
+Requirements:
+
+* Multi-tenant safe
+* Audit logged
+* PostgreSQL compatible
+* PDF generation
+* WhatsApp integration
+* Email integration
+
 
 
 ---

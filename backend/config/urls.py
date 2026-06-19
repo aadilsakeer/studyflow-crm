@@ -4,17 +4,18 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
     TokenRefreshView,
     TokenBlacklistView,
 )
+
+from security.api_views import SecureTokenObtainPairView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path(
         'api/token/',
-        TokenObtainPairView.as_view(),
+        SecureTokenObtainPairView.as_view(),
         name='token_obtain_pair'
     ),
 
@@ -150,6 +151,10 @@ urlpatterns = [
     path(
         'api/saas/',
         include('licensing.api_urls'),
+    ),
+    path(
+        'api/security/',
+        include('security.api_urls'),
     ),
 ]
 
