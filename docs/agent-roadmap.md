@@ -168,7 +168,9 @@ Status: COMPLETE — separate `/owner` platform, dashboard, company mgmt, deep v
 
 ---
 
-## Phase 8.9 Module Licensing Platform
+## [x] Phase 8.9 Module Licensing Platform
+
+Status: COMPLETE — module catalog, enable/disable/trial/expiry, company module management, plan integration (Starter/Growth/Enterprise/Custom), enforcement via existing licensing, owner module console
 
 ### Module Marketplace
 
@@ -181,6 +183,7 @@ Status: COMPLETE — separate `/owner` platform, dashboard, company mgmt, deep v
 * AI
 * Knowledge Base
 * Document Intelligence
+* Billing & Invoicing
 
 ### Controls
 

@@ -4,6 +4,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 const links = [
     { label: "Dashboard", path: "/owner" },
     { label: "Companies", path: "/owner/companies" },
+    { label: "Modules", path: "/owner/modules" },
 ];
 
 export default function OwnerLayout({ onLogout }) {

@@ -6,7 +6,8 @@ import {
 } from "@mui/material";
 import LoadingState from "../../components/LoadingState";
 import {
-    deleteOwnerCompany, getOwnerCompany, ownerCompanyAction, ownerImpersonate, startImpersonation,
+    deleteOwnerCompany, getOwnerCompany, ownerCompanyAction, ownerImpersonate,
+    ownerModuleAction, startImpersonation,
 } from "../../services/owner";
 import { showError, showSuccess } from "../../utils/toast";
 
@@ -27,12 +28,22 @@ export default function OwnerCompanyDetailPage() {
         catch { showError("Failed"); }
     }
 
+    async function moduleAct(code, action) {
+        try {
+            await ownerModuleAction(id, { action, module_code: code });
+            showSuccess(`${action} ${code}`);
+            load();
+        } catch { showError("Module action failed"); }
+    }
+
     async function impersonate() {
         try {
             const r = await ownerImpersonate(id, data.admin_user_id);
             startImpersonation(r.data);
         } catch { showError("Impersonate failed"); }
     }
+
+    const modules = data.modules || [];
 
     return (
         <Box>
@@ -56,9 +67,35 @@ export default function OwnerCompanyDetailPage() {
             </Paper>
             <Paper sx={{ mt: 2, borderRadius: 3 }}>
                 <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-                    <Tab label="Billing" /><Tab label="Support" /><Tab label="Audit Logs" />
+                    <Tab label="Modules" /><Tab label="Billing" /><Tab label="Support" /><Tab label="Audit Logs" />
                 </Tabs>
                 {tab === 0 && (
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Module</TableCell>
+                                <TableCell>Status</TableCell>
+                                <TableCell>Trial</TableCell>
+                                <TableCell>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {modules.map((m) => (
+                                <TableRow key={m.code}>
+                                    <TableCell>{m.name}</TableCell>
+                                    <TableCell>{m.is_accessible ? "Active" : "Inactive"}</TableCell>
+                                    <TableCell>{m.is_trial ? "Yes" : "No"}</TableCell>
+                                    <TableCell>
+                                        <Button size="small" onClick={() => moduleAct(m.code, "enable")}>Enable</Button>
+                                        <Button size="small" onClick={() => moduleAct(m.code, "trial")}>Trial</Button>
+                                        <Button size="small" onClick={() => moduleAct(m.code, "disable")}>Disable</Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+                {tab === 1 && (
                     <Table size="small">
                         <TableBody>
                             {data.billing.map((b) => (
@@ -71,7 +108,7 @@ export default function OwnerCompanyDetailPage() {
                         </TableBody>
                     </Table>
                 )}
-                {tab === 1 && (
+                {tab === 2 && (
                     <Table size="small">
                         <TableBody>
                             {data.support.map((s) => (
@@ -83,7 +120,7 @@ export default function OwnerCompanyDetailPage() {
                         </TableBody>
                     </Table>
                 )}
-                {tab === 2 && (
+                {tab === 3 && (
                     <Table size="small">
                         <TableBody>
                             {data.audit_logs.map((l) => (

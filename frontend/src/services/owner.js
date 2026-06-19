@@ -12,6 +12,13 @@ export const deleteOwnerCompany = (id) => api.delete(`${BASE}/companies/${id}/`)
 export const ownerImpersonate = (id, userId) =>
     api.post(`${BASE}/companies/${id}/impersonate/`, userId ? { user_id: userId } : {});
 
+export const getOwnerModuleCatalog = () => api.get(`${BASE}/modules/`);
+export const getOwnerCompanyModules = (id) => api.get(`${BASE}/companies/${id}/modules/`);
+export const ownerModuleAction = (id, payload) =>
+    api.post(`${BASE}/companies/${id}/modules/`, payload);
+export const ownerBulkModuleAssign = (payload) =>
+    api.post(`${BASE}/modules/bulk-assign/`, payload);
+
 export function startImpersonation(tokens) {
     localStorage.setItem("owner_access", localStorage.getItem("access"));
     localStorage.setItem("owner_refresh", localStorage.getItem("refresh"));

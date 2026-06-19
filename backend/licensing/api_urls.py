@@ -30,6 +30,7 @@ from .billing_views import (
     DowngradePlanAPIView,
     PublicBrandingAPIView,
 )
+from .module_views import CompanyModulesAPIView
 from .support_views import (
     AdminSupportTicketListAPIView,
     BrandingUploadAPIView,
@@ -50,6 +51,7 @@ urlpatterns = [
     path('subscription/downgrade/', DowngradePlanAPIView.as_view()),
     path('branding/public/', PublicBrandingAPIView.as_view()),
     path('usage/', CompanyUsageAPIView.as_view()),
+    path('modules/', CompanyModulesAPIView.as_view()),
     path('settings/', CompanySettingsAPIView.as_view()),
     path('settings/branding/', BrandingUploadAPIView.as_view()),
     path('billing/checkout/', BillingCheckoutAPIView.as_view()),

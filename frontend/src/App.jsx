@@ -36,6 +36,7 @@ import OwnerLayout from "./layouts/OwnerLayout";
 import OwnerDashboardPage from "./pages/owner/OwnerDashboardPage";
 import OwnerCompaniesPage from "./pages/owner/OwnerCompaniesPage";
 import OwnerCompanyDetailPage from "./pages/owner/OwnerCompanyDetailPage";
+import OwnerModulesPage from "./pages/owner/OwnerModulesPage";
 import { Navigate } from "react-router-dom";
 
 function OwnerRoutes({ onLogout }) {
@@ -56,6 +57,7 @@ function OwnerGate({ onLogout }) {
                 <Route index element={<OwnerDashboardPage />} />
                 <Route path="companies" element={<OwnerCompaniesPage />} />
                 <Route path="companies/:id" element={<OwnerCompanyDetailPage />} />
+                <Route path="modules" element={<OwnerModulesPage />} />
             </Route>
         </Routes>
     );

@@ -17,6 +17,7 @@ from core.operations import operations_snapshot
 from .constants import SUBSCRIPTION_STATUS_CANCELLED
 from .models import BillingInvoice, BillingPayment, CompanySubscription, TenantSupportTicket
 from .subscription_service import OnboardingService, SubscriptionService
+from .module_service import ModuleLicensingService
 from .usage_service import UsageLimitService
 
 
@@ -134,6 +135,7 @@ class OwnerConsoleService:
                 AuditLog.objects.filter(company=company).order_by('-created_at')[:30],
                 many=True,
             ).data,
+            'modules': ModuleLicensingService.company_modules(company),
         }
 
     @staticmethod
