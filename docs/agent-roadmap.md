@@ -133,36 +133,9 @@ Status: COMPLETE — owner dashboard, tenant ops, subscription ops, support queu
 
 ---
 
-## [ ] Phase 8.6 Production Operations
+## [x] Phase 8.6 Production Operations
 
-### Payments
-
-* Live Stripe Validation
-* Live Razorpay Validation
-
-### Email
-
-* SMTP Provider Integration
-* Transactional Email Verification
-
-### Backups
-
-* Automated Backups
-* Backup Verification
-* Restore Testing
-
-### Monitoring
-
-* Application Monitoring
-* Error Monitoring
-* Health Alerts
-
-### Operations Dashboard
-
-* System Health
-* Failed Jobs
-* Queue Status
-* Backup Status
+Status: COMPLETE — live payment validation, SMTP, automated backups, monitoring, ops dashboard
 
 ---
 

@@ -39,6 +39,9 @@ export const changePlan = (planCode) =>
 
 export const getAdminDashboard = () => api.get(`${BASE}/admin/dashboard/`);
 
+export const getProductionOps = () => api.get("/health/operations/");
+export const postProductionOps = (payload) => api.post("/health/operations/", payload);
+
 export const getAdminOperations = () => api.get(`${BASE}/admin/operations/`);
 export const adminTenantAction = (id, action) =>
     api.patch(`${BASE}/admin/tenants/${id}/`, { action });

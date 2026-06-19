@@ -8,7 +8,7 @@ import usePermissions from "../hooks/usePermissions";
 import {
     adminExtendTrial, adminImpersonate, adminResetUsage,
     adminTenantAction, adminTicketOps, getAdminDashboard,
-    getAdminOperations, getAdminSupportTickets,
+    getAdminOperations, getAdminSupportTickets, getProductionOps, postProductionOps,
 } from "../services/saas";
 import { showError, showSuccess } from "../utils/toast";
 
@@ -29,10 +29,12 @@ export default function SaasAdminPage() {
     const [ops, setOps] = useState(null);
     const [tickets, setTickets] = useState([]);
 
+    const [prod, setProd] = useState(null);
+
     const load = useCallback(() => {
         if (!user?.is_superuser) return;
-        Promise.all([getAdminDashboard(), getAdminOperations(), getAdminSupportTickets()])
-            .then(([d, o, t]) => { setDashboard(d.data); setOps(o.data); setTickets(t.data); })
+        Promise.all([getAdminDashboard(), getAdminOperations(), getAdminSupportTickets(), getProductionOps()])
+            .then(([d, o, t, p]) => { setDashboard(d.data); setOps(o.data); setTickets(t.data); setProd(p.data); })
             .catch(() => showError("Failed to load"))
             .finally(() => setLoading(false));
     }, [user]);
@@ -60,7 +62,7 @@ export default function SaasAdminPage() {
             </Grid>
             <Paper sx={{ p: 2, borderRadius: 4 }}>
                 <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-                    <Tab label="Tenants" /><Tab label="Subscriptions" /><Tab label="Support" />
+                    <Tab label="Tenants" /><Tab label="Subscriptions" /><Tab label="Support" /><Tab label="Production" />
                 </Tabs>
                 {tab === 0 && (
                     <Table size="small" sx={{ mt: 2 }}>
@@ -119,6 +121,21 @@ export default function SaasAdminPage() {
                             ))}
                         </TableBody>
                     </Table>
+                )}
+                {tab === 3 && prod && (
+                    <Box sx={{ mt: 2 }}>
+                        <Chip label={prod.status} color={prod.status === "healthy" ? "success" : "warning"} sx={{ mb: 2 }} />
+                        {(prod.alerts || []).map((a) => <Chip key={a} label={a} color="error" size="small" sx={{ mr: 1 }} />)}
+                        <Typography variant="body2">DB: {prod.database?.ok ? "OK" : "FAIL"}</Typography>
+                        <Typography variant="body2">Stripe: {prod.payments?.stripe?.ok ? "OK" : "—"}</Typography>
+                        <Typography variant="body2">Razorpay: {prod.payments?.razorpay?.ok ? "OK" : "—"}</Typography>
+                        <Typography variant="body2">Celery workers: {(prod.celery?.workers || []).join(", ") || "none"}</Typography>
+                        <Typography variant="body2">Backup: {prod.backup?.file || "none"}</Typography>
+                        <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+                            <Button size="small" variant="outlined" onClick={() => act(postProductionOps({ action: "validate_payments" }), "Validated")}>Validate Payments</Button>
+                            <Button size="small" variant="outlined" onClick={() => act(postProductionOps({ action: "verify_email", email: user.email }), "Email sent")}>Test Email</Button>
+                        </Box>
+                    </Box>
                 )}
             </Paper>
         </Box>

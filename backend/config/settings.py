@@ -256,6 +256,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'automation.dispatch_workflow_reminders',
         'schedule': crontab(minute=0),
     },
+    'daily-db-backup': {
+        'task': 'core.run_scheduled_backup',
+        'schedule': crontab(hour=2, minute=0),
+    },
 }
 
 CSRF_TRUSTED_ORIGINS = [
@@ -292,3 +296,74 @@ if not DEBUG:
         'HTTP_X_FORWARDED_PROTO',
         'https',
     )
+
+# SaaS billing (Phase 8)
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+STRIPE_SUCCESS_URL = os.getenv(
+    'STRIPE_SUCCESS_URL',
+    'http://localhost:5173/billing/success',
+)
+STRIPE_CANCEL_URL = os.getenv(
+    'STRIPE_CANCEL_URL',
+    'http://localhost:5173/billing/cancel',
+)
+STRIPE_PORTAL_RETURN_URL = os.getenv(
+    'STRIPE_PORTAL_RETURN_URL',
+    'http://localhost:5173/settings/billing',
+)
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', '')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
+RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
+STRIPE_LIVE_MODE = os.getenv('STRIPE_LIVE_MODE', 'False') == 'True'
+BACKUP_DIR = BASE_DIR / 'backups'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@globvio.com')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': (
+                '{levelname} {asctime} {module} '
+                '{message}'
+            ),
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.getenv('LOG_LEVEL', 'INFO'),
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+
+from config.sentry import init_sentry
+
+try:
+    init_sentry()
+except ImportError:
+    pass
