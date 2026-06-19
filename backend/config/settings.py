@@ -317,6 +317,7 @@ RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
 RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
 STRIPE_LIVE_MODE = os.getenv('STRIPE_LIVE_MODE', 'False') == 'True'
 BACKUP_DIR = BASE_DIR / 'backups'
+PG_DUMP_PATH = os.getenv('PG_DUMP_PATH', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@globvio.com')
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = os.getenv('EMAIL_HOST', '')

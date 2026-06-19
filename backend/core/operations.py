@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db import connection
 
+from .pg_dump import PgDumpNotFoundError, check_pg_dump, resolve_pg_dump_path, uses_postgresql
+
 
 def validate_stripe_live():
     key = getattr(settings, 'STRIPE_SECRET_KEY', '')
@@ -95,17 +97,24 @@ def run_db_backup():
     ts = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
     outfile = backup_dir / f'backup_{ts}.sql'
 
-    if 'postgresql' in db.get('ENGINE', ''):
+    if uses_postgresql():
+        pg_dump = resolve_pg_dump_path()
+        if not pg_dump:
+            raise PgDumpNotFoundError()
+
         env = os.environ.copy()
         if db.get('PASSWORD'):
             env['PGPASSWORD'] = db['PASSWORD']
         cmd = [
-            'pg_dump', '-h', db.get('HOST', 'localhost'),
+            pg_dump, '-h', db.get('HOST', 'localhost'),
             '-p', str(db.get('PORT', 5432)),
             '-U', db.get('USER', 'postgres'),
             '-d', db['NAME'], '-f', str(outfile),
         ]
-        subprocess.run(cmd, env=env, check=True, capture_output=True)
+        try:
+            subprocess.run(cmd, env=env, check=True, capture_output=True)
+        except FileNotFoundError as exc:
+            raise PgDumpNotFoundError() from exc
     else:
         outfile = backup_dir / f'backup_{ts}.json'
         from django.core.management import call_command
@@ -156,6 +165,7 @@ def operations_snapshot():
     email = check_email_config()
     celery = check_celery()
     backup = verify_latest_backup()
+    pg_dump = check_pg_dump() if uses_postgresql() else {'ok': True, 'skipped': True}
     sentry = check_sentry()
 
     alerts = []
@@ -167,6 +177,8 @@ def operations_snapshot():
         alerts.append('razorpay_invalid')
     if not backup.get('ok'):
         alerts.append('backup_missing')
+    if uses_postgresql() and not pg_dump.get('ok'):
+        alerts.append('pg_dump_missing')
     if not celery.get('ok'):
         alerts.append('celery_unreachable')
 
@@ -179,6 +191,7 @@ def operations_snapshot():
         'celery': celery,
         'sentry': sentry,
         'backup': backup,
+        'pg_dump': pg_dump,
         'alerts': alerts,
         'timestamp': datetime.now(timezone.utc).isoformat(),
     }

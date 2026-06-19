@@ -131,6 +131,9 @@ export default function SaasAdminPage() {
                         <Typography variant="body2">Razorpay: {prod.payments?.razorpay?.ok ? "OK" : "—"}</Typography>
                         <Typography variant="body2">Celery workers: {(prod.celery?.workers || []).join(", ") || "none"}</Typography>
                         <Typography variant="body2">Backup: {prod.backup?.file || "none"}</Typography>
+                        <Typography variant="body2" color={prod.pg_dump?.ok ? "text.primary" : "error.main"}>
+                            pg_dump: {prod.pg_dump?.ok ? prod.pg_dump.path : (prod.pg_dump?.error || "unknown")}
+                        </Typography>
                         <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
                             <Button size="small" variant="outlined" onClick={() => act(postProductionOps({ action: "validate_payments" }), "Validated")}>Validate Payments</Button>
                             <Button size="small" variant="outlined" onClick={() => act(postProductionOps({ action: "verify_email", email: user.email }), "Email sent")}>Test Email</Button>
