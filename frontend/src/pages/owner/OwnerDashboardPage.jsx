@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, Grid, Paper, Typography } from "@mui/material";
-import LoadingState from "../components/LoadingState";
-import { getOwnerDashboard } from "../services/owner";
+import LoadingState from "../../components/LoadingState";
+import { getOwnerDashboard } from "../../services/owner";
 
 function Stat({ label, value }) {
     return (
