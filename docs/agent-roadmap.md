@@ -194,7 +194,9 @@ Status: COMPLETE — module catalog, enable/disable/trial/expiry, company module
 
 ---
 
-## Phase 8.10 Customer Success Platform
+## [x] Phase 8.10 Customer Success Platform
+
+Status: COMPLETE — health score, renewal risk, feature adoption, customer timeline (audit/support/billing/CS events), success manager assignment, renewal dashboard, company health page, renewal alerts in owner portal
 
 ### Customer Health
 

@@ -378,3 +378,77 @@ class TenantSupportAttachment(models.Model):
 
     def __str__(self):
         return self.filename
+
+
+RENEWAL_RISK_LOW = 'low'
+RENEWAL_RISK_MEDIUM = 'medium'
+RENEWAL_RISK_HIGH = 'high'
+
+RENEWAL_RISKS = (
+    RENEWAL_RISK_LOW,
+    RENEWAL_RISK_MEDIUM,
+    RENEWAL_RISK_HIGH,
+)
+
+
+class CustomerSuccessProfile(models.Model):
+
+    company = models.OneToOneField(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='customer_success',
+    )
+    success_manager = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='managed_companies',
+    )
+    renewal_date = models.DateField(null=True, blank=True)
+    meeting_notes = models.TextField(blank=True)
+    health_score = models.PositiveSmallIntegerField(default=50)
+    renewal_risk = models.CharField(
+        max_length=10,
+        choices=[(r, r.title()) for r in RENEWAL_RISKS],
+        default=RENEWAL_RISK_LOW,
+    )
+    feature_adoption = models.JSONField(default=dict, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'CS: {self.company}'
+
+
+class CustomerSuccessEvent(models.Model):
+
+    EVENT_LOGIN = 'login'
+    EVENT_FEATURE = 'feature'
+    EVENT_TICKET = 'ticket'
+    EVENT_RENEWAL = 'renewal'
+    EVENT_MEETING = 'meeting'
+    EVENT_AUDIT = 'audit'
+    EVENT_BILLING = 'billing'
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='cs_events',
+    )
+    event_type = models.CharField(max_length=20)
+    title = models.CharField(max_length=255)
+    body = models.TextField(blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_by = models.ForeignKey(
+        'accounts.CustomUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.company_id}: {self.title}'

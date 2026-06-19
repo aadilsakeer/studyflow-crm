@@ -22,6 +22,15 @@ export const ownerModuleAction = (id, payload) =>
 export const ownerBulkModuleAssign = (payload) =>
     api.post(`${BASE}/modules/bulk-assign/`, payload);
 
+export const getOwnerCustomerSuccessDashboard = () =>
+    api.get(`${BASE}/customer-success/dashboard/`);
+export const getOwnerCustomerSuccessAlerts = () =>
+    api.get(`${BASE}/customer-success/alerts/`);
+export const getOwnerCustomerSuccessCompany = (id) =>
+    api.get(`${BASE}/customer-success/companies/${id}/`);
+export const updateOwnerCustomerSuccessCompany = (id, payload) =>
+    api.patch(`${BASE}/customer-success/companies/${id}/`, payload);
+
 export function startImpersonation(tokens) {
     localStorage.setItem("owner_access", localStorage.getItem("access"));
     localStorage.setItem("owner_refresh", localStorage.getItem("refresh"));

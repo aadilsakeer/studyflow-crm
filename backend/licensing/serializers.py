@@ -158,6 +158,12 @@ class OwnerUserActionSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=['reset_password', 'disable', 'unlock'])
 
 
+class CustomerSuccessUpdateSerializer(serializers.Serializer):
+    success_manager_id = serializers.IntegerField(required=False, allow_null=True)
+    renewal_date = serializers.DateField(required=False, allow_null=True)
+    meeting_notes = serializers.CharField(required=False, allow_blank=True)
+
+
 class BillingInvoiceSerializer(serializers.ModelSerializer):
 
     class Meta:

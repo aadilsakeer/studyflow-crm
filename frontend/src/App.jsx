@@ -38,6 +38,14 @@ import OwnerCompaniesPage from "./pages/owner/OwnerCompaniesPage";
 import OwnerCompanyDetailPage from "./pages/owner/OwnerCompanyDetailPage";
 import OwnerModulesPage from "./pages/owner/OwnerModulesPage";
 import OwnerLoginHelpPage from "./pages/owner/OwnerLoginHelpPage";
+import OwnerSubscriptionsPage from "./pages/owner/OwnerSubscriptionsPage";
+import OwnerSupportPage from "./pages/owner/OwnerSupportPage";
+import OwnerRevenuePage from "./pages/owner/OwnerRevenuePage";
+import OwnerCustomerSuccessPage from "./pages/owner/OwnerCustomerSuccessPage";
+import OwnerCompanyHealthPage from "./pages/owner/OwnerCompanyHealthPage";
+import OwnerSystemHealthPage from "./pages/owner/OwnerSystemHealthPage";
+import OwnerAuditLogsPage from "./pages/owner/OwnerAuditLogsPage";
+import OwnerSettingsPage from "./pages/owner/OwnerSettingsPage";
 import { Navigate } from "react-router-dom";
 
 function OwnerRoutes({ onLogout }) {
@@ -59,15 +67,33 @@ function OwnerGate({ onLogout }) {
                 <Route path="companies" element={<OwnerCompaniesPage />} />
                 <Route path="companies/:id" element={<OwnerCompanyDetailPage />} />
                 <Route path="modules" element={<OwnerModulesPage />} />
+                <Route path="subscriptions" element={<OwnerSubscriptionsPage />} />
+                <Route path="support" element={<OwnerSupportPage />} />
+                <Route path="revenue" element={<OwnerRevenuePage />} />
+                <Route path="customer-success" element={<OwnerCustomerSuccessPage />} />
+                <Route path="customer-success/companies/:id" element={<OwnerCompanyHealthPage />} />
+                <Route path="system-health" element={<OwnerSystemHealthPage />} />
+                <Route path="audit-logs" element={<OwnerAuditLogsPage />} />
+                <Route path="settings" element={<OwnerSettingsPage />} />
             </Route>
         </Routes>
     );
 }
 
+function CrmGate({ children }) {
+    const { user, loading } = usePermissions();
+    if (loading) return null;
+    if (user?.is_superuser && !localStorage.getItem("impersonating")) {
+        return <Navigate to="/owner" replace />;
+    }
+    return children;
+}
+
 function CrmRoutes({ onLogout }) {
     return (
         <PermissionsProvider>
-            <Routes>
+            <CrmGate>
+                <Routes>
                 <Route
                     path="/"
                     element={
@@ -164,6 +190,7 @@ function CrmRoutes({ onLogout }) {
                     />
                 </Route>
             </Routes>
+            </CrmGate>
         </PermissionsProvider>
     );
 }

@@ -1,5 +1,10 @@
 from django.urls import path
 
+from .customer_success_views import (
+    OwnerCustomerSuccessAlertsAPIView,
+    OwnerCustomerSuccessCompanyAPIView,
+    OwnerCustomerSuccessDashboardAPIView,
+)
 from .module_views import (
     OwnerBulkModuleAssignAPIView,
     OwnerCompanyModulesAPIView,
@@ -15,6 +20,9 @@ from .owner_views import (
 )
 
 urlpatterns = [
+    path('customer-success/dashboard/', OwnerCustomerSuccessDashboardAPIView.as_view()),
+    path('customer-success/alerts/', OwnerCustomerSuccessAlertsAPIView.as_view()),
+    path('customer-success/companies/<int:company_id>/', OwnerCustomerSuccessCompanyAPIView.as_view()),
     path('dashboard/', OwnerDashboardAPIView.as_view()),
     path('onboard/', OwnerOnboardAPIView.as_view()),
     path('modules/', OwnerModuleCatalogAPIView.as_view()),
