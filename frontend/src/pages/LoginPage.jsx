@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
 import {
     Box,
@@ -9,9 +10,11 @@ import {
 } from "@mui/material";
 
 import { login } from "../services/auth";
+import { useBrand } from "../theme/BrandThemeProvider";
 import { showError, showSuccess } from "../utils/toast";
 
 function LoginPage({ onLogin }) {
+    const brand = useBrand();
     const [username, setUsername] =
         useState("");
 
@@ -72,7 +75,7 @@ function LoginPage({ onLogin }) {
                     fontWeight={700}
                     mb={1}
                 >
-                    Globvio
+                    {brand?.brand_name || "Globvio"}
                 </Typography>
 
                 <Typography
@@ -118,6 +121,10 @@ function LoginPage({ onLogin }) {
                 >
                     Login
                 </Button>
+                <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+                    Platform owner?{" "}
+                    <RouterLink to="/owner/login-help">Login help</RouterLink>
+                </Typography>
             </Paper>
         </Box>
     );

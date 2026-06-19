@@ -140,6 +140,24 @@ class BulkModuleAssignSerializer(serializers.Serializer):
     trial_days = serializers.IntegerField(required=False, min_value=1, max_value=90)
 
 
+class OwnerOnboardSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    admin_email = serializers.EmailField()
+    admin_first_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
+    admin_last_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
+    plan_code = serializers.CharField(required=False, allow_blank=True, max_length=50)
+    module_codes = serializers.ListField(
+        child=serializers.CharField(max_length=50),
+        required=False,
+        allow_empty=True,
+    )
+
+
+class OwnerUserActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=['reset_password', 'disable', 'unlock'])
+
+
 class BillingInvoiceSerializer(serializers.ModelSerializer):
 
     class Meta:

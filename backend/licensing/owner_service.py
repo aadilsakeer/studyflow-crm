@@ -1,10 +1,12 @@
 from decimal import Decimal
 
+from django.db import transaction
 from django.db.models import Count, Sum
 from django.utils import timezone
 
 from accounts.constants import ROLE_ADMIN
 from accounts.models import CustomUser
+from accounts.password_service import UserPasswordService, generate_temp_password
 from admissions.models import Student, StudentDocument
 from auditlogs.models import AuditLog
 from auditlogs.serializers import AuditLogSerializer
@@ -146,6 +148,73 @@ class OwnerConsoleService:
             admin_password=admin_password,
             plan_code=None,
         )
+
+    @classmethod
+    @transaction.atomic
+    def onboard_tenant(
+        cls,
+        *,
+        name,
+        email,
+        admin_email,
+        plan_code=None,
+        module_codes=None,
+        admin_first_name='',
+        admin_last_name='',
+        actor=None,
+    ):
+        temp_password = generate_temp_password()
+        company, user = OnboardingService.register_tenant(
+            company_name=name,
+            admin_email=admin_email or email,
+            admin_password=temp_password,
+            admin_first_name=admin_first_name,
+            admin_last_name=admin_last_name,
+            plan_code=plan_code,
+        )
+        if email:
+            company.email = email
+            company.save(update_fields=['email'])
+
+        if plan_code:
+            from .platform_service import PlatformOpsService
+            PlatformOpsService.admin_change_plan(company.id, plan_code)
+
+        for code in module_codes or []:
+            try:
+                ModuleLicensingService.enable_module(company, code, actor=actor)
+            except ValueError:
+                pass
+
+        return {
+            'company_id': company.id,
+            'company_name': company.name,
+            'admin_id': user.id,
+            'admin_username': user.username,
+            'admin_email': user.email,
+            'temporary_password': temp_password,
+            'plan_code': plan_code,
+            'module_codes': module_codes or [],
+        }
+
+    @staticmethod
+    def reset_user_password(user_id, *, actor):
+        user = CustomUser.objects.filter(pk=user_id).first()
+        if not user:
+            return None
+        temp = UserPasswordService.reset_password(user, actor=actor)
+        return {'user_id': user.id, 'username': user.username, 'temporary_password': temp}
+
+    @staticmethod
+    def set_user_active(user_id, *, active, actor):
+        user = CustomUser.objects.filter(pk=user_id).first()
+        if not user:
+            return None
+        if active:
+            UserPasswordService.unlock_user(user, actor=actor)
+        else:
+            UserPasswordService.disable_user(user, actor=actor)
+        return {'user_id': user.id, 'username': user.username, 'is_active': user.is_active}
 
     @staticmethod
     def delete_company(company_id):

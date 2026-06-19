@@ -8,7 +8,7 @@ from accounts.models import CustomUser
 
 from .owner_service import OwnerConsoleService
 from .platform_service import PlatformOpsService
-from .serializers import ChangePlanSerializer
+from .serializers import ChangePlanSerializer, OwnerOnboardSerializer, OwnerUserActionSerializer
 
 
 class OwnerDashboardAPIView(APIView):
@@ -18,6 +18,26 @@ class OwnerDashboardAPIView(APIView):
         return Response(OwnerConsoleService.dashboard())
 
 
+class OwnerOnboardAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        ser = OwnerOnboardSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.validated_data
+        result = OwnerConsoleService.onboard_tenant(
+            name=data['name'],
+            email=data.get('email', ''),
+            admin_email=data['admin_email'],
+            plan_code=data.get('plan_code') or None,
+            module_codes=data.get('module_codes') or [],
+            admin_first_name=data.get('admin_first_name', ''),
+            admin_last_name=data.get('admin_last_name', ''),
+            actor=request.user,
+        )
+        return Response(result, status=201)
+
+
 class OwnerCompanyListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
@@ -25,17 +45,7 @@ class OwnerCompanyListCreateAPIView(APIView):
         return Response(OwnerConsoleService.list_companies())
 
     def post(self, request):
-        data = request.data
-        name = data.get('name', '').strip()
-        email = data.get('email', '').strip()
-        admin_email = data.get('admin_email', email).strip()
-        password = data.get('admin_password', '')
-        if not name or not admin_email or len(password) < 8:
-            raise ValidationError('name, admin_email, and admin_password (8+) required.')
-        company, user = OwnerConsoleService.create_company(
-            name=name, email=email, admin_email=admin_email, admin_password=password,
-        )
-        return Response({'company_id': company.id, 'admin_id': user.id}, status=201)
+        return OwnerOnboardAPIView().post(request)
 
 
 class OwnerCompanyDetailAPIView(APIView):
@@ -69,6 +79,26 @@ class OwnerCompanyDetailAPIView(APIView):
     def delete(self, request, company_id):
         OwnerConsoleService.delete_company(company_id)
         return Response(status=204)
+
+
+class OwnerUserManagementAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request, user_id):
+        ser = OwnerUserActionSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        action = ser.validated_data['action']
+        if action == 'reset_password':
+            result = OwnerConsoleService.reset_user_password(user_id, actor=request.user)
+        elif action == 'disable':
+            result = OwnerConsoleService.set_user_active(user_id, active=False, actor=request.user)
+        elif action == 'unlock':
+            result = OwnerConsoleService.set_user_active(user_id, active=True, actor=request.user)
+        else:
+            raise ValidationError({'action': 'Invalid action.'})
+        if not result:
+            raise NotFound('User not found.')
+        return Response(result)
 
 
 class OwnerImpersonateAPIView(APIView):

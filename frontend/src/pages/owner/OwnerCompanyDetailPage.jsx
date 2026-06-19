@@ -7,7 +7,7 @@ import {
 import LoadingState from "../../components/LoadingState";
 import {
     deleteOwnerCompany, getOwnerCompany, ownerCompanyAction, ownerImpersonate,
-    ownerModuleAction, startImpersonation,
+    ownerModuleAction, ownerUserAction, startImpersonation,
 } from "../../services/owner";
 import { showError, showSuccess } from "../../utils/toast";
 
@@ -26,6 +26,19 @@ export default function OwnerCompanyDetailPage() {
     async function act(payload, msg) {
         try { await ownerCompanyAction(id, payload); showSuccess(msg); load(); }
         catch { showError("Failed"); }
+    }
+
+    async function userAct(action) {
+        if (!data.admin_user_id) return;
+        try {
+            const r = await ownerUserAction(data.admin_user_id, { action });
+            if (r.data.temporary_password) {
+                showSuccess(`New password: ${r.data.temporary_password}`);
+            } else {
+                showSuccess(`User ${action} complete`);
+            }
+            load();
+        } catch { showError("User action failed"); }
     }
 
     async function moduleAct(code, action) {
@@ -57,6 +70,9 @@ export default function OwnerCompanyDetailPage() {
                 </Button>
                 <Button size="small" onClick={() => act({ action: "extend_trial", days: 7 }, "Trial extended")}>+Trial</Button>
                 <Button size="small" onClick={() => act({ action: "reset_usage" }, "Reset")}>Reset Usage</Button>
+                <Button size="small" onClick={() => userAct("reset_password")}>Reset Admin Password</Button>
+                <Button size="small" onClick={() => userAct("disable")}>Disable Admin</Button>
+                <Button size="small" onClick={() => userAct("unlock")}>Unlock Admin</Button>
                 <Button size="small" color="error" onClick={async () => {
                     await deleteOwnerCompany(id); navigate("/owner/companies");
                 }}>Delete</Button>

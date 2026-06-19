@@ -53,3 +53,7 @@ class CurrentUserSerializer(
         return sorted(
             get_user_permission_codes(obj)
         )
+
+
+class StaffUserActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=['reset_password', 'disable'])

@@ -37,6 +37,7 @@ import OwnerDashboardPage from "./pages/owner/OwnerDashboardPage";
 import OwnerCompaniesPage from "./pages/owner/OwnerCompaniesPage";
 import OwnerCompanyDetailPage from "./pages/owner/OwnerCompanyDetailPage";
 import OwnerModulesPage from "./pages/owner/OwnerModulesPage";
+import OwnerLoginHelpPage from "./pages/owner/OwnerLoginHelpPage";
 import { Navigate } from "react-router-dom";
 
 function OwnerRoutes({ onLogout }) {
@@ -216,6 +217,10 @@ function App() {
                 <Route
                     path="/onboard"
                     element={<OnboardingPage onComplete={handleLogin} />}
+                />
+                <Route
+                    path="/owner/login-help"
+                    element={<OwnerLoginHelpPage />}
                 />
                 <Route
                     path="/owner/*"

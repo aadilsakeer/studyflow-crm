@@ -5,6 +5,9 @@ const BASE = "/owner";
 export const getOwnerDashboard = () => api.get(`${BASE}/dashboard/`);
 export const getOwnerCompanies = () => api.get(`${BASE}/companies/`);
 export const createOwnerCompany = (payload) => api.post(`${BASE}/companies/`, payload);
+export const ownerOnboardTenant = (payload) => api.post(`${BASE}/onboard/`, payload);
+export const ownerUserAction = (userId, payload) =>
+    api.post(`${BASE}/users/${userId}/`, payload);
 export const getOwnerCompany = (id) => api.get(`${BASE}/companies/${id}/`);
 export const ownerCompanyAction = (id, payload) =>
     api.patch(`${BASE}/companies/${id}/`, payload);
