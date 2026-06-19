@@ -18,6 +18,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { getCurrentUser } from "../services/auth";
+import { returnToOwner } from "../services/owner";
 
 const PAGE_TITLES = {
     "/": "Dashboard",
@@ -114,6 +115,15 @@ function Navbar({ onLogout }) {
             }}
         >
             <Toolbar>
+                {localStorage.getItem("impersonating") && (
+                    <Typography
+                        component="button"
+                        onClick={returnToOwner}
+                        sx={{ mr: 2, color: "#dc2626", cursor: "pointer", border: 0, bgcolor: "transparent", fontWeight: 600 }}
+                    >
+                        ← Return to Owner
+                    </Typography>
+                )}
                 <Typography
                     variant="h6"
                     sx={{

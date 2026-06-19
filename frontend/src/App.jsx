@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/LoginPage";
 import { PermissionsProvider } from "./hooks/usePermissions";
+import usePermissions from "./hooks/usePermissions";
 import { logout as logoutApi } from "./services/auth";
 import DashboardPage from "./pages/DashboardPage";
 import LeadsPage from "./pages/LeadsPage";
@@ -26,6 +27,39 @@ import CommunicationsPage from "./pages/CommunicationsPage";
 import WhatsAppPage from "./pages/WhatsAppPage";
 import PortalLoginPage from "./pages/portal/PortalLoginPage";
 import PortalLayout from "./layouts/PortalLayout";
+import OnboardingPage from "./pages/OnboardingPage";
+import BillingPage from "./pages/BillingPage";
+import BrandingPage from "./pages/BrandingPage";
+import SupportPage from "./pages/SupportPage";
+import SaasAdminPage from "./pages/SaasAdminPage";
+import OwnerLayout from "./layouts/OwnerLayout";
+import OwnerDashboardPage from "./pages/owner/OwnerDashboardPage";
+import OwnerCompaniesPage from "./pages/owner/OwnerCompaniesPage";
+import OwnerCompanyDetailPage from "./pages/owner/OwnerCompanyDetailPage";
+import { Navigate } from "react-router-dom";
+
+function OwnerRoutes({ onLogout }) {
+    return (
+        <PermissionsProvider>
+            <OwnerGate onLogout={onLogout} />
+        </PermissionsProvider>
+    );
+}
+
+function OwnerGate({ onLogout }) {
+    const { user, loading } = usePermissions();
+    if (loading) return null;
+    if (!user?.is_superuser) return <Navigate to="/" replace />;
+    return (
+        <Routes>
+            <Route path="/" element={<OwnerLayout onLogout={onLogout} />}>
+                <Route index element={<OwnerDashboardPage />} />
+                <Route path="companies" element={<OwnerCompaniesPage />} />
+                <Route path="companies/:id" element={<OwnerCompanyDetailPage />} />
+            </Route>
+        </Routes>
+    );
+}
 
 function CrmRoutes({ onLogout }) {
     return (
@@ -109,6 +143,22 @@ function CrmRoutes({ onLogout }) {
                         path="recycle-bin"
                         element={<RecycleBinPage />}
                     />
+                    <Route
+                        path="billing"
+                        element={<BillingPage />}
+                    />
+                    <Route
+                        path="settings/branding"
+                        element={<BrandingPage />}
+                    />
+                    <Route
+                        path="support"
+                        element={<SupportPage />}
+                    />
+                    <Route
+                        path="saas-admin"
+                        element={<SaasAdminPage />}
+                    />
                 </Route>
             </Routes>
         </PermissionsProvider>
@@ -160,6 +210,20 @@ function App() {
                 <Route
                     path="/portal/*"
                     element={<PortalLayout />}
+                />
+                <Route
+                    path="/onboard"
+                    element={<OnboardingPage onComplete={handleLogin} />}
+                />
+                <Route
+                    path="/owner/*"
+                    element={
+                        token ? (
+                            <OwnerRoutes onLogout={handleLogout} />
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
+                    }
                 />
                 <Route
                     path="/*"

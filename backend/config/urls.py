@@ -139,6 +139,18 @@ urlpatterns = [
         'api/notifications/',
         include('notifications.api_urls')
     ),
+    path(
+        'api/health/',
+        include('core.health_urls'),
+    ),
+    path(
+        'api/owner/',
+        include('licensing.owner_urls'),
+    ),
+    path(
+        'api/saas/',
+        include('licensing.api_urls'),
+    ),
 ]
 
 if settings.DEBUG:
