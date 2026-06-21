@@ -10,7 +10,9 @@ from accounts.permissions import (
     ActionPermissionMixin,
     crm_permission_map,
 )
+from auditlogs.helpers import log_audit
 from core.mixins import CompanyFilteredMixin, require_company
+from licensing.mixins import LicensedModuleMixin
 from leads.models import Lead
 
 from .history_service import (
@@ -45,11 +47,13 @@ class EntityFilterMixin:
 
 
 class CommunicationNoteListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     CompanyFilteredMixin,
     EntityFilterMixin,
     ListCreateAPIView,
 ):
+    licensed_module = 'crm'
     queryset = CommunicationNote.objects.all()
     serializer_class = CommunicationNoteSerializer
     permission_map = crm_permission_map('communications')
@@ -65,18 +69,28 @@ class CommunicationNoteListCreateAPIView(
         ).order_by('-created_at')
 
     def perform_create(self, serializer):
-        serializer.save(
+        note = serializer.save(
             company=require_company(self.request.user),
             author=self.request.user,
+        )
+        log_audit(
+            company=note.company,
+            user=self.request.user,
+            module='Communications',
+            action='create',
+            object_id=note.id,
+            description='Communication note created.',
         )
 
 
 class EmailLogListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     CompanyFilteredMixin,
     EntityFilterMixin,
     ListCreateAPIView,
 ):
+    licensed_module = 'crm'
     queryset = EmailLog.objects.all()
     serializer_class = EmailLogSerializer
     permission_map = crm_permission_map('communications')
@@ -99,19 +113,29 @@ class EmailLogListCreateAPIView(
         if not sent_at:
             sent_at = timezone.now()
 
-        serializer.save(
+        email = serializer.save(
             company=require_company(self.request.user),
             logged_by=self.request.user,
             sent_at=sent_at,
         )
+        log_audit(
+            company=email.company,
+            user=self.request.user,
+            module='Communications',
+            action='create',
+            object_id=email.id,
+            description='Email log created.',
+        )
 
 
 class WhatsAppLogListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     CompanyFilteredMixin,
     EntityFilterMixin,
     ListCreateAPIView,
 ):
+    licensed_module = 'crm'
     queryset = WhatsAppLog.objects.all()
     serializer_class = WhatsAppLogSerializer
     permission_map = crm_permission_map('communications')
@@ -127,16 +151,26 @@ class WhatsAppLogListCreateAPIView(
         ).order_by('-created_at')
 
     def perform_create(self, serializer):
-        serializer.save(
+        entry = serializer.save(
             company=require_company(self.request.user),
             logged_by=self.request.user,
+        )
+        log_audit(
+            company=entry.company,
+            user=self.request.user,
+            module='Communications',
+            action='create',
+            object_id=entry.id,
+            description='WhatsApp log created.',
         )
 
 
 class CommunicationHistoryAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     APIView,
 ):
+    licensed_module = 'crm'
     permission_map = crm_permission_map('communications')
 
     def get(self, request):
@@ -151,6 +185,8 @@ class CommunicationHistoryAPIView(
             limit = int(limit)
         except (TypeError, ValueError):
             limit = 100
+
+        limit = max(1, min(limit, 100))
 
         lead = None
         student = None

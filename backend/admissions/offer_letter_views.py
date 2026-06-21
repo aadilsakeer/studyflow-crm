@@ -15,6 +15,12 @@ from rest_framework.views import APIView
 
 from auditlogs.services import AuditLogService
 
+from activity.timeline_constants import (
+    EVENT_OFFER_ACCEPTED,
+    EVENT_OFFER_RECEIVED,
+)
+from activity.timeline_service import record_student_event
+
 from accounts.access import filter_students_for_user
 from accounts.constants import PERM_OFFERLETTERS_RESTORE
 from accounts.permissions import (
@@ -104,6 +110,16 @@ class OfferLetterListCreateAPIView(
                 f'Created offer {offer.offer_number} '
                 f'for {offer.student.student_id}'
             ),
+        )
+
+        record_student_event(
+            offer.student,
+            EVENT_OFFER_RECEIVED,
+            description=(
+                f'Offer {offer.offer_number} from '
+                f'{offer.university}.'
+            ),
+            user=self.request.user,
         )
 
 
@@ -237,6 +253,16 @@ class OfferLetterWorkflowAPIView(
                 f'{offer.offer_number}'
             ),
         )
+
+        if action == 'accept':
+            record_student_event(
+                offer.student,
+                EVENT_OFFER_ACCEPTED,
+                description=(
+                    f'Offer {offer.offer_number} accepted.'
+                ),
+                user=request.user,
+            )
 
         return Response(
             OfferLetterSerializer(

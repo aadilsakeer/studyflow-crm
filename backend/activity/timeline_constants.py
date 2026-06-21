@@ -1,0 +1,57 @@
+EVENT_LEAD_CREATED = 'lead_created'
+EVENT_LEAD_IMPORTED = 'lead_imported'
+EVENT_TELECALLER_ASSIGNED = 'telecaller_assigned'
+EVENT_CALL_COMPLETED = 'call_completed'
+EVENT_STATUS_CHANGED = 'status_changed'
+EVENT_COUNSELLOR_ASSIGNED = 'counsellor_assigned'
+EVENT_STUDENT_CONVERTED = 'student_converted'
+EVENT_DOCUMENT_UPLOADED = 'document_uploaded'
+EVENT_DOCUMENT_APPROVED = 'document_approved'
+EVENT_OFFER_RECEIVED = 'offer_received'
+EVENT_OFFER_ACCEPTED = 'offer_accepted'
+EVENT_VISA_SUBMITTED = 'visa_submitted'
+EVENT_VISA_APPROVED = 'visa_approved'
+
+ACTIVITY_EVENT_TYPES = (
+    EVENT_LEAD_CREATED,
+    EVENT_LEAD_IMPORTED,
+    EVENT_TELECALLER_ASSIGNED,
+    EVENT_CALL_COMPLETED,
+    EVENT_STATUS_CHANGED,
+    EVENT_COUNSELLOR_ASSIGNED,
+    EVENT_STUDENT_CONVERTED,
+    EVENT_DOCUMENT_UPLOADED,
+    EVENT_DOCUMENT_APPROVED,
+    EVENT_OFFER_RECEIVED,
+    EVENT_OFFER_ACCEPTED,
+    EVENT_VISA_SUBMITTED,
+    EVENT_VISA_APPROVED,
+)
+
+EVENT_LABELS = {
+    EVENT_LEAD_CREATED: 'Lead Created',
+    EVENT_LEAD_IMPORTED: 'Lead Imported',
+    EVENT_TELECALLER_ASSIGNED: 'Telecaller Assigned',
+    EVENT_CALL_COMPLETED: 'Call Completed',
+    EVENT_STATUS_CHANGED: 'Status Changed',
+    EVENT_COUNSELLOR_ASSIGNED: 'Counsellor Assigned',
+    EVENT_STUDENT_CONVERTED: 'Student Converted',
+    EVENT_DOCUMENT_UPLOADED: 'Document Uploaded',
+    EVENT_DOCUMENT_APPROVED: 'Document Approved',
+    EVENT_OFFER_RECEIVED: 'Offer Received',
+    EVENT_OFFER_ACCEPTED: 'Offer Accepted',
+    EVENT_VISA_SUBMITTED: 'Visa Submitted',
+    EVENT_VISA_APPROVED: 'Visa Approved',
+}
+
+ACTION_TO_EVENT = {
+    'Lead Created': EVENT_LEAD_CREATED,
+    'Lead Imported': EVENT_LEAD_IMPORTED,
+    'Telecaller Assigned': EVENT_TELECALLER_ASSIGNED,
+    'Call Logged': EVENT_CALL_COMPLETED,
+    'Call Completed': EVENT_CALL_COMPLETED,
+    'Status Changed': EVENT_STATUS_CHANGED,
+    'Counsellor Assigned': EVENT_COUNSELLOR_ASSIGNED,
+    'Converted to Student': EVENT_STUDENT_CONVERTED,
+    'Student Converted': EVENT_STUDENT_CONVERTED,
+}

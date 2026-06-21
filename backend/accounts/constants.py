@@ -101,6 +101,13 @@ PERM_PARTNERS_DELETE = "partners.delete"
 
 PERM_SETTINGS_MANAGE = "settings.manage"
 
+PERM_BILLING_VIEW = "billing.view"
+PERM_BILLING_MANAGE = "billing.manage"
+
+PERM_SUPPORT_VIEW = "support.view"
+PERM_SUPPORT_ADD = "support.add"
+PERM_SUPPORT_MANAGE = "support.manage"
+
 PERM_HRM_VIEW = "hrm.view"
 PERM_HRM_ADD = "hrm.add"
 PERM_HRM_CHANGE = "hrm.change"
@@ -214,6 +221,11 @@ ALL_PERMISSIONS = [
     (PERM_PARTNERS_CHANGE, "Change Partners"),
     (PERM_PARTNERS_DELETE, "Delete Partners"),
     (PERM_SETTINGS_MANAGE, "Manage Settings"),
+    (PERM_BILLING_VIEW, "View Billing"),
+    (PERM_BILLING_MANAGE, "Manage Billing"),
+    (PERM_SUPPORT_VIEW, "View Support Tickets"),
+    (PERM_SUPPORT_ADD, "Create Support Tickets"),
+    (PERM_SUPPORT_MANAGE, "Manage Support Tickets"),
     (PERM_HRM_VIEW, "View HRM"),
     (PERM_HRM_ADD, "Add HRM"),
     (PERM_HRM_CHANGE, "Change HRM"),
@@ -293,6 +305,9 @@ ROLE_PERMISSIONS = {
         PERM_OFFERLETTERS_DELETE,
         PERM_VISAS_VIEW,
         PERM_REPORTS_VIEW,
+        PERM_BILLING_VIEW,
+        PERM_SUPPORT_VIEW,
+        PERM_SUPPORT_ADD,
     ],
     ROLE_COUNSELLOR: [
         PERM_DASHBOARD_VIEW,

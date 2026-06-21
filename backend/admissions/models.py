@@ -81,6 +81,12 @@ class Student(SoftDeleteModel):
         blank=True
     )
 
+    journey_stage = models.CharField(
+        max_length=30,
+        blank=True,
+        default='',
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )

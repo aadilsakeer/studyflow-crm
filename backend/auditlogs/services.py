@@ -13,11 +13,11 @@ class AuditLogService:
         description
     ):
 
-        AuditLog.objects.create(
+        return AuditLog.objects.create(
             company=company,
             user=user,
             module=module,
             action=action,
             object_id=object_id,
-            description=description
+            description=description,
         )

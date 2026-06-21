@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'notifications',
     'reports',
     'licensing',
+    'operations',
     'auditlogs',
     'security.apps.SecurityConfig',
     'activity',

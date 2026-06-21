@@ -1,5 +1,8 @@
 from rest_framework import serializers
 
+from accounts.models import CustomUser
+from core.models import Branch
+
 
 def get_request_company(context):
     request = context.get("request")
@@ -51,3 +54,51 @@ def validate_ticket_in_company(ticket, company):
         ticket.student,
         company,
     )
+
+
+def validate_user_in_company(user, company):
+    if not user:
+        return user
+
+    if not company:
+        raise serializers.ValidationError(
+            "Your account is not linked to a company."
+        )
+
+    if user.company_id != company.id:
+        raise serializers.ValidationError(
+            "User not found in your company."
+        )
+
+    return user
+
+
+def validate_branch_in_company(branch, company):
+    if not branch:
+        return branch
+
+    if not company:
+        raise serializers.ValidationError(
+            "Your account is not linked to a company."
+        )
+
+    if branch.company_id != company.id:
+        raise serializers.ValidationError(
+            "Branch not found in your company."
+        )
+
+    return branch
+
+
+def validate_payment_in_company(payment, company):
+    if not company:
+        raise serializers.ValidationError(
+            "Your account is not linked to a company."
+        )
+
+    if payment.company_id != company.id:
+        raise serializers.ValidationError(
+            "Payment not found in your company."
+        )
+
+    return payment

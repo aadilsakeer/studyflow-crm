@@ -840,6 +840,7 @@ class StudentRestoreAPIView(APIView):
 
         if not Lead.objects.filter(
             pk=student.lead_id,
+            company=company,
         ).exists():
             raise ValidationError(
                 {
@@ -851,6 +852,7 @@ class StudentRestoreAPIView(APIView):
             )
 
         if Student.objects.filter(
+            company=company,
             student_id=student.student_id,
         ).exists():
             raise ValidationError(
@@ -870,6 +872,19 @@ class StudentRestoreAPIView(APIView):
             is_deleted=False,
             deleted_at=None,
             deleted_by=None,
+        )
+
+        from auditlogs.helpers import log_audit
+
+        log_audit(
+            company=company,
+            user=request.user,
+            module='Admissions',
+            action='restore',
+            object_id=student.id,
+            description=(
+                f"Student {student.student_id} restored."
+            ),
         )
 
         return Response(

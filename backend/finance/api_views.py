@@ -6,6 +6,7 @@ from accounts.permissions import (
     ActionPermissionMixin,
     crm_permission_map,
 )
+from licensing.mixins import LicensedModuleMixin
 
 from .models import (
     Payment,
@@ -25,9 +26,11 @@ from .serializers import (
 
 
 class PaymentListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
 
@@ -61,9 +64,11 @@ class PaymentListCreateAPIView(
 
 
 class PaymentDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
 
@@ -112,9 +117,11 @@ class PaymentDetailAPIView(
 
     
 class ExpenseListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
     serializer_class = ExpenseSerializer
@@ -147,9 +154,11 @@ class ExpenseListCreateAPIView(
 
 
 class ExpenseDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
     serializer_class = ExpenseSerializer
@@ -198,9 +207,11 @@ class ExpenseDetailAPIView(
     
 #invoice 
 class InvoiceListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("invoices")
 
@@ -232,9 +243,11 @@ class InvoiceListCreateAPIView(
 
 
 class InvoiceDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("invoices")
 
@@ -283,9 +296,11 @@ class InvoiceDetailAPIView(
 
     
 class ReceiptListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
     serializer_class = ReceiptSerializer
@@ -316,9 +331,11 @@ class ReceiptListCreateAPIView(
 
 
 class ReceiptDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
     serializer_class = ReceiptSerializer
@@ -367,9 +384,11 @@ class ReceiptDetailAPIView(
     
 #refunds
 class RefundListCreateAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.ListCreateAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
     serializer_class = RefundSerializer
@@ -400,9 +419,11 @@ class RefundListCreateAPIView(
 
 
 class RefundDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
+    licensed_module = 'finance'
 
     permission_map = crm_permission_map("payments")
     serializer_class = RefundSerializer

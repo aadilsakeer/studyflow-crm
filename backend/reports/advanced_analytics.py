@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.db.models import Count, Q, Sum
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, TruncMonth
 
 from admissions.models import Application, OfferLetter, Student, VisaCase
 from dashboard.analytics import (
@@ -237,19 +237,21 @@ class AdvancedReportService:
             for row in country_rows
         ]
 
-        university_rows = Application.objects.filter(
+        application_qs = Application.objects.filter(
             student__company=company,
             student__is_deleted=False,
             is_deleted=False,
         )
 
         if current_start and current_end:
-            university_rows = university_rows.filter(
+            application_qs = application_qs.filter(
                 created_at__gte=current_start,
                 created_at__lt=current_end,
             )
 
-        university_rows = university_rows.values(
+        application_count = application_qs.count()
+
+        university_rows = application_qs.values(
             'university_name',
         ).annotate(
             applications=Count('id'),
@@ -302,9 +304,115 @@ class AdvancedReportService:
             'payment_count': payment_qs.count(),
         }
 
+        total_leads = lead_qs.count()
+        converted_leads = lead_qs.filter(
+            status='converted',
+        ).count()
+        active_students = student_qs.count()
+
+        kpis = {
+            'total_leads': total_leads,
+            'active_students': active_students,
+            'applications': application_count,
+            'revenue': float(revenue_total or 0),
+            'conversion_rate': round(
+                (converted_leads / total_leads) * 100,
+                1,
+            ) if total_leads else 0,
+        }
+
+        funnel = [
+            {
+                'label': 'New',
+                'value': lead_qs.filter(
+                    status__in=[
+                        'new',
+                        'assigned',
+                        'called',
+                    ],
+                ).count(),
+            },
+            {
+                'label': 'Interested',
+                'value': lead_qs.filter(
+                    status__in=[
+                        'interested',
+                        'follow_up',
+                    ],
+                ).count(),
+            },
+            {
+                'label': 'Qualified',
+                'value': lead_qs.filter(
+                    status__in=[
+                        'qualified',
+                        'documents_requested',
+                        'documents_received',
+                        'counsellor_assigned',
+                        'profile_evaluation',
+                        'university_selection',
+                        'application_ready',
+                    ],
+                ).count(),
+            },
+            {
+                'label': 'Student',
+                'value': converted_leads,
+            },
+        ]
+
+        monthly_rows = (
+            lead_qs.annotate(
+                month=TruncMonth('created_at'),
+            )
+            .values('month')
+            .annotate(
+                leads=Count('id'),
+                converted=Count(
+                    'id',
+                    filter=Q(status='converted'),
+                ),
+            )
+            .order_by('month')
+        )
+
+        monthly_trends = [
+            {
+                'label': (
+                    row['month'].strftime('%b %Y')
+                    if row['month'] else 'Unknown'
+                ),
+                'leads': row['leads'],
+                'converted': row['converted'],
+            }
+            for row in monthly_rows
+        ]
+
+        recent_conversions = [
+            {
+                'name': (
+                    f"{row['first_name']} {row['last_name']}".strip()
+                ),
+                'phone': row['phone'],
+                'converted_at': row['updated_at'],
+            }
+            for row in lead_qs.filter(
+                status='converted',
+            ).order_by('-updated_at')[:10].values(
+                'first_name',
+                'last_name',
+                'phone',
+                'updated_at',
+            )
+        ]
+
         return {
             'range': range_key,
             'range_label': RANGE_LABELS.get(range_key, range_key),
+            'kpis': kpis,
+            'funnel': funnel,
+            'monthly_trends': monthly_trends,
+            'recent_conversions': recent_conversions,
             'lead_source_roi': lead_source_roi,
             'telecaller_performance': telecaller_performance,
             'counsellor_performance': counsellor_performance,

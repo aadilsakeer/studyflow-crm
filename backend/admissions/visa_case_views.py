@@ -9,6 +9,12 @@ from rest_framework.views import APIView
 
 from auditlogs.services import AuditLogService
 
+from activity.timeline_constants import (
+    EVENT_VISA_APPROVED,
+    EVENT_VISA_SUBMITTED,
+)
+from activity.timeline_service import record_student_event
+
 from accounts.access import filter_students_for_user
 from accounts.constants import (
     PERM_VISAS_APPROVE,
@@ -295,6 +301,26 @@ class VisaCaseWorkflowAPIView(
                 f'{visa_case.id}'
             ),
         )
+
+        if action == 'submit':
+            record_student_event(
+                visa_case.student,
+                EVENT_VISA_SUBMITTED,
+                description=(
+                    f'Visa application submitted for '
+                    f'{visa_case.country}.'
+                ),
+                user=request.user,
+            )
+        elif action == 'approve':
+            record_student_event(
+                visa_case.student,
+                EVENT_VISA_APPROVED,
+                description=(
+                    f'Visa approved for {visa_case.country}.'
+                ),
+                user=request.user,
+            )
 
         return Response(
             VisaCaseSerializer(

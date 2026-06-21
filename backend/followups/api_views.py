@@ -10,17 +10,21 @@ from accounts.permissions import (
     crm_permission_map,
 )
 
+from auditlogs.helpers import log_audit
 from core.mixins import LeadCompanyFilteredMixin
+from licensing.mixins import LicensedModuleMixin
 
 from leads.models import FollowUp
 from .serializers import FollowUpSerializer
 
 
 class FollowUpListAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     ListCreateAPIView,
 ):
+    licensed_module = 'crm'
     queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
     permission_map = crm_permission_map("followups")
@@ -113,14 +117,49 @@ class FollowUpListAPIView(
                 "to this lead."
             )
 
-        serializer.save()
+        follow_up = serializer.save()
+        log_audit(
+            company=company,
+            user=self.request.user,
+            module='FollowUps',
+            action='create',
+            object_id=follow_up.id,
+            description=f"Follow-up created for lead {lead.id}.",
+        )
 
 
 class FollowUpDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     RetrieveUpdateDestroyAPIView,
 ):
+    licensed_module = 'crm'
     queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
     permission_map = crm_permission_map("followups")
+
+    def perform_update(self, serializer):
+        follow_up = serializer.save()
+        company = getattr(self.request.user, 'company', None)
+        log_audit(
+            company=company,
+            user=self.request.user,
+            module='FollowUps',
+            action='update',
+            object_id=follow_up.id,
+            description=f"Follow-up {follow_up.id} updated.",
+        )
+
+    def perform_destroy(self, instance):
+        company = getattr(self.request.user, 'company', None)
+        object_id = instance.id
+        instance.delete()
+        log_audit(
+            company=company,
+            user=self.request.user,
+            module='FollowUps',
+            action='delete',
+            object_id=object_id,
+            description=f"Follow-up {object_id} deleted.",
+        )

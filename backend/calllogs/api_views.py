@@ -8,17 +8,21 @@ from accounts.permissions import (
     crm_permission_map,
 )
 
+from auditlogs.helpers import log_audit
 from core.mixins import LeadCompanyFilteredMixin
+from licensing.mixins import LicensedModuleMixin
 
 from leads.models import CallLog
 from .serializers import CallLogSerializer
 
 
 class CallLogListAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     ListCreateAPIView,
 ):
+    licensed_module = 'crm'
     queryset = CallLog.objects.all()
     serializer_class = CallLogSerializer
     permission_map = crm_permission_map("calllogs")
@@ -83,16 +87,51 @@ class CallLogListAPIView(
                 "for this lead."
             )
 
-        serializer.save(
+        call_log = serializer.save(
             called_by=self.request.user,
+        )
+        log_audit(
+            company=company,
+            user=self.request.user,
+            module='CallLogs',
+            action='create',
+            object_id=call_log.id,
+            description=f"Call logged for lead {lead.id}.",
         )
 
 
 class CallLogDetailAPIView(
+    LicensedModuleMixin,
     ActionPermissionMixin,
     LeadCompanyFilteredMixin,
     RetrieveUpdateDestroyAPIView,
 ):
+    licensed_module = 'crm'
     queryset = CallLog.objects.all()
     serializer_class = CallLogSerializer
     permission_map = crm_permission_map("calllogs")
+
+    def perform_update(self, serializer):
+        call_log = serializer.save()
+        company = getattr(self.request.user, 'company', None)
+        log_audit(
+            company=company,
+            user=self.request.user,
+            module='CallLogs',
+            action='update',
+            object_id=call_log.id,
+            description=f"Call log {call_log.id} updated.",
+        )
+
+    def perform_destroy(self, instance):
+        company = getattr(self.request.user, 'company', None)
+        object_id = instance.id
+        instance.delete()
+        log_audit(
+            company=company,
+            user=self.request.user,
+            module='CallLogs',
+            action='delete',
+            object_id=object_id,
+            description=f"Call log {object_id} deleted.",
+        )

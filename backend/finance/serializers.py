@@ -1,5 +1,12 @@
 from rest_framework import serializers
 
+from core.validators import (
+    get_request_company,
+    validate_application_in_company,
+    validate_payment_in_company,
+    validate_student_in_company,
+)
+
 from .models import (
     Payment,
     Invoice,
@@ -31,6 +38,23 @@ class PaymentSerializer(serializers.ModelSerializer):
             "created_at",
         )
 
+    def validate_student(self, student):
+        validate_student_in_company(
+            student,
+            get_request_company(self.context),
+        )
+        return student
+
+    def validate_application(self, application):
+        if not application:
+            return application
+
+        validate_application_in_company(
+            application,
+            get_request_company(self.context),
+        )
+        return application
+
 
 class InvoiceSerializer(serializers.ModelSerializer):
 
@@ -52,6 +76,20 @@ class InvoiceSerializer(serializers.ModelSerializer):
             "created_at",
         )
 
+    def validate_student(self, student):
+        validate_student_in_company(
+            student,
+            get_request_company(self.context),
+        )
+        return student
+
+    def validate_payment(self, payment):
+        validate_payment_in_company(
+            payment,
+            get_request_company(self.context),
+        )
+        return payment
+
 
 class ReceiptSerializer(serializers.ModelSerializer):
 
@@ -71,6 +109,13 @@ class ReceiptSerializer(serializers.ModelSerializer):
             "created_at",
         )
 
+    def validate_payment(self, payment):
+        validate_payment_in_company(
+            payment,
+            get_request_company(self.context),
+        )
+        return payment
+
 
 class RefundSerializer(serializers.ModelSerializer):
 
@@ -88,6 +133,13 @@ class RefundSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "created_at",
         )
+
+    def validate_payment(self, payment):
+        validate_payment_in_company(
+            payment,
+            get_request_company(self.context),
+        )
+        return payment
 
 
 class ExpenseSerializer(serializers.ModelSerializer):

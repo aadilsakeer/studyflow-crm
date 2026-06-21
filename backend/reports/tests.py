@@ -71,7 +71,8 @@ class AdvancedReportServiceTests(TestCase):
         )
 
         self.assertIn('lead_source_roi', data)
-        self.assertIn('offer_conversion', data)
+        self.assertIn('kpis', data)
+        self.assertIn('funnel', data)
         self.assertIn('visa_success', data)
         self.assertEqual(data['offer_conversion']['offers_accepted'], 1)
         self.assertEqual(data['visa_success']['visas_approved'], 1)

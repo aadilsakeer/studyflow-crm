@@ -28,8 +28,7 @@ class AuditLog(models.Model):
     )
 
     action = models.CharField(
-        max_length=20,
-        choices=ACTION_CHOICES
+        max_length=50,
     )
 
     object_id = models.PositiveIntegerField()

@@ -10,7 +10,96 @@ from .api_views import (
     LeadRestoreAPIView,
 )
 
+from .assignment_views import (
+    TelecallerListAPIView,
+    LeadAssignAPIView,
+    LeadBulkAssignAPIView,
+    LeadRoundRobinAssignAPIView,
+)
+
+from .import_views import (
+    LeadImportHistoryAPIView,
+    LeadImportUploadAPIView,
+    LeadImportDetailAPIView,
+    LeadImportMapAPIView,
+    LeadImportValidateAPIView,
+    LeadImportExecuteAPIView,
+)
+
+from .pipeline_views import (
+    CounsellorListAPIView,
+    LeadQualifyAPIView,
+    LeadAssignCounsellorAPIView,
+    LeadPipelineAPIView,
+    LeadAdvancePipelineAPIView,
+)
+
+from .journey_views import (
+    JourneyBoardAPIView,
+    JourneyBoardMoveAPIView,
+)
+
 urlpatterns = [
+    path(
+        "journey-board/",
+        JourneyBoardAPIView.as_view(),
+        name="journey-board",
+    ),
+    path(
+        "journey-board/<str:entity_type>/<int:pk>/move/",
+        JourneyBoardMoveAPIView.as_view(),
+        name="journey-board-move",
+    ),
+    path(
+        "counsellors/",
+        CounsellorListAPIView.as_view(),
+        name="lead-counsellors",
+    ),
+    path(
+        "import/history/",
+        LeadImportHistoryAPIView.as_view(),
+        name="lead-import-history",
+    ),
+    path(
+        "import/upload/",
+        LeadImportUploadAPIView.as_view(),
+        name="lead-import-upload",
+    ),
+    path(
+        "import/<int:pk>/map/",
+        LeadImportMapAPIView.as_view(),
+        name="lead-import-map",
+    ),
+    path(
+        "import/<int:pk>/validate/",
+        LeadImportValidateAPIView.as_view(),
+        name="lead-import-validate",
+    ),
+    path(
+        "import/<int:pk>/execute/",
+        LeadImportExecuteAPIView.as_view(),
+        name="lead-import-execute",
+    ),
+    path(
+        "import/<int:pk>/",
+        LeadImportDetailAPIView.as_view(),
+        name="lead-import-detail",
+    ),
+    path(
+        "telecallers/",
+        TelecallerListAPIView.as_view(),
+        name="lead-telecallers",
+    ),
+    path(
+        "bulk-assign/",
+        LeadBulkAssignAPIView.as_view(),
+        name="lead-bulk-assign",
+    ),
+    path(
+        "round-robin/",
+        LeadRoundRobinAssignAPIView.as_view(),
+        name="lead-round-robin",
+    ),
     path(
         "",
         LeadListAPIView.as_view(),
@@ -20,6 +109,31 @@ urlpatterns = [
         "trash/",
         LeadTrashListAPIView.as_view(),
         name="lead-trash",
+    ),
+    path(
+        "<int:pk>/qualify/",
+        LeadQualifyAPIView.as_view(),
+        name="lead-qualify",
+    ),
+    path(
+        "<int:pk>/assign-counsellor/",
+        LeadAssignCounsellorAPIView.as_view(),
+        name="lead-assign-counsellor",
+    ),
+    path(
+        "<int:pk>/pipeline/",
+        LeadPipelineAPIView.as_view(),
+        name="lead-pipeline",
+    ),
+    path(
+        "<int:pk>/advance/",
+        LeadAdvancePipelineAPIView.as_view(),
+        name="lead-advance",
+    ),
+    path(
+        "<int:pk>/assign/",
+        LeadAssignAPIView.as_view(),
+        name="lead-assign",
     ),
     path(
         "<int:pk>/restore/",

@@ -3,6 +3,7 @@ from django.db.models import Q
 from accounts.constants import (
     ROLE_MANAGER,
     ROLE_COUNSELLOR,
+    ROLE_TELECALLER,
 )
 from accounts.models import StaffProfile
 
@@ -36,9 +37,12 @@ def filter_leads_for_user(queryset, user):
 
     if role_name == ROLE_COUNSELLOR:
         return queryset.filter(
-            Q(assigned_to=user)
-            | Q(assigned_to__isnull=True)
+            Q(assigned_counsellor=user)
+            | Q(assigned_to=user)
         )
+
+    if role_name == ROLE_TELECALLER:
+        return queryset.filter(assigned_to=user)
 
     return queryset
 

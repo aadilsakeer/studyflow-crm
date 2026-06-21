@@ -36,9 +36,17 @@ VALID_RANGES = (
 )
 
 QUALIFIED_LEAD_STATUSES = (
-    'contacted',
+    'assigned',
+    'called',
     'interested',
     'follow_up',
+    'documents_requested',
+    'documents_received',
+    'qualified',
+    'counsellor_assigned',
+    'profile_evaluation',
+    'university_selection',
+    'application_ready',
     'converted',
 )
 

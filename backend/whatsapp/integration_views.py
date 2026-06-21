@@ -11,11 +11,19 @@ from licensing.decorators import module_required
 
 from .message_service import (
     connect_user_session,
+    get_connected_account,
     refresh_session_status,
     send_whatsapp_message,
 )
 from .models import WhatsAppAccount
-from .openwa_client import OpenWAError
+from .openwa_client import (
+    OpenWAError,
+    enrich_openwa_error,
+    fetch_session_qr,
+    get_client_for_company,
+    humanize_openwa_error,
+    is_session_missing_error,
+)
 from .integration_serializers import WhatsAppSendSerializer
 
 
@@ -64,8 +72,19 @@ class WhatsAppSendAPIView(ActionPermissionMixin, APIView):
                 student=student,
             )
         except OpenWAError as exc:
+            client, _server = get_client_for_company(company)
+            account = get_connected_account(company, user=request.user)
+            detail = str(exc)
+
+            if client and account and account.session_id:
+                detail = enrich_openwa_error(
+                    client,
+                    account.session_id,
+                    exc,
+                )
+
             raise ValidationError(
-                {'detail': str(exc)},
+                {'detail': detail},
             ) from exc
 
         return Response({
@@ -132,11 +151,30 @@ class WhatsAppSessionStatusAPIView(
 
         account = refresh_session_status(account)
 
+        session_status = None
+
+        try:
+            from .openwa_client import get_client_for_company
+
+            client, _server = get_client_for_company(company)
+
+            if (
+                client
+                and account.session_id
+                and not account.session_id.startswith('pending-')
+            ):
+                session_status = client.get_session(
+                    account.session_id,
+                ).get('status')
+        except OpenWAError:
+            pass
+
         return Response({
             'connected': account.is_connected,
             'session_id': account.session_id,
             'phone_number': account.phone_number,
             'last_connected_at': account.last_connected_at,
+            'status': session_status,
         })
 
 
@@ -170,10 +208,29 @@ class WhatsAppSessionQRAPIView(
             )
 
         try:
-            qr = client.get_qr(account.session_id)
+            qr = fetch_session_qr(
+                client,
+                account.session_id,
+            )
         except OpenWAError as exc:
+            if is_session_missing_error(exc):
+                account, qr = connect_user_session(request.user)
+                return Response({
+                    'account_id': account.id,
+                    'session_id': account.session_id,
+                    'is_connected': account.is_connected,
+                    'qr': qr,
+                    'recovered': True,
+                })
+
             raise ValidationError(
-                {'detail': str(exc)},
+                {
+                    'detail': enrich_openwa_error(
+                        client,
+                        account.session_id,
+                        exc,
+                    ),
+                },
             ) from exc
 
         return Response({'qr': qr})

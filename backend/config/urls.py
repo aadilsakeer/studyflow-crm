@@ -149,6 +149,14 @@ urlpatterns = [
         include('licensing.owner_urls'),
     ),
     path(
+        'api/owner/operations/',
+        include('operations.owner_urls'),
+    ),
+    path(
+        'api/owner/hrms/',
+        include('hrm.owner_urls'),
+    ),
+    path(
         'api/saas/',
         include('licensing.api_urls'),
     ),

@@ -16,6 +16,12 @@ from rest_framework.views import APIView
 
 from auditlogs.services import AuditLogService
 
+from activity.timeline_constants import (
+    EVENT_DOCUMENT_APPROVED,
+    EVENT_DOCUMENT_UPLOADED,
+)
+from activity.timeline_service import record_student_event
+
 from accounts.access import filter_students_for_user
 from accounts.constants import PERM_DOCUMENTS_RESTORE
 from accounts.permissions import (
@@ -113,9 +119,21 @@ class StudentDocumentListCreateAPIView(
         return context
 
     def perform_create(self, serializer):
+        file_obj = serializer.validated_data.get('file')
+        if file_obj and self.request.user.company:
+            from licensing.constants import LIMIT_STORAGE
+            from licensing.usage_service import UsageLimitService
+
+            mb = max(1, int(file_obj.size / (1024 * 1024)))
+            UsageLimitService.check(
+                self.request.user.company,
+                LIMIT_STORAGE,
+                increment=mb,
+            )
+
         document = serializer.save()
 
-        AuditLogService.log(
+        audit = AuditLogService.log(
             company=self.request.user.company,
             user=self.request.user,
             module='Student Documents',
@@ -126,6 +144,17 @@ class StudentDocumentListCreateAPIView(
                 f'for student {document.student.student_id}'
             ),
         )
+
+        if document.file:
+            record_student_event(
+                document.student,
+                EVENT_DOCUMENT_UPLOADED,
+                description=(
+                    f'{document.get_document_type_display()} uploaded.'
+                ),
+                user=self.request.user,
+                audit_log=audit,
+            )
 
 
 class StudentDocumentRequestAPIView(
@@ -359,6 +388,14 @@ class StudentDocumentReviewAPIView(
             object_id=document.id,
             description=description,
         )
+
+        if action == 'approve':
+            record_student_event(
+                document.student,
+                EVENT_DOCUMENT_APPROVED,
+                description=description,
+                user=request.user,
+            )
 
         return Response(
             StudentDocumentSerializer(

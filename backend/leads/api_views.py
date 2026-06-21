@@ -32,6 +32,8 @@ from core.mixins import (
     CompanyCreateMixin,
 )
 
+from auditlogs.helpers import log_audit
+
 from .models import Lead, LeadTimeline, LeadAuditLog
 from .serializers import LeadSerializer
 from .timeline_serializers import (
@@ -45,6 +47,9 @@ from .audit_service import (
     log_lead_created,
     log_lead_changes,
 )
+from licensing.usage_service import UsageLimitService
+from licensing.constants import LIMIT_LEADS, LIMIT_STUDENTS
+
 from .conversion_service import (
     convert_lead_to_student,
 )
@@ -99,6 +104,12 @@ class LeadListAPIView(
         status = self.request.query_params.get(
             "status",
         )
+        assigned_to = self.request.query_params.get(
+            "assigned_to",
+        )
+        mine = self.request.query_params.get(
+            "mine",
+        )
 
         if search:
             queryset = queryset.filter(
@@ -113,6 +124,15 @@ class LeadListAPIView(
                 status=status,
             )
 
+        if mine and mine.lower() == "true":
+            queryset = queryset.filter(
+                assigned_to=self.request.user,
+            )
+        elif assigned_to:
+            queryset = queryset.filter(
+                assigned_to_id=assigned_to,
+            )
+
         return queryset.order_by("-created_at")
 
     def get_serializer_context(self):
@@ -121,10 +141,20 @@ class LeadListAPIView(
         return context
 
     def perform_create(self, serializer):
+        company = self.request.user.company
+        UsageLimitService.check(company, LIMIT_LEADS)
         super().perform_create(serializer)
-        log_lead_created(
-            serializer.instance,
-            self.request.user,
+        lead = serializer.instance
+        log_lead_created(lead, self.request.user)
+        log_audit(
+            company=lead.company,
+            user=self.request.user,
+            module='Leads',
+            action='create',
+            object_id=lead.id,
+            description=(
+                f"Lead {lead.first_name} {lead.last_name} created."
+            ),
         )
 
 
@@ -149,6 +179,14 @@ class LeadDetailAPIView(
             lead,
             old_snapshot,
             self.request.user,
+        )
+        log_audit(
+            company=lead.company,
+            user=self.request.user,
+            module='Leads',
+            action='update',
+            object_id=lead.id,
+            description=f"Lead {lead.first_name} {lead.last_name} updated.",
         )
 
     def perform_destroy(self, instance):
@@ -180,6 +218,17 @@ class LeadDetailAPIView(
             new_value="True",
             changed_by=user,
         )
+        log_audit(
+            company=instance.company,
+            user=user,
+            module='Leads',
+            action='delete',
+            object_id=instance.id,
+            description=(
+                f"Lead {instance.first_name} "
+                f"{instance.last_name} deleted."
+            ),
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -208,13 +257,20 @@ class LeadTimelineListAPIView(
         ).exists():
             return LeadTimeline.objects.none()
 
-        return LeadTimeline.objects.filter(
+        qs = LeadTimeline.objects.filter(
             lead_id=lead_pk,
             lead__company=company,
         ).select_related(
             "performed_by",
             "lead",
         ).order_by("-created_at")
+
+        event_type = self.request.query_params.get('event_type')
+
+        if event_type:
+            qs = qs.filter(event_type=event_type)
+
+        return qs
 
 
 class LeadAuditLogListAPIView(
@@ -312,6 +368,13 @@ class LeadTrashListAPIView(
         return filter_leads_for_user(
             queryset,
             self.request.user,
+        ).select_related(
+            "branch",
+            "source",
+            "assigned_to",
+            "assigned_counsellor",
+        ).prefetch_related(
+            "tags",
         ).order_by("-deleted_at")
 
 
@@ -368,6 +431,16 @@ class LeadRestoreAPIView(
             old_value="True",
             new_value="False",
             changed_by=request.user,
+        )
+        log_audit(
+            company=company,
+            user=request.user,
+            module='Leads',
+            action='restore',
+            object_id=lead.id,
+            description=(
+                f"Lead {lead.first_name} {lead.last_name} restored."
+            ),
         )
 
         return Response(
